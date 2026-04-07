@@ -89,4 +89,9 @@ Database migrations are one of those areas where a small mistake can quietly gro
 
 Current version: `1.0.0`
 
+## License
+
+This project is licensed under the GNU General Public License v3.0.
+See [LICENSE](LICENSE).
+
 This repository contains the source for the IntelliJ plugin. If you want to build, test, or iterate on the plugin locally, the Gradle tasks above are the quickest way in.
