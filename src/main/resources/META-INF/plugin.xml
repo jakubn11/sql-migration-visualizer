@@ -1,0 +1,56 @@
+<idea-plugin>
+    <id>io.github.jakub.sqlmigrationvisualizer</id>
+    <name>SQL Migration Visualizer</name>
+    <vendor url="https://github.com/jakub/sql-migration-visualizer">Schema Tools</vendor>
+
+    <description><![CDATA[
+    <h2>SQL Migration Visualizer</h2>
+    <p>Explore, validate, and manage SQL schema history directly inside IntelliJ-based IDEs.</p>
+    <p>The plugin turns versioned migration files into a visual timeline, helps you inspect how tables evolve,
+    and suggests new migration checkpoints when your schema SQL files change.</p>
+    <h3>Highlights</h3>
+    <ul>
+        <li><b>Timeline View</b> — Browse every schema version with table counts, change summaries, and source actions</li>
+        <li><b>Schema Diff</b> — Compare versions to see added, removed, and modified tables and columns</li>
+        <li><b>ER Diagram</b> — Inspect relationships visually with zoom and draggable tables</li>
+        <li><b>Migration Validation</b> — Catch gaps, duplicates, invalid alters, and inconsistent history</li>
+        <li><b>Pending Migration Suggestions</b> — Detect saved schema SQL changes and prompt you to review a migration draft</li>
+        <li><b>Create, Edit, and Delete</b> — Manage migration files without leaving the IDE</li>
+    </ul>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="SQL Migrations"
+                    factoryClass="io.github.jakub.sqlmigrationvisualizer.MigrationVisualizerToolWindowFactory"
+                    anchor="bottom"
+                    secondary="false"
+                    icon="/icons/pluginIconInactive.png"/>
+
+        <postStartupActivity implementation="io.github.jakub.sqlmigrationvisualizer.startup.SchemaChangePromptStartupActivity"/>
+
+        <notificationGroup id="SQL Migration Visualizer"
+                           displayType="BALLOON"/>
+
+        <projectConfigurable
+                parentId="tools"
+                instance="io.github.jakub.sqlmigrationvisualizer.settings.VisualizerConfigurable"
+                id="io.github.jakub.sqlmigrationvisualizer.settings"
+                displayName="SQL Migration Visualizer"/>
+    </extensions>
+
+    <actions>
+        <action id="SqlMigrationVisualizer.Refresh"
+                class="io.github.jakub.sqlmigrationvisualizer.actions.RefreshMigrationsAction"
+                text="Refresh Migrations"
+                description="Re-scan the project for migration files"
+                icon="AllIcons.Actions.Refresh"/>
+
+        <action id="SqlMigrationVisualizer.Validate"
+                class="io.github.jakub.sqlmigrationvisualizer.actions.ValidateMigrationsAction"
+                text="Validate Migrations"
+                description="Validate migration consistency"
+                icon="AllIcons.Actions.Execute"/>
+    </actions>
+</idea-plugin>

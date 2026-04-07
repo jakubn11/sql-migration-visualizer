@@ -1,0 +1,6 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <mask id="icon-mask" x="0" y="0" width="16" height="16" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" style="mask-type:alpha">
+    <image x="0" y="0" width="16" height="16" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAYklEQVR4XtWQUQrAIAxDPfruucN0OBZpGtGFfe1BwIpJgy0i2hflYYUYoZ0xI+YuJ6Dz8wCY8nkErIKO4K1g2oDqPTrpBSMBNrWWC/3BW4F7drfLQiegNhkBtdoMMUJy4eoCyv2K/Apx+C8AAAAASUVORK5CYII="/>
+  </mask>
+  <rect x="0" y="0" width="16" height="16" fill="currentColor" mask="url(#icon-mask)"/>
+</svg>
