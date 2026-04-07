@@ -1,41 +1,81 @@
 # SQL Migration Visualizer
 
 <p align="center">
-  <img src="src/main/resources/icons/panelIcon.png" alt="SQL Migration Visualizer logo" width="240">
+  <img src="src/main/resources/icons/panelIcon.png" alt="SQL Migration Visualizer" width="260">
 </p>
 
 <p align="center">
-  Explore SQL migration history, inspect schema diffs, and generate the next migration without leaving IntelliJ IDEA.
+  <strong>See your database history inside IntelliJ IDEA.</strong>
 </p>
 
 <p align="center">
-  Built for teams working with versioned SQL migrations, SQLDelight layouts, and baseline schema files.
+  Explore schema evolution, compare versions, validate migrations, and draft the next SQL migration without bouncing between folders and files.
 </p>
 
-## What It Does
+<p align="center">
+  <img alt="License" src="https://img.shields.io/badge/license-GPLv3-1f6feb?style=flat-square">
+  <img alt="Platform" src="https://img.shields.io/badge/intellij-2024.1%2B-0a0a0a?style=flat-square">
+  <img alt="Java" src="https://img.shields.io/badge/java-17-f57c00?style=flat-square">
+  <img alt="Kotlin" src="https://img.shields.io/badge/kotlin-2.0.21-7f52ff?style=flat-square">
+</p>
 
-SQL Migration Visualizer turns your migration files and schema definitions into an interactive view inside IntelliJ-based IDEs. Instead of manually jumping between migration folders, schema snapshots, and generated SQL, you get one place to understand how your database evolved and what should happen next.
+## Why It Feels Useful
 
-It is especially useful when you want to:
+SQL migrations often live in a messy gap between schema files, versioned scripts, and whatever context still exists in your head. This plugin turns that history into something you can browse and reason about directly inside the IDE.
 
-- trace how a table changed across versions
-- compare two schema states side by side
-- validate migration history before something breaks
-- spot schema changes and draft a migration faster
+Instead of piecing everything together manually, you can:
 
-## Highlights
+- follow how a table changed over time
+- compare two schema versions side by side
+- inspect relationships visually in an ER diagram
+- validate migration history before problems reach runtime
+- generate a draft for the next migration after schema changes
 
-- Timeline view for browsing schema versions, change summaries, and migration sources
-- Schema diff tools for added, removed, and modified tables and columns
-- ER diagram view with zoom and draggable tables
-- Migration validation for gaps, duplicates, invalid alters, and inconsistent history
-- Pending migration suggestions when schema files change on save
-- Migration creation and management directly from the IDE
-- SQL generation support for Generic SQL, PostgreSQL, and MySQL / MariaDB workflows
+## What You Get
 
-## Supported Project Layouts
+<table>
+  <tr>
+    <td valign="top" width="50%">
+      <h3>Timeline View</h3>
+      Browse schema history version by version with change summaries, table counts, and source-aware navigation.
+    </td>
+    <td valign="top" width="50%">
+      <h3>Schema Diff</h3>
+      Compare two versions to spot added, removed, renamed, and changed tables or columns quickly.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top" width="50%">
+      <h3>ER Diagram</h3>
+      Inspect table relationships visually with zoomable, draggable table cards.
+    </td>
+    <td valign="top" width="50%">
+      <h3>Validation</h3>
+      Catch gaps, duplicates, invalid alters, and inconsistent migration history before it causes damage.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top" width="50%">
+      <h3>Suggested Migrations</h3>
+      Detect saved schema changes and prepare a draft migration for review when you're ready.
+    </td>
+    <td valign="top" width="50%">
+      <h3>Dialect Support</h3>
+      Generate SQL for Generic SQL, PostgreSQL, and MySQL / MariaDB workflows.
+    </td>
+  </tr>
+</table>
 
-The plugin auto-detects common migration and schema locations, including:
+## Ideal For
+
+- SQLDelight-based projects
+- teams using versioned `.sql` or `.sqm` migrations
+- projects with baseline schema files that drift over time
+- developers who want migration history to be reviewable instead of tribal knowledge
+
+## Supported Layouts
+
+The plugin auto-detects common migration and schema locations such as:
 
 - `src/main/sqldelight`
 - `src/commonMain/sqldelight`
@@ -46,27 +86,25 @@ The plugin auto-detects common migration and schema locations, including:
 - `src/main/resources/db/migrations`
 - `src/main/resources/schema`
 
-It also recognizes common migration naming patterns such as `1.sql`, `2.sqm`, and `V3__add_users.sql`.
+It also recognizes common naming patterns like:
 
-## IntelliJ Plugin Features
+- `1.sql`
+- `2.sqm`
+- `12_add_users.sql`
+- `V3__create_orders.sql`
 
-### Visualize Schema History
+## Visual Preview
 
-Follow your database evolution version by version through a timeline view that makes migration history easier to scan and reason about.
+The README is ready for real screenshots, but I have not added fake UI mockups here. Once you capture the timeline, diff, and ER views from the plugin, this section is the right place to showcase them.
 
-### Compare Versions
+Suggested screenshots to add later:
 
-Inspect differences between schema versions to quickly see renamed tables, changed columns, and structural drift.
+- timeline view with version history
+- schema diff comparison
+- ER diagram canvas
+- pending migration suggestion banner
 
-### Generate a Migration Draft
-
-When a schema change is detected, the plugin can prepare SQL for the next migration and adapt output for your selected SQL dialect.
-
-### Catch Problems Early
-
-Validation helps surface missing versions, duplicate migrations, and other consistency issues before they become runtime surprises.
-
-## Development
+## Local Development
 
 Requirements:
 
@@ -81,17 +119,13 @@ Useful commands:
 ./gradlew build
 ```
 
-## Why This Project Exists
-
-Database migrations are one of those areas where a small mistake can quietly grow into a hard-to-debug production issue. This plugin is meant to make migration history more visible, schema changes more reviewable, and migration authoring less tedious for developers who live inside JetBrains IDEs.
-
-## Status
+## Project Status
 
 Current version: `1.0.0`
 
+This repository contains the source for the IntelliJ plugin. If you want to build, test, or iterate on the plugin locally, the Gradle tasks above are the quickest path in.
+
 ## License
 
-This project is licensed under the GNU General Public License v3.0.
+Licensed under the GNU General Public License v3.0.
 See [LICENSE](LICENSE).
-
-This repository contains the source for the IntelliJ plugin. If you want to build, test, or iterate on the plugin locally, the Gradle tasks above are the quickest way in.
