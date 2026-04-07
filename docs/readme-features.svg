@@ -67,35 +67,35 @@
   </g>
 
   <g>
-    <rect x="72" y="274" width="504" height="164" rx="26" fill="#1B2230" opacity="0.01" filter="url(#shadow)"/>
-    <rect x="72" y="274" width="504" height="164" rx="26" fill="url(#cardBg)" stroke="#334050"/>
-    <rect x="73.5" y="275.5" width="501" height="161" rx="24.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
-    <rect x="94" y="262" width="460" height="6" rx="3" fill="url(#accent)"/>
-    <rect x="102" y="304" width="64" height="64" rx="20" fill="#58D1C918" stroke="#58D1C940"/>
-    <path d="M120 348L132 332L143 341L156 320" stroke="#58D1C9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="120" cy="348" r="4" fill="#58D1C9"/>
-    <circle cx="132" cy="332" r="4" fill="#58D1C9"/>
-    <circle cx="143" cy="341" r="4" fill="#58D1C9"/>
-    <circle cx="156" cy="320" r="4" fill="#58D1C9"/>
-    <text x="196" y="335" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Timeline View</text>
-    <text x="196" y="368" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">Browse schema history version by version</text>
-    <text x="196" y="394" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">with change summaries, table counts,</text>
-    <text x="196" y="420" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">and source-aware navigation.</text>
+    <rect x="72" y="298" width="504" height="164" rx="26" fill="#1B2230" opacity="0.01" filter="url(#shadow)"/>
+    <rect x="72" y="298" width="504" height="164" rx="26" fill="url(#cardBg)" stroke="#334050"/>
+    <rect x="73.5" y="299.5" width="501" height="161" rx="24.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
+    <rect x="94" y="286" width="460" height="6" rx="3" fill="url(#accent)"/>
+    <rect x="102" y="328" width="64" height="64" rx="20" fill="#58D1C918" stroke="#58D1C940"/>
+    <path d="M120 372L132 356L143 365L156 344" stroke="#58D1C9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="120" cy="372" r="4" fill="#58D1C9"/>
+    <circle cx="132" cy="356" r="4" fill="#58D1C9"/>
+    <circle cx="143" cy="365" r="4" fill="#58D1C9"/>
+    <circle cx="156" cy="344" r="4" fill="#58D1C9"/>
+    <text x="196" y="359" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Timeline View</text>
+    <text x="196" y="392" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">Browse schema history version by version</text>
+    <text x="196" y="418" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">with change summaries, table counts,</text>
+    <text x="196" y="444" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">and source-aware navigation.</text>
   </g>
 
   <g>
-    <rect x="624" y="274" width="504" height="164" rx="26" fill="#1B2230" opacity="0.01" filter="url(#shadow)"/>
-    <rect x="624" y="274" width="504" height="164" rx="26" fill="url(#cardBg)" stroke="#334050"/>
-    <rect x="625.5" y="275.5" width="501" height="161" rx="24.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
-    <rect x="646" y="262" width="460" height="6" rx="3" fill="url(#accent)"/>
-    <rect x="654" y="304" width="64" height="64" rx="20" fill="#6AA6FF18" stroke="#6AA6FF40"/>
-    <rect x="670" y="320" width="14" height="14" rx="4" stroke="#8ABBFF" stroke-width="3"/>
-    <rect x="689" y="339" width="14" height="14" rx="4" stroke="#8ABBFF" stroke-width="3"/>
-    <path d="M684 327H691M677 334V341" stroke="#8ABBFF" stroke-width="3" stroke-linecap="round"/>
-    <text x="748" y="335" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Schema Diff</text>
-    <text x="748" y="368" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">Compare two versions to spot added,</text>
-    <text x="748" y="394" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">removed, renamed, and changed</text>
-    <text x="748" y="420" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">tables or columns quickly.</text>
+    <rect x="624" y="298" width="504" height="164" rx="26" fill="#1B2230" opacity="0.01" filter="url(#shadow)"/>
+    <rect x="624" y="298" width="504" height="164" rx="26" fill="url(#cardBg)" stroke="#334050"/>
+    <rect x="625.5" y="299.5" width="501" height="161" rx="24.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
+    <rect x="646" y="286" width="460" height="6" rx="3" fill="url(#accent)"/>
+    <rect x="654" y="328" width="64" height="64" rx="20" fill="#6AA6FF18" stroke="#6AA6FF40"/>
+    <rect x="670" y="344" width="14" height="14" rx="4" stroke="#8ABBFF" stroke-width="3"/>
+    <rect x="689" y="363" width="14" height="14" rx="4" stroke="#8ABBFF" stroke-width="3"/>
+    <path d="M684 351H691M677 358V365" stroke="#8ABBFF" stroke-width="3" stroke-linecap="round"/>
+    <text x="748" y="359" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Schema Diff</text>
+    <text x="748" y="392" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">Compare two versions to spot added,</text>
+    <text x="748" y="418" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">removed, renamed, and changed</text>
+    <text x="748" y="444" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">tables or columns quickly.</text>
   </g>
 
   <g>
