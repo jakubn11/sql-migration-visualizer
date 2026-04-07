@@ -11,6 +11,14 @@
       <stop offset="0.58" stop-color="#6AA6FF"/>
       <stop offset="1" stop-color="#8ABBFF"/>
     </linearGradient>
+    <linearGradient id="cardBg" x1="138" y1="248" x2="1096" y2="812" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#202734"/>
+      <stop offset="1" stop-color="#1B2230"/>
+    </linearGradient>
+    <linearGradient id="cardInset" x1="72" y1="248" x2="72" y2="412" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
     <radialGradient id="glowA" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(204 126) rotate(41) scale(380 280)">
       <stop stop-color="#58D1C9" stop-opacity="0.2"/>
       <stop offset="1" stop-color="#58D1C9" stop-opacity="0"/>
@@ -23,7 +31,7 @@
       <path d="M44 0H0V44" stroke="#26303D" stroke-width="1"/>
     </pattern>
     <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%" color-interpolation-filters="sRGB">
-      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#03080F" flood-opacity="0.3"/>
+      <feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#03080F" flood-opacity="0.28"/>
     </filter>
     <clipPath id="frameClip">
       <rect x="20" y="20" width="1160" height="820" rx="34"/>
@@ -42,10 +50,12 @@
   <text x="169" y="80" text-anchor="middle" fill="#58D1C9" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="0.08em">FEATURE OVERVIEW</text>
   <rect x="72" y="108" width="205" height="10" rx="5" fill="url(#accent)"/>
   <text x="72" y="186" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="60" font-weight="800">What You Get</text>
-  <text x="72" y="228" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" font-weight="500">A cleaner way to follow schema history, compare versions, validate changes, and draft the next migration.</text>
+  <text x="72" y="224" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" font-weight="500">A cleaner way to follow schema history, compare versions,</text>
+  <text x="72" y="252" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" font-weight="500">validate changes, and draft the next migration.</text>
 
   <g filter="url(#shadow)">
-    <rect x="854" y="60" width="264" height="144" rx="24" fill="#1B222D" stroke="#334050"/>
+    <rect x="854" y="60" width="264" height="144" rx="24" fill="url(#cardBg)" stroke="#334050"/>
+    <rect x="855.5" y="61.5" width="261" height="141" rx="22.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
     <text x="884" y="92" fill="#8793A9" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="0.08em">WORKFLOW</text>
     <rect x="884" y="111" width="14" height="14" rx="7" fill="#58D1C9"/>
     <text x="914" y="124" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="20" font-weight="700">Inside the IDE</text>
@@ -56,79 +66,91 @@
   </g>
 
   <g filter="url(#shadow)">
-    <rect x="72" y="248" width="504" height="164" rx="26" fill="#1B222D" stroke="#334050"/>
-    <rect x="72" y="248" width="504" height="6" rx="3" fill="url(#accent)"/>
-    <rect x="102" y="279" width="58" height="58" rx="18" fill="#58D1C918" stroke="#58D1C940"/>
-    <path d="M118 319L129 304L139 312L151 293" stroke="#58D1C9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="118" cy="319" r="4" fill="#58D1C9"/>
-    <circle cx="129" cy="304" r="4" fill="#58D1C9"/>
-    <circle cx="139" cy="312" r="4" fill="#58D1C9"/>
-    <circle cx="151" cy="293" r="4" fill="#58D1C9"/>
-    <text x="182" y="305" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="30" font-weight="800">Timeline View</text>
-    <text x="182" y="339" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">Browse schema history version by version with</text>
-    <text x="182" y="366" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">change summaries, table counts, and source-aware navigation.</text>
+    <rect x="72" y="274" width="504" height="164" rx="26" fill="url(#cardBg)" stroke="#334050"/>
+    <rect x="73.5" y="275.5" width="501" height="161" rx="24.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
+    <rect x="94" y="262" width="460" height="6" rx="3" fill="url(#accent)"/>
+    <rect x="102" y="304" width="64" height="64" rx="20" fill="#58D1C918" stroke="#58D1C940"/>
+    <path d="M120 348L132 332L143 341L156 320" stroke="#58D1C9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="120" cy="348" r="4" fill="#58D1C9"/>
+    <circle cx="132" cy="332" r="4" fill="#58D1C9"/>
+    <circle cx="143" cy="341" r="4" fill="#58D1C9"/>
+    <circle cx="156" cy="320" r="4" fill="#58D1C9"/>
+    <text x="196" y="335" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Timeline View</text>
+    <text x="196" y="368" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">Browse schema history version by version</text>
+    <text x="196" y="394" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">with change summaries, table counts,</text>
+    <text x="196" y="420" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">and source-aware navigation.</text>
   </g>
 
   <g filter="url(#shadow)">
-    <rect x="624" y="248" width="504" height="164" rx="26" fill="#1B222D" stroke="#334050"/>
-    <rect x="624" y="248" width="504" height="6" rx="3" fill="url(#accent)"/>
-    <rect x="654" y="279" width="58" height="58" rx="18" fill="#6AA6FF18" stroke="#6AA6FF40"/>
-    <rect x="669" y="293" width="13" height="13" rx="3" stroke="#8ABBFF" stroke-width="3"/>
-    <rect x="686" y="310" width="13" height="13" rx="3" stroke="#8ABBFF" stroke-width="3"/>
-    <path d="M682 299H688M675 306V312" stroke="#8ABBFF" stroke-width="3" stroke-linecap="round"/>
-    <text x="734" y="305" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="30" font-weight="800">Schema Diff</text>
-    <text x="734" y="339" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">Compare two versions to spot added, removed,</text>
-    <text x="734" y="366" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">renamed, and changed tables or columns quickly.</text>
+    <rect x="624" y="274" width="504" height="164" rx="26" fill="url(#cardBg)" stroke="#334050"/>
+    <rect x="625.5" y="275.5" width="501" height="161" rx="24.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
+    <rect x="646" y="262" width="460" height="6" rx="3" fill="url(#accent)"/>
+    <rect x="654" y="304" width="64" height="64" rx="20" fill="#6AA6FF18" stroke="#6AA6FF40"/>
+    <rect x="670" y="320" width="14" height="14" rx="4" stroke="#8ABBFF" stroke-width="3"/>
+    <rect x="689" y="339" width="14" height="14" rx="4" stroke="#8ABBFF" stroke-width="3"/>
+    <path d="M684 327H691M677 334V341" stroke="#8ABBFF" stroke-width="3" stroke-linecap="round"/>
+    <text x="748" y="335" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Schema Diff</text>
+    <text x="748" y="368" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">Compare two versions to spot added,</text>
+    <text x="748" y="394" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">removed, renamed, and changed</text>
+    <text x="748" y="420" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">tables or columns quickly.</text>
   </g>
 
   <g filter="url(#shadow)">
-    <rect x="72" y="442" width="504" height="164" rx="26" fill="#1B222D" stroke="#334050"/>
-    <rect x="72" y="442" width="504" height="6" rx="3" fill="url(#accent)"/>
-    <rect x="102" y="473" width="58" height="58" rx="18" fill="#58D1C918" stroke="#58D1C940"/>
-    <rect x="115" y="486" width="12" height="12" rx="3" stroke="#58D1C9" stroke-width="3"/>
-    <rect x="136" y="486" width="12" height="12" rx="3" stroke="#58D1C9" stroke-width="3"/>
-    <rect x="126" y="507" width="12" height="12" rx="3" stroke="#58D1C9" stroke-width="3"/>
-    <path d="M127 492H136M142 498V507M121 498V507" stroke="#58D1C9" stroke-width="3" stroke-linecap="round"/>
-    <text x="182" y="499" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="30" font-weight="800">ER Diagram</text>
-    <text x="182" y="533" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">Inspect table relationships visually with</text>
-    <text x="182" y="560" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">zoomable, draggable table cards.</text>
+    <rect x="72" y="462" width="504" height="164" rx="26" fill="url(#cardBg)" stroke="#334050"/>
+    <rect x="73.5" y="463.5" width="501" height="161" rx="24.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
+    <rect x="94" y="450" width="460" height="6" rx="3" fill="url(#accent)"/>
+    <rect x="102" y="492" width="64" height="64" rx="20" fill="#58D1C918" stroke="#58D1C940"/>
+    <rect x="117" y="507" width="13" height="13" rx="4" stroke="#58D1C9" stroke-width="3"/>
+    <rect x="139" y="507" width="13" height="13" rx="4" stroke="#58D1C9" stroke-width="3"/>
+    <rect x="128" y="529" width="13" height="13" rx="4" stroke="#58D1C9" stroke-width="3"/>
+    <path d="M130 513H139M145 520V529M123 520V529" stroke="#58D1C9" stroke-width="3" stroke-linecap="round"/>
+    <text x="196" y="523" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">ER Diagram</text>
+    <text x="196" y="556" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">Inspect table relationships visually</text>
+    <text x="196" y="582" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">with zoomable, draggable</text>
+    <text x="196" y="608" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">table cards.</text>
   </g>
 
   <g filter="url(#shadow)">
-    <rect x="624" y="442" width="504" height="164" rx="26" fill="#1B222D" stroke="#334050"/>
-    <rect x="624" y="442" width="504" height="6" rx="3" fill="url(#accent)"/>
-    <rect x="654" y="473" width="58" height="58" rx="18" fill="#F5C46B16" stroke="#F5C46B38"/>
-    <path d="M683 489L697 497V509C697 515 691 520 683 523C675 520 669 515 669 509V497L683 489Z" stroke="#F5C46B" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M678 507L682 511L689 503" stroke="#F5C46B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    <text x="734" y="499" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="30" font-weight="800">Validation</text>
-    <text x="734" y="533" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">Catch gaps, duplicates, invalid alters, and</text>
-    <text x="734" y="560" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">inconsistent migration history before it causes damage.</text>
+    <rect x="624" y="462" width="504" height="164" rx="26" fill="url(#cardBg)" stroke="#334050"/>
+    <rect x="625.5" y="463.5" width="501" height="161" rx="24.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
+    <rect x="646" y="450" width="460" height="6" rx="3" fill="url(#accent)"/>
+    <rect x="654" y="492" width="64" height="64" rx="20" fill="#F5C46B16" stroke="#F5C46B38"/>
+    <path d="M686 509L701 517V530C701 537 694 543 686 546C678 543 671 537 671 530V517L686 509Z" stroke="#F5C46B" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M680 528L685 533L693 524" stroke="#F5C46B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="748" y="523" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Validation</text>
+    <text x="748" y="556" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">Catch gaps, duplicates, invalid alters,</text>
+    <text x="748" y="582" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">and inconsistent migration history</text>
+    <text x="748" y="608" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">before it causes damage.</text>
   </g>
 
   <g filter="url(#shadow)">
-    <rect x="72" y="636" width="504" height="164" rx="26" fill="#1B222D" stroke="#334050"/>
-    <rect x="72" y="636" width="504" height="6" rx="3" fill="url(#accent)"/>
-    <rect x="102" y="667" width="58" height="58" rx="18" fill="#6AA6FF18" stroke="#6AA6FF40"/>
-    <path d="M117 696H144" stroke="#8ABBFF" stroke-width="3" stroke-linecap="round"/>
-    <path d="M117 686H134" stroke="#8ABBFF" stroke-width="3" stroke-linecap="round"/>
-    <path d="M117 706H137" stroke="#8ABBFF" stroke-width="3" stroke-linecap="round"/>
-    <path d="M137 685L145 693L137 701" stroke="#8ABBFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    <text x="182" y="693" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="30" font-weight="800">Suggested Migrations</text>
-    <text x="182" y="727" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">Detect saved schema changes and prepare a</text>
-    <text x="182" y="754" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">draft migration for review when you are ready.</text>
+    <rect x="72" y="650" width="504" height="164" rx="26" fill="url(#cardBg)" stroke="#334050"/>
+    <rect x="73.5" y="651.5" width="501" height="161" rx="24.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
+    <rect x="94" y="638" width="460" height="6" rx="3" fill="url(#accent)"/>
+    <rect x="102" y="680" width="64" height="64" rx="20" fill="#6AA6FF18" stroke="#6AA6FF40"/>
+    <path d="M119 711H148" stroke="#8ABBFF" stroke-width="3" stroke-linecap="round"/>
+    <path d="M119 698H138" stroke="#8ABBFF" stroke-width="3" stroke-linecap="round"/>
+    <path d="M119 724H141" stroke="#8ABBFF" stroke-width="3" stroke-linecap="round"/>
+    <path d="M140 697L149 706L140 715" stroke="#8ABBFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="196" y="711" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Suggested Migrations</text>
+    <text x="196" y="744" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">Detect saved schema changes and prepare</text>
+    <text x="196" y="770" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">a draft migration for review</text>
+    <text x="196" y="796" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">when you are ready.</text>
   </g>
 
   <g filter="url(#shadow)">
-    <rect x="624" y="636" width="504" height="164" rx="26" fill="#1B222D" stroke="#334050"/>
-    <rect x="624" y="636" width="504" height="6" rx="3" fill="url(#accent)"/>
-    <rect x="654" y="667" width="58" height="58" rx="18" fill="#58D1C918" stroke="#58D1C940"/>
-    <path d="M672 689H695" stroke="#58D1C9" stroke-width="3" stroke-linecap="round"/>
-    <path d="M672 701H684" stroke="#58D1C9" stroke-width="3" stroke-linecap="round"/>
-    <path d="M686 701H696" stroke="#58D1C9" stroke-width="3" stroke-linecap="round"/>
-    <path d="M672 713H690" stroke="#58D1C9" stroke-width="3" stroke-linecap="round"/>
-    <circle cx="699" cy="701" r="7" stroke="#58D1C9" stroke-width="3"/>
-    <text x="734" y="693" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="30" font-weight="800">Dialect Support</text>
-    <text x="734" y="727" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">Generate SQL for Generic SQL, PostgreSQL,</text>
-    <text x="734" y="754" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">and MySQL or MariaDB workflows.</text>
+    <rect x="624" y="650" width="504" height="164" rx="26" fill="url(#cardBg)" stroke="#334050"/>
+    <rect x="625.5" y="651.5" width="501" height="161" rx="24.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
+    <rect x="646" y="638" width="460" height="6" rx="3" fill="url(#accent)"/>
+    <rect x="654" y="680" width="64" height="64" rx="20" fill="#58D1C918" stroke="#58D1C940"/>
+    <path d="M674 703H699" stroke="#58D1C9" stroke-width="3" stroke-linecap="round"/>
+    <path d="M674 715H687" stroke="#58D1C9" stroke-width="3" stroke-linecap="round"/>
+    <path d="M689 715H700" stroke="#58D1C9" stroke-width="3" stroke-linecap="round"/>
+    <path d="M674 727H693" stroke="#58D1C9" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="704" cy="715" r="8" stroke="#58D1C9" stroke-width="3"/>
+    <text x="748" y="711" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Dialect Support</text>
+    <text x="748" y="744" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">Generate SQL for Generic SQL,</text>
+    <text x="748" y="770" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">PostgreSQL, and MySQL or</text>
+    <text x="748" y="796" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">MariaDB workflows.</text>
   </g>
 </svg>
