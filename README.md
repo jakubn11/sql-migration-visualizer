@@ -33,38 +33,23 @@ Instead of piecing everything together manually, you can:
 
 ## What You Get
 
-<table>
-  <tr>
-    <td valign="top" width="50%">
-      <h3>Timeline View</h3>
-      Browse schema history version by version with change summaries, table counts, and source-aware navigation.
-    </td>
-    <td valign="top" width="50%">
-      <h3>Schema Diff</h3>
-      Compare two versions to spot added, removed, renamed, and changed tables or columns quickly.
-    </td>
-  </tr>
-  <tr>
-    <td valign="top" width="50%">
-      <h3>ER Diagram</h3>
-      Inspect table relationships visually with zoomable, draggable table cards.
-    </td>
-    <td valign="top" width="50%">
-      <h3>Validation</h3>
-      Catch gaps, duplicates, invalid alters, and inconsistent migration history before it causes damage.
-    </td>
-  </tr>
-  <tr>
-    <td valign="top" width="50%">
-      <h3>Suggested Migrations</h3>
-      Detect saved schema changes and prepare a draft migration for review when you're ready.
-    </td>
-    <td valign="top" width="50%">
-      <h3>Dialect Support</h3>
-      Generate SQL for Generic SQL, PostgreSQL, and MySQL / MariaDB workflows.
-    </td>
-  </tr>
-</table>
+- **Timeline View**
+  Browse schema history version by version with change summaries, table counts, and source-aware navigation.
+
+- **Schema Diff**
+  Compare two versions to spot added, removed, renamed, and changed tables or columns quickly.
+
+- **ER Diagram**
+  Inspect table relationships visually with zoomable, draggable table cards.
+
+- **Validation**
+  Catch gaps, duplicates, invalid alters, and inconsistent migration history before it causes damage.
+
+- **Suggested Migrations**
+  Detect saved schema changes and prepare a draft migration for review when you're ready.
+
+- **Dialect Support**
+  Generate SQL for Generic SQL, PostgreSQL, and MySQL / MariaDB workflows.
 
 ## Ideal For
 
