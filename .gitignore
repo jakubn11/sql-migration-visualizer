@@ -1,0 +1,9 @@
+.DS_Store
+.claude/
+.gradle/
+.gradle-local/
+.idea/
+.intellijPlatform/
+.kotlin/
+build/
+out/
