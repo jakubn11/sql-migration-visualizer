@@ -13,10 +13,10 @@
 </p>
 
 <p align="center">
-  <img alt="License" src="https://img.shields.io/badge/license-GPLv3-1f6feb?style=flat-square">
-  <img alt="Platform" src="https://img.shields.io/badge/intellij-2024.1%2B-0a0a0a?style=flat-square">
-  <img alt="Java" src="https://img.shields.io/badge/java-17-f57c00?style=flat-square">
-  <img alt="Kotlin" src="https://img.shields.io/badge/kotlin-2.0.21-7f52ff?style=flat-square">
+  <img alt="License" src="https://img.shields.io/badge/license-GPLv3-58D1C9?style=flat-square">
+  <img alt="Platform" src="https://img.shields.io/badge/intellij-2024.1%2B-6AA6FF?style=flat-square">
+  <img alt="Java" src="https://img.shields.io/badge/java-17-334050?style=flat-square">
+  <img alt="Kotlin" src="https://img.shields.io/badge/kotlin-2.0.21-8ABBFF?style=flat-square">
 </p>
 
 ## Why It Feels Useful
@@ -33,23 +33,11 @@ Instead of piecing everything together manually, you can:
 
 ## What You Get
 
-- **Timeline View**
-  Browse schema history version by version with change summaries, table counts, and source-aware navigation.
+<p align="center">
+  <img src="docs/readme-features.svg" alt="Feature board for SQL Migration Visualizer showing Timeline View, Schema Diff, ER Diagram, Validation, Suggested Migrations, and Dialect Support." width="100%">
+</p>
 
-- **Schema Diff**
-  Compare two versions to spot added, removed, renamed, and changed tables or columns quickly.
-
-- **ER Diagram**
-  Inspect table relationships visually with zoomable, draggable table cards.
-
-- **Validation**
-  Catch gaps, duplicates, invalid alters, and inconsistent migration history before it causes damage.
-
-- **Suggested Migrations**
-  Detect saved schema changes and prepare a draft migration for review when you're ready.
-
-- **Dialect Support**
-  Generate SQL for Generic SQL, PostgreSQL, and MySQL / MariaDB workflows.
+The plugin keeps the full migration workflow in one place: browse history, compare versions, inspect relationships, validate drift, and draft the next migration without bouncing between folders, SQL files, and mental notes.
 
 ## Ideal For
 
