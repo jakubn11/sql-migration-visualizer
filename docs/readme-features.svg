@@ -1,0 +1,104 @@
+<svg width="1200" height="860" viewBox="0 0 1200 860" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">SQL Migration Visualizer feature overview</title>
+  <desc id="desc">A modern feature board showing Timeline View, Schema Diff, ER Diagram, Validation, Suggested Migrations, and Dialect Support using the plugin's blue and cyan palette.</desc>
+  <defs>
+    <linearGradient id="bg" x1="74" y1="48" x2="1128" y2="822" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#131821"/>
+      <stop offset="1" stop-color="#1B222D"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="192" y1="148" x2="994" y2="742" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#58D1C9"/>
+      <stop offset="0.55" stop-color="#6AA6FF"/>
+      <stop offset="1" stop-color="#8ABBFF"/>
+    </linearGradient>
+    <radialGradient id="glowLeft" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(215 170) rotate(36.8699) scale(372 296)">
+      <stop stop-color="#58D1C9" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#58D1C9" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowRight" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1010 110) rotate(129.75) scale(408 332)">
+      <stop stop-color="#6AA6FF" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#6AA6FF" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" stroke="#26303D" stroke-width="1"/>
+    </pattern>
+    <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="160%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#03080F" flood-opacity="0.32"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="860" rx="32" fill="url(#bg)"/>
+  <rect width="1200" height="860" rx="32" fill="url(#grid)" opacity="0.32"/>
+  <circle cx="215" cy="170" r="320" fill="url(#glowLeft)"/>
+  <circle cx="1010" cy="110" r="340" fill="url(#glowRight)"/>
+
+  <rect x="72" y="58" width="146" height="34" rx="17" fill="#58D1C922" stroke="#58D1C955"/>
+  <text x="145" y="80" text-anchor="middle" fill="#58D1C9" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" letter-spacing="0.08em">FEATURE OVERVIEW</text>
+
+  <text x="72" y="145" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="58" font-weight="800">What You Get</text>
+  <text x="72" y="186" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" font-weight="500">SQL migration workflows that feel visual, focused, and IDE-native.</text>
+  <rect x="72" y="210" width="256" height="6" rx="3" fill="url(#accent)"/>
+
+  <rect x="913" y="62" width="215" height="98" rx="24" fill="#1B222D" stroke="#334050" filter="url(#cardShadow)"/>
+  <text x="940" y="96" fill="#8793A9" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="0.08em">WORKFLOW</text>
+  <text x="940" y="128" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="20" font-weight="700">Visualize</text>
+  <text x="1028" y="128" fill="#58D1C9" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="20" font-weight="700">Compare</text>
+  <text x="940" y="153" fill="#6AA6FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="20" font-weight="700">Validate</text>
+  <text x="1026" y="153" fill="#8ABBFF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="20" font-weight="700">Ship</text>
+
+  <g filter="url(#cardShadow)">
+    <rect x="72" y="264" width="500" height="160" rx="26" fill="#1B222D" stroke="#334050"/>
+    <rect x="72" y="264" width="500" height="7" rx="3.5" fill="url(#accent)"/>
+    <rect x="100" y="291" width="90" height="30" rx="15" fill="#58D1C91C" stroke="#58D1C944"/>
+    <text x="145" y="311" text-anchor="middle" fill="#58D1C9" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="700">History</text>
+    <text x="100" y="353" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Timeline View</text>
+    <text x="100" y="387" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">Browse version-by-version schema history with</text>
+    <text x="100" y="414" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">change summaries, table counts, and source links.</text>
+    <text x="525" y="315" text-anchor="end" fill="#334050" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="32" font-weight="800">01</text>
+
+    <rect x="628" y="264" width="500" height="160" rx="26" fill="#1B222D" stroke="#334050"/>
+    <rect x="628" y="264" width="500" height="7" rx="3.5" fill="url(#accent)"/>
+    <rect x="656" y="291" width="102" height="30" rx="15" fill="#6AA6FF1C" stroke="#6AA6FF44"/>
+    <text x="707" y="311" text-anchor="middle" fill="#8ABBFF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="700">Compare</text>
+    <text x="656" y="353" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Schema Diff</text>
+    <text x="656" y="387" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">Spot added, removed, renamed, and modified</text>
+    <text x="656" y="414" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">tables or columns without leaving the IDE.</text>
+    <text x="1081" y="315" text-anchor="end" fill="#334050" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="32" font-weight="800">02</text>
+
+    <rect x="72" y="450" width="500" height="160" rx="26" fill="#1B222D" stroke="#334050"/>
+    <rect x="72" y="450" width="500" height="7" rx="3.5" fill="url(#accent)"/>
+    <rect x="100" y="477" width="92" height="30" rx="15" fill="#58D1C91C" stroke="#58D1C944"/>
+    <text x="146" y="497" text-anchor="middle" fill="#58D1C9" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="700">Visual</text>
+    <text x="100" y="539" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">ER Diagram</text>
+    <text x="100" y="573" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">Inspect table relationships on a zoomable canvas</text>
+    <text x="100" y="600" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">with draggable table cards.</text>
+    <text x="525" y="501" text-anchor="end" fill="#334050" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="32" font-weight="800">03</text>
+
+    <rect x="628" y="450" width="500" height="160" rx="26" fill="#1B222D" stroke="#334050"/>
+    <rect x="628" y="450" width="500" height="7" rx="3.5" fill="url(#accent)"/>
+    <rect x="656" y="477" width="102" height="30" rx="15" fill="#F5C46B1A" stroke="#F5C46B40"/>
+    <text x="707" y="497" text-anchor="middle" fill="#F5C46B" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="700">Checks</text>
+    <text x="656" y="539" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Validation</text>
+    <text x="656" y="573" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">Catch gaps, duplicates, invalid alters, and</text>
+    <text x="656" y="600" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">inconsistent migration history before runtime.</text>
+    <text x="1081" y="501" text-anchor="end" fill="#334050" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="32" font-weight="800">04</text>
+
+    <rect x="72" y="636" width="500" height="160" rx="26" fill="#1B222D" stroke="#334050"/>
+    <rect x="72" y="636" width="500" height="7" rx="3.5" fill="url(#accent)"/>
+    <rect x="100" y="663" width="140" height="30" rx="15" fill="#6AA6FF1C" stroke="#6AA6FF44"/>
+    <text x="170" y="683" text-anchor="middle" fill="#8ABBFF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="700">Next Step</text>
+    <text x="100" y="725" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Suggested Migrations</text>
+    <text x="100" y="759" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">Detect saved schema changes and prepare a</text>
+    <text x="100" y="786" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">draft migration for review when you are ready.</text>
+    <text x="525" y="687" text-anchor="end" fill="#334050" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="32" font-weight="800">05</text>
+
+    <rect x="628" y="636" width="500" height="160" rx="26" fill="#1B222D" stroke="#334050"/>
+    <rect x="628" y="636" width="500" height="7" rx="3.5" fill="url(#accent)"/>
+    <rect x="656" y="663" width="110" height="30" rx="15" fill="#58D1C91C" stroke="#58D1C944"/>
+    <text x="711" y="683" text-anchor="middle" fill="#58D1C9" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="700">SQL Output</text>
+    <text x="656" y="725" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Dialect Support</text>
+    <text x="656" y="759" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">Generate SQL for Generic SQL, PostgreSQL,</text>
+    <text x="656" y="786" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">and MySQL or MariaDB workflows.</text>
+    <text x="1081" y="687" text-anchor="end" fill="#334050" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="32" font-weight="800">06</text>
+  </g>
+</svg>
