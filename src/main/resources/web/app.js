@@ -14,7 +14,17 @@
         pendingMigration: {
             hasPendingChanges: false,
             generatedSql: '',
-            summary: ''
+            summary: '',
+            suggestedVersion: 0,
+            suggestedName: '',
+            suggestedFileName: '',
+            changeHighlights: [],
+            risk: {
+                level: 'LOW',
+                score: 0,
+                headline: '',
+                items: []
+            }
         },
         selectedVersion: -1,
         activeTab: 'timeline',
@@ -225,12 +235,16 @@
     }
 
     function toggleSectionVisibility(sectionKey) {
+        if (sectionKey === 'utilityBar' || sectionKey === 'timelineStrip') {
+            return;
+        }
         state.ui.collapsedSections[sectionKey] = !state.ui.collapsedSections[sectionKey];
         applySectionVisibility();
         persistUiPreferences();
     }
 
     function applySectionVisibility() {
+        forceExpandedSections();
         const sectionMap = {
             utilityBar: 'utility-bar',
             pendingBanner: 'migration-suggestion-banner',
@@ -288,6 +302,7 @@
                     state.ui.collapsedSections = Object.assign({}, state.ui.collapsedSections, parsed.collapsedSections);
                 }
             }
+            forceExpandedSections();
         } catch (error) {
             console.warn('[App] Failed to load UI preferences:', error);
         }
@@ -296,6 +311,7 @@
     function persistUiPreferences() {
         try {
             if (!window.localStorage) return;
+            forceExpandedSections();
             window.localStorage.setItem(UI_PREFERENCES_KEY, JSON.stringify({
                 activeTab: state.activeTab,
                 timelineChangedOnly: !!state.ui.timelineChangedOnly,
@@ -304,6 +320,11 @@
         } catch (error) {
             console.warn('[App] Failed to save UI preferences:', error);
         }
+    }
+
+    function forceExpandedSections() {
+        state.ui.collapsedSections.utilityBar = false;
+        state.ui.collapsedSections.timelineStrip = false;
     }
 
     function renderActivePanel() {
@@ -353,6 +374,8 @@
         const banner = document.getElementById('migration-suggestion-banner');
         const title = document.getElementById('migration-suggestion-title');
         const text = document.getElementById('migration-suggestion-text');
+        const meta = document.getElementById('migration-suggestion-meta');
+        const riskBadge = document.getElementById('migration-suggestion-risk');
         const createButton = document.getElementById('btn-create-migration');
         const createButtonIcon = document.getElementById('btn-create-migration-icon');
         const createButtonLabel = document.getElementById('btn-create-migration-label');
@@ -373,6 +396,34 @@
                 text.textContent = pending.summary || 'Review the suggested migration draft when you are ready to create a migration.';
             } else {
                 text.textContent = 'Refresh to review the suggested migration.';
+            }
+        }
+        if (meta) {
+            if (hasPending) {
+                const metaBits = [];
+                if (pending.suggestedFileName) {
+                    metaBits.push('Ready as ' + pending.suggestedFileName);
+                } else if (pending.suggestedVersion) {
+                    metaBits.push('Ready as version ' + pending.suggestedVersion);
+                }
+                if (pending.risk && pending.risk.headline) {
+                    metaBits.push(pending.risk.headline);
+                }
+                meta.textContent = metaBits.join(' • ');
+                meta.style.display = metaBits.length > 0 ? 'block' : 'none';
+            } else {
+                meta.style.display = 'none';
+                meta.textContent = '';
+            }
+        }
+        if (riskBadge) {
+            if (hasPending) {
+                riskBadge.className = 'risk-badge ' + getRiskBadgeClass(pending.risk);
+                riskBadge.textContent = formatRiskLabel(pending.risk);
+                riskBadge.style.display = 'inline-flex';
+            } else {
+                riskBadge.style.display = 'none';
+                riskBadge.textContent = '';
             }
         }
 
@@ -1129,7 +1180,9 @@
             modal.style.display = 'none';
             window.CreateMigrationModule.openModal({
                 sql: sql,
-                name: inferMigrationNameFromSql(sql)
+                name: inferMigrationNameFromSql(sql),
+                sourceKind: 'generated',
+                summary: 'Generated from the selected schema diff. Review the SQL and save it as a migration when it looks right.'
             });
             if (sql) {
                 showToast('Generated SQL moved into the migration editor.', 'info');
@@ -1142,7 +1195,13 @@
                 showToast('Pending migration draft loaded for review.', 'info');
                 window.CreateMigrationModule.openModal({
                     sql: state.pendingMigration.generatedSql,
-                    name: inferMigrationNameFromSql(state.pendingMigration.generatedSql)
+                    name: state.pendingMigration.suggestedName || inferMigrationNameFromSql(state.pendingMigration.generatedSql),
+                    version: state.pendingMigration.suggestedVersion || undefined,
+                    suggestedFileName: state.pendingMigration.suggestedFileName || '',
+                    summary: state.pendingMigration.summary || '',
+                    changeHighlights: state.pendingMigration.changeHighlights || [],
+                    risk: state.pendingMigration.risk || null,
+                    sourceKind: 'pending'
                 });
             } else {
                 window.CreateMigrationModule.openModal(opts);
@@ -1196,16 +1255,23 @@
             if (!defaults.directory) {
                 showToast('Choose a migration directory once, then future suggested migrations can be created in one click.', 'info');
                 window.CreateMigrationModule.openModal({
-                    sql: state.pendingMigration.generatedSql
+                    sql: state.pendingMigration.generatedSql,
+                    name: state.pendingMigration.suggestedName || inferMigrationNameFromSql(state.pendingMigration.generatedSql),
+                    version: state.pendingMigration.suggestedVersion || defaults.version,
+                    suggestedFileName: state.pendingMigration.suggestedFileName || '',
+                    summary: state.pendingMigration.summary || '',
+                    changeHighlights: state.pendingMigration.changeHighlights || [],
+                    risk: state.pendingMigration.risk || null,
+                    sourceKind: 'pending'
                 });
                 return;
             }
 
             window.__bridge.createMigration(JSON.stringify({
-                version: defaults.version,
+                version: state.pendingMigration.suggestedVersion || defaults.version,
                 directory: defaults.directory,
                 content: state.pendingMigration.generatedSql,
-                name: inferMigrationNameFromSql(state.pendingMigration.generatedSql)
+                name: state.pendingMigration.suggestedName || inferMigrationNameFromSql(state.pendingMigration.generatedSql)
             }));
         },
         cancelPendingMigration: function() {
@@ -1265,7 +1331,10 @@
         copyText: copyText,
         confirm: openConfirmDialog,
         closeConfirm: closeConfirmDialog,
-        submitConfirm: submitConfirmDialog
+        submitConfirm: submitConfirmDialog,
+        renderRiskBadge: renderRiskBadge,
+        renderRiskList: renderRiskList,
+        formatRiskLabel: formatRiskLabel
     };
 
     window.__onRelatedSchemaOpenFailed = function(message) {
@@ -1287,6 +1356,35 @@
                   .replace(/</g, '&lt;')
                   .replace(/>/g, '&gt;')
                   .replace(/"/g, '&quot;');
+    }
+
+    function getRiskBadgeClass(risk) {
+        var level = risk && risk.level ? String(risk.level).toUpperCase() : 'LOW';
+        if (level === 'HIGH') return 'risk-badge-high';
+        if (level === 'MEDIUM') return 'risk-badge-medium';
+        return 'risk-badge-low';
+    }
+
+    function formatRiskLabel(risk) {
+        var level = risk && risk.level ? String(risk.level).toUpperCase() : 'LOW';
+        if (level === 'HIGH') return 'High risk';
+        if (level === 'MEDIUM') return 'Moderate risk';
+        return 'Low risk';
+    }
+
+    function renderRiskBadge(risk) {
+        return '<span class="risk-badge ' + getRiskBadgeClass(risk) + '">' + escapeHtml(formatRiskLabel(risk)) + '</span>';
+    }
+
+    function renderRiskList(risk, limit) {
+        var items = risk && Array.isArray(risk.items) ? risk.items.slice(0, limit || 3) : [];
+        if (items.length === 0) return '';
+        return items.map(function(item) {
+            return '<div class="risk-list-item">' +
+                '<span class="risk-list-title">' + escapeHtml(item.title) + '</span>' +
+                '<span class="risk-list-detail">' + escapeHtml(item.detail) + '</span>' +
+            '</div>';
+        }).join('');
     }
 
     function escapeJs(str) {

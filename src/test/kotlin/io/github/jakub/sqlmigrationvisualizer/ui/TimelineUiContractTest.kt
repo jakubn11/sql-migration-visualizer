@@ -21,6 +21,8 @@ class TimelineUiContractTest {
         assertContains(panelSource, "Table History")
         assertContains(panelSource, "Selected table is not in this version")
         assertContains(panelSource, "Open SQL")
+        assertContains(panelSource, "Column Lineage")
+        assertContains(panelSource, "Lineage")
     }
 
     private fun resourceText(path: String): String =

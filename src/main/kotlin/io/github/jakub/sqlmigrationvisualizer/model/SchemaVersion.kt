@@ -10,7 +10,8 @@ data class SchemaVersion(
     val version: Int,
     val tables: Map<String, TableSchema>,
     val migrationFile: MigrationFile?,
-    val changesSummary: ChangesSummary? = null
+    val changesSummary: ChangesSummary? = null,
+    val risk: MigrationRisk? = null
 )
 
 /**
@@ -24,5 +25,6 @@ data class ChangesSummary(
     val columnsAdded: Map<String, List<String>> = emptyMap(),
     val columnsRemoved: Map<String, List<String>> = emptyMap(),
     val removedColumnDefs: Map<String, List<ColumnDef>> = emptyMap(),
-    val totalStatements: Int = 0
+    val totalStatements: Int = 0,
+    val risk: MigrationRisk? = null
 )

@@ -28,6 +28,7 @@
     const CreateMigrationModule = {
         submitting: false,
         completionState: null,
+        metadataInputsBound: false,
 
         getSuggestedDefaults: function() {
             var state = window.AppHelpers ? window.AppHelpers.getState() : null;
@@ -85,6 +86,7 @@
             modal.dataset.migrationExtension = opts.extension || defaults.extension || 'sql';
             modal.dataset.mode = isEditMode ? 'edit' : 'create';
             modal.dataset.filePath = opts.filePath || '';
+            modal._composerOptions = opts;
 
             // Clear SQL and errors
             sqlInput.value = opts.sql || '';
@@ -93,6 +95,7 @@
             this.setSubmitting(false);
             this.syncSqlHighlight();
             this.hideSuggestions();
+            this.bindMetadataInputs();
 
             versionInput.disabled = isEditMode;
             dirInput.disabled = isEditMode;
@@ -126,6 +129,7 @@
                 delete submitButton.dataset.defaultHtml;
             }
 
+            this.renderContext();
             modal.style.display = 'flex';
             // Focus the SQL textarea after animation
             setTimeout(function() {
@@ -144,6 +148,99 @@
             this.setSubmitting(false);
             document.getElementById('create-migration-modal').style.display = 'none';
             this.hideSuggestions();
+        },
+
+        bindMetadataInputs: function() {
+            if (this.metadataInputsBound) return;
+            this.metadataInputsBound = true;
+
+            ['create-mig-version', 'create-mig-directory', 'create-mig-name'].forEach(function(id) {
+                var input = document.getElementById(id);
+                if (!input) return;
+                input.addEventListener('input', function() {
+                    CreateMigrationModule.renderContext();
+                });
+                input.addEventListener('change', function() {
+                    CreateMigrationModule.renderContext();
+                });
+            });
+        },
+
+        renderContext: function() {
+            var modal = document.getElementById('create-migration-modal');
+            var card = document.getElementById('create-mig-context');
+            if (!modal || !card) return;
+
+            var opts = modal._composerOptions || {};
+            var sourceBadge = document.getElementById('create-mig-source-badge');
+            var summaryTitle = document.getElementById('create-mig-summary-title');
+            var summaryText = document.getElementById('create-mig-summary-text');
+            var riskBadge = document.getElementById('create-mig-risk-badge');
+            var filePreview = document.getElementById('create-mig-file-preview');
+            var pathPreview = document.getElementById('create-mig-path-preview');
+            var highlights = document.getElementById('create-mig-highlights');
+            var riskList = document.getElementById('create-mig-risk-list');
+
+            var version = parseInt(document.getElementById('create-mig-version').value, 10);
+            if (Number.isNaN(version) || version < 1) {
+                version = this.getSuggestedDefaults().version;
+            }
+            var directory = document.getElementById('create-mig-directory').value.trim();
+            var nameValue = document.getElementById('create-mig-name').value.trim();
+            var sqlValue = document.getElementById('create-mig-sql').value || '';
+            var fileName = (window.AppHelpers && window.AppHelpers.getSuggestedMigrationFileName
+                ? window.AppHelpers.getSuggestedMigrationFileName({
+                    version: version,
+                    sql: sqlValue,
+                    explicitName: nameValue || opts.name || '',
+                    extension: modal.dataset.migrationExtension || 'sql'
+                })
+                : '');
+            if (!fileName && opts.suggestedFileName) {
+                fileName = opts.suggestedFileName;
+            }
+            var highlightItems = Array.isArray(opts.changeHighlights) && opts.changeHighlights.length > 0
+                ? opts.changeHighlights
+                : (((opts.risk || {}).items || []).slice(0, 3).map(function(item) { return item.title; }));
+
+            sourceBadge.textContent = opts.sourceKind === 'pending'
+                ? 'Pending draft'
+                : opts.sourceKind === 'generated'
+                    ? 'Generated from diff'
+                    : (modal.dataset.mode === 'edit' ? 'Editing existing file' : 'Migration draft');
+            summaryTitle.textContent = modal.dataset.mode === 'edit'
+                ? 'Edit migration'
+                : (opts.sourceKind === 'pending' ? 'Review suggested migration' : 'Create migration');
+            summaryText.textContent = opts.summary || (opts.risk && opts.risk.headline) || 'Fill in the migration details and review the SQL before saving.';
+
+            if (opts.risk && opts.risk.items && opts.risk.items.length > 0 && window.AppUi && window.AppUi.renderRiskBadge) {
+                riskBadge.innerHTML = window.AppUi.renderRiskBadge(opts.risk);
+            } else {
+                riskBadge.innerHTML = '';
+            }
+
+            filePreview.textContent = fileName || 'Migration file preview unavailable';
+            pathPreview.textContent = directory
+                ? directory + '/' + fileName
+                : 'Choose a directory to preview the full path.';
+
+            if (highlightItems.length > 0) {
+                highlights.innerHTML = highlightItems.map(function(item) {
+                    return '<span class="composer-chip">' + escapeHtml(item) + '</span>';
+                }).join('');
+            } else {
+                highlights.innerHTML = '<span class="composer-chip composer-chip-muted">No special review notes</span>';
+            }
+
+            if (opts.risk && opts.risk.items && opts.risk.items.length > 0 && window.AppUi && window.AppUi.renderRiskList) {
+                riskList.innerHTML = window.AppUi.renderRiskList(opts.risk, 3);
+                riskList.style.display = 'grid';
+            } else {
+                riskList.innerHTML = '';
+                riskList.style.display = 'none';
+            }
+
+            card.style.display = (opts.summary || fileName || highlightItems.length > 0 || riskBadge.innerHTML) ? 'grid' : 'none';
         },
 
         syncSqlHighlight: function() {
@@ -172,6 +269,7 @@
             sqlInput.addEventListener('input', function() {
                 CreateMigrationModule.syncSqlHighlight();
                 CreateMigrationModule.updateSuggestions();
+                CreateMigrationModule.renderContext();
             });
             sqlInput.addEventListener('scroll', function() {
                 CreateMigrationModule.syncSqlHighlight();
@@ -544,6 +642,9 @@
         if (dir) {
             document.getElementById('create-mig-directory').value = dir;
             window.__defaultMigrationDir = dir;
+            if (window.CreateMigrationModule) {
+                window.CreateMigrationModule.renderContext();
+            }
         }
     };
 
