@@ -69,14 +69,7 @@ It also recognizes common naming patterns like:
 
 ## Visual Preview
 
-The README is ready for real screenshots, but I have not added fake UI mockups here. Once you capture the timeline, diff, and ER views from the plugin, this section is the right place to showcase them.
-
-Suggested screenshots to add later:
-
-- timeline view with version history
-- schema diff comparison
-- ER diagram canvas
-- pending migration suggestion banner
+Screenshots of the timeline, diff, and ER diagram views belong here once captured from the running plugin.
 
 ## Local Development
 
@@ -90,12 +83,12 @@ Useful commands:
 ```bash
 ./gradlew test
 ./gradlew runIde
-./gradlew build
+./gradlew buildPlugin
 ```
 
 ## Project Status
 
-Current version: `1.0.0`
+Current version: `1.1.0`
 
 This repository contains the source for the IntelliJ plugin. If you want to build, test, or iterate on the plugin locally, the Gradle tasks above are the quickest path in.
 
