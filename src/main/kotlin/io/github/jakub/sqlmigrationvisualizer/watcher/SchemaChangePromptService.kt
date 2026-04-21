@@ -1,6 +1,7 @@
 package io.github.jakub.sqlmigrationvisualizer.watcher
 
 import io.github.jakub.sqlmigrationvisualizer.MigrationVisualizerToolWindowFactory
+import io.github.jakub.sqlmigrationvisualizer.analyzer.SchemaChangeRiskAnalyzer
 import io.github.jakub.sqlmigrationvisualizer.generator.MigrationGenerator
 import io.github.jakub.sqlmigrationvisualizer.generator.SqlDialect
 import io.github.jakub.sqlmigrationvisualizer.model.MigrationFile
@@ -9,6 +10,7 @@ import io.github.jakub.sqlmigrationvisualizer.model.SchemaVersion
 import io.github.jakub.sqlmigrationvisualizer.parser.SqlParser
 import io.github.jakub.sqlmigrationvisualizer.services.ProjectSchemaSnapshotService
 import io.github.jakub.sqlmigrationvisualizer.settings.VisualizerSettings
+import io.github.jakub.sqlmigrationvisualizer.util.MigrationFileNaming
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -138,17 +140,37 @@ class SchemaChangePromptService(
             return PendingMigrationSuggestion()
         }
 
-        val hasExistingMigration = snapshotService.getSnapshot().migrations.isNotEmpty()
+        val snapshot = snapshotService.getSnapshot()
+        val hasExistingMigration = snapshot.migrations.isNotEmpty()
         val summary = if (hasExistingMigration) {
             "Schema changes are ready to be saved as your next migration."
         } else {
             "Schema changes are ready to become your first migration."
         }
 
+        val previousSchema = parser.buildSchemaTimeline(myState.trackedBaselineStatements, emptyList()).firstOrNull()
+            ?: SchemaVersion(0, emptyMap(), null)
+        val currentSchema = parser.buildSchemaTimeline(snapshot.baselineStatements, emptyList()).firstOrNull()
+            ?: SchemaVersion(0, emptyMap(), null)
+        val risk = SchemaChangeRiskAnalyzer.analyze(previousSchema, currentSchema)
+        val suggestedVersion = (snapshot.migrations.maxOfOrNull { it.version } ?: 0) + 1
+        val suggestedName = suggestMigrationName(myState.pendingMigrationSql)
+        val suggestedFileName = MigrationFileNaming.buildFileName(
+            pattern = settings.state.migrationFileNamePattern,
+            version = suggestedVersion,
+            name = suggestedName,
+            extension = detectPreferredExtension(snapshot.migrations)
+        )
+
         return PendingMigrationSuggestion(
             hasPendingChanges = true,
             generatedSql = myState.pendingMigrationSql,
-            summary = summary
+            summary = summary,
+            suggestedVersion = suggestedVersion,
+            suggestedName = suggestedName,
+            suggestedFileName = suggestedFileName,
+            changeHighlights = risk.items.take(3).map { it.title },
+            risk = risk
         )
     }
 
@@ -338,6 +360,29 @@ class SchemaChangePromptService(
         val normalized = statements.joinToString(separator = "\n;\n") { it.trim() }
         return digest.digest(normalized.toByteArray()).joinToString("") { "%02x".format(it) }
     }
+
+    private fun suggestMigrationName(sql: String): String {
+        val tableName = Regex(
+            """\b(?:CREATE|ALTER|DROP)\s+TABLE\s+(?:IF\s+(?:NOT\s+EXISTS|EXISTS)\s+)?(?:ONLY\s+)?([`"\[]?[A-Za-z_][\w$.\]]*)""",
+            RegexOption.IGNORE_CASE
+        ).find(sql)?.groupValues?.getOrNull(1)
+            ?.replace(Regex("""[`"\[\]]"""), "")
+            ?.substringAfterLast('.')
+        if (!tableName.isNullOrBlank()) {
+            return "${tableName}_changes"
+        }
+
+        val indexName = Regex(
+            """\bCREATE\s+(?:UNIQUE\s+)?INDEX\s+([A-Za-z_][\w$]*)""",
+            RegexOption.IGNORE_CASE
+        ).find(sql)?.groupValues?.getOrNull(1)
+        return indexName ?: "migration"
+    }
+
+    private fun detectPreferredExtension(migrations: List<MigrationFile>): String =
+        migrations.firstNotNullOfOrNull { migration ->
+            migration.fileName.substringAfterLast('.', "").lowercase().takeIf { it == "sql" || it == "sqm" }
+        } ?: "sql"
 
     override fun dispose() {
         activeNotification?.expire()

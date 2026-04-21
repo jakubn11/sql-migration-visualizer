@@ -544,6 +544,11 @@ code {
     max-width: 72ch;
 }
 
+.migration-suggestion-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
 .migration-suggestion-badge {
     display: inline-flex;
     align-items: center;
@@ -577,6 +582,38 @@ code {
 #btn-review-pending-migration:hover {
     border-color: rgba(106, 166, 255, 0.3);
     color: var(--text-primary);
+}
+
+.risk-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    padding: 0 10px;
+    border-radius: var(--radius-full);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.risk-badge-low {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+    border-color: rgba(134, 239, 172, 0.22);
+}
+
+.risk-badge-medium {
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+    border-color: rgba(252, 211, 77, 0.24);
+}
+
+.risk-badge-high {
+    background: var(--color-error-bg);
+    color: var(--color-error);
+    border-color: rgba(252, 165, 165, 0.24);
 }
 
 .tab {
@@ -1255,6 +1292,20 @@ code {
     color: var(--text-secondary);
 }
 
+.table-history-column-section {
+    margin-top: var(--space-lg);
+    display: grid;
+    gap: var(--space-md);
+}
+
+.table-history-column-heading {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
 .table-history-changes {
     display: flex;
     flex-wrap: wrap;
@@ -1763,6 +1814,22 @@ code {
     gap: var(--space-sm);
     flex-wrap: wrap;
     justify-content: flex-end;
+}
+
+.diff-summary-riskline {
+    margin-top: var(--space-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.diff-summary-risklist {
+    margin-top: var(--space-md);
+    display: grid;
+    gap: var(--space-sm);
 }
 
 .diff-summary-pill {
@@ -3581,6 +3648,116 @@ code {
     font-size: 12px;
     color: var(--color-error);
     margin-bottom: var(--space-md);
+}
+
+.composer-context-card {
+    display: grid;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+    padding: var(--space-md);
+    border-radius: var(--radius-xl);
+    border: 1px solid rgba(106, 166, 255, 0.18);
+    background:
+        linear-gradient(180deg, rgba(106, 166, 255, 0.08), rgba(106, 166, 255, 0.02)),
+        color-mix(in srgb, var(--bg-secondary) 95%, var(--bg-primary));
+}
+
+.composer-context-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-md);
+}
+
+.composer-context-eyebrow,
+.composer-context-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.composer-context-summary {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.composer-context-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--space-md);
+}
+
+.composer-context-pane {
+    display: grid;
+    gap: 6px;
+    padding: 12px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-default);
+    background: var(--bg-primary);
+}
+
+.composer-context-preview {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+    word-break: break-word;
+}
+
+.composer-context-helper {
+    font-size: 11px;
+    color: var(--text-muted);
+    word-break: break-word;
+}
+
+.composer-chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+}
+
+.composer-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border-radius: var(--radius-full);
+    background: rgba(106, 166, 255, 0.12);
+    border: 1px solid rgba(106, 166, 255, 0.16);
+    color: var(--accent-primary);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.composer-chip-muted {
+    background: var(--bg-secondary);
+    color: var(--text-muted);
+    border-color: var(--border-default);
+}
+
+.composer-risk-list,
+.risk-list-item {
+    display: grid;
+    gap: 4px;
+}
+
+.risk-list-item {
+    padding: 10px 12px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-default);
+    background: var(--bg-primary);
+}
+
+.risk-list-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.risk-list-detail {
+    font-size: 11px;
+    color: var(--text-secondary);
 }
 
 .empty-state-actions {

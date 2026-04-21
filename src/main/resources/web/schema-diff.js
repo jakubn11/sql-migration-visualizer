@@ -264,12 +264,20 @@
                 acc.notes += tableDiff.notes.length;
                 return acc;
             }, { tables: 0, added: 0, removed: 0, modified: 0, notes: 0 });
+            const risk = this.computeRisk(diff);
+            const riskBadge = window.AppUi && window.AppUi.renderRiskBadge
+                ? window.AppUi.renderRiskBadge(risk)
+                : '';
+            const riskList = window.AppUi && window.AppUi.renderRiskList
+                ? window.AppUi.renderRiskList(risk, 3)
+                : '';
 
             return `
                 <div class="diff-summary-card">
                     <div>
                         <div class="diff-summary-title">Version ${fromSchema.version} -> Version ${toSchema.version}</div>
                         <div class="diff-summary-subtitle">Review table additions, removals, and property-level column changes before generating a migration.</div>
+                        ${risk.headline ? `<div class="diff-summary-riskline">${riskBadge}<span>${escapeHtml(risk.headline)}</span></div>` : ''}
                     </div>
                     <div class="diff-summary-pills">
                         <span class="diff-summary-pill"><strong>${totals.tables}</strong> tables changed</span>
@@ -278,6 +286,7 @@
                         <span class="diff-summary-pill modified"><strong>${totals.modified}</strong> columns modified</span>
                         <button type="button" class="btn btn-ghost btn-sm diff-summary-copy-btn" onclick="window.AppUi && window.AppUi.copyText('Schema diff summary: Version ${fromSchema.version} to Version ${toSchema.version}. ${totals.tables} tables changed, ${totals.added} columns added, ${totals.removed} columns removed, ${totals.modified} columns modified.', 'Diff summary copied.')">Copy Summary</button>
                     </div>
+                    ${riskList ? `<div class="diff-summary-risklist">${riskList}</div>` : ''}
                 </div>
             `;
         },
@@ -359,7 +368,7 @@
                 <div class="diff-line ${lineClass}" data-column-name="${escapeHtml(column.name)}">
                     <span class="diff-prefix">${prefix}</span>
                     <div class="diff-line-content">
-                        <div class="diff-line-main">${main}<button type="button" class="inline-source-btn diff-source-btn" title="Open related schema file" onclick="event.stopPropagation(); window.__bridge && window.__bridge.openRelatedSchemaSource && window.__bridge.openRelatedSchemaSource(JSON.stringify({tableName:'${escapeJs(tableName)}',columnName:'${escapeJs(column.name)}'}))">SQL</button></div>
+                        <div class="diff-line-main">${main}<button type="button" class="inline-source-btn diff-source-btn" title="Focus column lineage" onclick="event.stopPropagation(); window.AppActions && window.AppActions.showTableHistory('${escapeJs(tableName)}', ${document.getElementById('diff-to').value}, '${escapeJs(column.name)}')">Lineage</button><button type="button" class="inline-source-btn diff-source-btn" title="Open related schema file" onclick="event.stopPropagation(); window.__bridge && window.__bridge.openRelatedSchemaSource && window.__bridge.openRelatedSchemaSource(JSON.stringify({tableName:'${escapeJs(tableName)}',columnName:'${escapeJs(column.name)}'}))">SQL</button></div>
                         ${changeMeta ? `<div class="diff-line-meta">${changeMeta}</div>` : ''}
                     </div>
                 </div>
@@ -395,6 +404,70 @@
             }));
             this._pendingFrom = fromVersion;
             this._pendingTo = toVersion;
+        },
+
+        computeRisk: function(diff) {
+            const items = [];
+
+            diff.forEach(function(tableDiff) {
+                if (tableDiff.status === 'dropped') {
+                    items.push({
+                        title: 'Table dropped',
+                        detail: tableDiff.name + ' is removed entirely from the target schema.'
+                    });
+                }
+
+                tableDiff.columns.forEach(function(column) {
+                    if (column.status === 'removed') {
+                        items.push({
+                            title: 'Column dropped',
+                            detail: tableDiff.name + '.' + column.name + ' is removed from the target schema.'
+                        });
+                        return;
+                    }
+                    if (column.status === 'added' && column.after && !column.after.nullable && !column.after.isPrimaryKey && !column.after.defaultValue) {
+                        items.push({
+                            title: 'Required column added without default',
+                            detail: tableDiff.name + '.' + column.name + ' will need a backfill plan for existing rows.'
+                        });
+                        return;
+                    }
+                    if (column.status === 'modified') {
+                        const detailLabels = (column.changeDetails || []).map(function(item) { return item.label; });
+                        if (detailLabels.indexOf('primary key') >= 0 || detailLabels.indexOf('type') >= 0) {
+                            items.push({
+                                title: 'High-impact column change',
+                                detail: tableDiff.name + '.' + column.name + ' changes ' + detailLabels.join(', ') + '.'
+                            });
+                        } else if (detailLabels.indexOf('nullability') >= 0) {
+                            items.push({
+                                title: 'Column contract changed',
+                                detail: tableDiff.name + '.' + column.name + ' tightens nullability or defaults.'
+                            });
+                        }
+                    }
+                });
+
+                (tableDiff.notes || []).forEach(function(note) {
+                    if (/primary key/i.test(note) || /foreign key/i.test(note)) {
+                        items.push({
+                            title: note,
+                            detail: tableDiff.name + ' changes a key relationship that may require extra review.'
+                        });
+                    }
+                });
+            });
+
+            const headline = items.length === 0
+                ? 'Low-risk additive diff'
+                : (items.length >= 3 ? 'High-risk diff review recommended' : 'Moderate diff review recommended');
+
+            return {
+                level: items.length >= 3 ? 'HIGH' : (items.length > 0 ? 'MEDIUM' : 'LOW'),
+                score: items.length,
+                headline: headline,
+                items: items.slice(0, 6)
+            };
         }
     };
 
