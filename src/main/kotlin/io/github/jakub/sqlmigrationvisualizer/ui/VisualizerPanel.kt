@@ -275,9 +275,6 @@ $css
 
         <section id="utility-bar" class="collapsible-section">
             <div class="section-collapsed-indicator">Search &amp; stats</div>
-            <button type="button" class="section-inline-toggle" data-section-toggle="utilityBar" aria-expanded="true" title="Collapse search and stats">
-                <svg class="section-toggle-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg>
-            </button>
             <div class="utility-search-group">
                 <div class="search-container">
                     <svg class="search-icon" viewBox="0 0 24 24" width="14" height="14"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/></svg>
@@ -328,9 +325,11 @@ $css
                     </div>
                     <strong id="migration-suggestion-title">Schema changes detected</strong>
                     <span id="migration-suggestion-text">Refresh to review the suggested migration.</span>
+                    <div id="migration-suggestion-meta" class="migration-suggestion-meta" style="display:none"></div>
                 </div>
             </div>
             <div class="migration-suggestion-actions">
+                <span id="migration-suggestion-risk" class="risk-badge risk-badge-low" style="display:none">Low risk</span>
                 <button class="btn btn-primary btn-sm" id="btn-create-pending-migration" onclick="window.AppActions && window.AppActions.quickCreatePendingMigration()">
                     Create Suggested Migration
                 </button>
@@ -347,9 +346,6 @@ $css
             <section id="panel-timeline" class="panel active">
                 <div id="timeline-container" class="collapsible-section">
                     <div class="section-collapsed-indicator">Timeline overview</div>
-                    <button type="button" class="section-inline-toggle" data-section-toggle="timelineStrip" aria-expanded="true" title="Collapse timeline overview">
-                        <svg class="section-toggle-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg>
-                    </button>
                     <div id="timeline-empty" class="empty-state">
                         <div class="empty-state-card empty-state-card-large">
                             <div class="empty-state-badge">Timeline Ready</div>
@@ -549,6 +545,28 @@ $css
             </div>
             <div class="modal-body">
                 <div id="create-mig-error" class="form-error" style="display:none"></div>
+                <div id="create-mig-context" class="composer-context-card" style="display:none">
+                    <div class="composer-context-header">
+                        <div>
+                            <div class="composer-context-eyebrow" id="create-mig-source-badge">Migration Draft</div>
+                            <strong id="create-mig-summary-title">Create migration</strong>
+                            <div id="create-mig-summary-text" class="composer-context-summary"></div>
+                        </div>
+                        <div id="create-mig-risk-badge"></div>
+                    </div>
+                    <div class="composer-context-grid">
+                        <div class="composer-context-pane">
+                            <div class="composer-context-label">Planned file</div>
+                            <div id="create-mig-file-preview" class="composer-context-preview">1.sql</div>
+                            <div id="create-mig-path-preview" class="composer-context-helper">Choose a directory to preview the full path.</div>
+                        </div>
+                        <div class="composer-context-pane">
+                            <div class="composer-context-label">Why review it</div>
+                            <div id="create-mig-highlights" class="composer-chip-list"></div>
+                        </div>
+                    </div>
+                    <div id="create-mig-risk-list" class="composer-risk-list"></div>
+                </div>
                 <div class="form-row">
                     <div class="form-group" style="flex: 0 0 100px">
                         <label class="form-label">Version</label>

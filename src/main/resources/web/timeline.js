@@ -307,6 +307,7 @@
                                 <span class="col-name">${escapeHtml(col.name)}</span>
                                 ${pkBadge}${fkBadge}${nullBadge}
                                 <span class="col-type">${escapeHtml(col.type)}</span>
+                                <button type="button" class="inline-source-btn" title="Focus column lineage" onclick="event.stopPropagation(); window.AppActions && window.AppActions.showTableHistory('${escapeJs(name)}', ${version.version}, '${escapeJs(col.name)}')">Lineage</button>
                                 <button type="button" class="inline-source-btn" title="Open related schema file" onclick="event.stopPropagation(); window.__bridge && window.__bridge.openRelatedSchemaSource && window.__bridge.openRelatedSchemaSource(JSON.stringify({tableName:'${escapeJs(name)}',columnName:'${escapeJs(col.name)}'}))">SQL</button>
                             </div>
                         `;
@@ -323,6 +324,7 @@
                                 <span class="col-name">${escapeHtml(col.name)}</span>
                                 ${pkBadge}${nullBadge}
                                 <span class="col-type">${escapeHtml(col.type)}</span>
+                                <button type="button" class="inline-source-btn" title="Focus column lineage" onclick="event.stopPropagation(); window.AppActions && window.AppActions.showTableHistory('${escapeJs(name)}', ${version.version}, '${escapeJs(col.name)}')">Lineage</button>
                                 <button type="button" class="inline-source-btn" title="Open related schema file" onclick="event.stopPropagation(); window.__bridge && window.__bridge.openRelatedSchemaSource && window.__bridge.openRelatedSchemaSource(JSON.stringify({tableName:'${escapeJs(name)}',columnName:'${escapeJs(col.name)}'}))">SQL</button>
                             </div>
                         `;
@@ -412,6 +414,7 @@
             if (history.length === 0) {
                 return '';
             }
+            const columnHistory = columnName ? this.buildColumnHistory(tableName, columnName, versions || []) : [];
             const currentVersion = (versions || []).find(function(version) { return version.version === currentVersionNumber; }) || null;
             const currentTable = currentVersion && currentVersion.tables ? currentVersion.tables[tableName] : null;
             const currentSummary = currentTable
@@ -444,6 +447,24 @@
                 }).join('')
                 : '<div class="table-history-empty">No history entries found for this table yet.</div>';
 
+            const columnItemsHtml = columnHistory.length > 0
+                ? columnHistory.map(function(item) {
+                    return `
+                        <div class="table-history-item ${item.status}">
+                            <div class="table-history-item-header">
+                                <div>
+                                    <div class="table-history-item-title">${escapeHtml(item.title)}</div>
+                                    <div class="table-history-item-meta">Version ${item.version}${item.fileLabel ? ' • ' + escapeHtml(item.fileLabel) : ''}</div>
+                                </div>
+                                <span class="table-history-status ${item.status}">${escapeHtml(item.statusLabel)}</span>
+                            </div>
+                            <div class="table-history-item-summary">${escapeHtml(item.summary)}</div>
+                            ${item.changeLines.length > 0 ? `<div class="table-history-changes">${item.changeLines.map(function(line) { return '<span class="table-history-change-chip">' + escapeHtml(line) + '</span>'; }).join('')}</div>` : ''}
+                        </div>
+                    `;
+                }).join('')
+                : '<div class="table-history-empty">No lineage entries found for this column yet.</div>';
+
             return `
                 <section class="table-history-card">
                     <div class="table-history-header">
@@ -459,6 +480,12 @@
                         </div>
                     </div>
                     <div class="table-history-list">${itemsHtml}</div>
+                    ${columnName ? `
+                        <div class="table-history-column-section">
+                            <div class="table-history-column-heading">Column Lineage</div>
+                            <div class="table-history-list">${columnItemsHtml}</div>
+                        </div>
+                    ` : ''}
                 </section>
             `;
         },
@@ -514,6 +541,69 @@
                         changeLines: diff.slice(1),
                         version: version.version,
                         fromVersion: previous ? previous.version : null,
+                        fileLabel: version.migrationFile ? version.migrationFile.fileName : 'Baseline'
+                    });
+                }
+            }
+
+            return items.reverse();
+        },
+
+        buildColumnHistory: function(tableName, columnName, versions) {
+            const items = [];
+
+            for (let index = 0; index < versions.length; index++) {
+                const version = versions[index];
+                const previous = index > 0 ? versions[index - 1] : null;
+                const previousColumn = previous && previous.tables && previous.tables[tableName]
+                    ? previous.tables[tableName].columns.find(function(column) { return column.name === columnName; }) || null
+                    : null;
+                const currentColumn = version && version.tables && version.tables[tableName]
+                    ? version.tables[tableName].columns.find(function(column) { return column.name === columnName; }) || null
+                    : null;
+
+                if (!previousColumn && !currentColumn) {
+                    continue;
+                }
+
+                if (!previousColumn && currentColumn) {
+                    items.push({
+                        status: version.migrationFile ? 'added' : 'baseline',
+                        statusLabel: version.migrationFile ? 'Added' : 'Baseline',
+                        title: 'Column introduced',
+                        summary: this.renderColumnSummary(currentColumn),
+                        changeLines: [
+                            currentColumn.type,
+                            currentColumn.nullable ? 'NULL allowed' : 'NOT NULL'
+                        ],
+                        version: version.version,
+                        fileLabel: version.migrationFile ? version.migrationFile.fileName : 'Baseline'
+                    });
+                    continue;
+                }
+
+                if (previousColumn && !currentColumn) {
+                    items.push({
+                        status: 'removed',
+                        statusLabel: 'Removed',
+                        title: 'Column removed',
+                        summary: columnName + ' disappears from ' + tableName + ' at this version.',
+                        changeLines: [previousColumn.type],
+                        version: version.version,
+                        fileLabel: version.migrationFile ? version.migrationFile.fileName : 'Baseline'
+                    });
+                    continue;
+                }
+
+                const delta = this.describeColumnDelta(previousColumn, currentColumn);
+                if (delta.length > 0) {
+                    items.push({
+                        status: 'modified',
+                        statusLabel: 'Updated',
+                        title: 'Column changed',
+                        summary: delta[0],
+                        changeLines: delta.slice(1),
+                        version: version.version,
                         fileLabel: version.migrationFile ? version.migrationFile.fileName : 'Baseline'
                     });
                 }
@@ -589,6 +679,39 @@
             }
 
             return lines.concat(added, removed, modified).slice(0, 8);
+        },
+
+        describeColumnDelta: function(previousColumn, currentColumn) {
+            const lines = [];
+            if (previousColumn.type !== currentColumn.type) {
+                lines.push('Type changed');
+                lines.push(previousColumn.type + ' -> ' + currentColumn.type);
+            }
+            if (!!previousColumn.nullable !== !!currentColumn.nullable) {
+                lines.push('Nullability changed');
+                lines.push((previousColumn.nullable ? 'NULL' : 'NOT NULL') + ' -> ' + (currentColumn.nullable ? 'NULL' : 'NOT NULL'));
+            }
+            if ((previousColumn.defaultValue || null) !== (currentColumn.defaultValue || null)) {
+                lines.push('Default value changed');
+                lines.push((previousColumn.defaultValue || 'none') + ' -> ' + (currentColumn.defaultValue || 'none'));
+            }
+            if (!!previousColumn.isPrimaryKey !== !!currentColumn.isPrimaryKey) {
+                lines.push('Primary key membership changed');
+                lines.push((previousColumn.isPrimaryKey ? 'part of PK' : 'not in PK') + ' -> ' + (currentColumn.isPrimaryKey ? 'part of PK' : 'not in PK'));
+            }
+            return lines.slice(0, 6);
+        },
+
+        renderColumnSummary: function(column) {
+            const bits = [column.type];
+            bits.push(column.nullable ? 'NULL allowed' : 'NOT NULL');
+            if (column.defaultValue) {
+                bits.push('default ' + column.defaultValue);
+            }
+            if (column.isPrimaryKey) {
+                bits.push('primary key');
+            }
+            return bits.join(' • ');
         }
     };
 

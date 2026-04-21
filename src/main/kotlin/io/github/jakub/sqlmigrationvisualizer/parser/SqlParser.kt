@@ -1,5 +1,6 @@
 package io.github.jakub.sqlmigrationvisualizer.parser
 
+import io.github.jakub.sqlmigrationvisualizer.analyzer.SchemaChangeRiskAnalyzer
 import io.github.jakub.sqlmigrationvisualizer.model.*
 
 /**
@@ -152,6 +153,7 @@ class SqlParser {
 
         // Apply each migration sequentially
         for (migration in migrations) {
+            val previousVersion = versions.last()
             val prevTables = currentSchema.keys.toSet()
             val prevColumns = currentSchema.mapValues { it.value.columns.map { c -> c.name }.toSet() }
             val prevColumnDefs = currentSchema.mapValues { entry ->
@@ -184,11 +186,16 @@ class SqlParser {
                 if (added.isNotEmpty() || removed.isNotEmpty()) tablesModified.add(tableName)
             }
 
+            val currentSnapshot = currentSchema.toMap()
+            val nextVersion = SchemaVersion(
+                version = migration.version,
+                tables = currentSnapshot,
+                migrationFile = migration
+            )
+            val risk = SchemaChangeRiskAnalyzer.analyze(previousVersion, nextVersion)
+
             versions.add(
-                SchemaVersion(
-                    version = migration.version,
-                    tables = currentSchema.toMap(),
-                    migrationFile = migration,
+                nextVersion.copy(
                     changesSummary = ChangesSummary(
                         tablesAdded = tablesAdded,
                         tablesRemoved = tablesRemoved,
@@ -196,8 +203,10 @@ class SqlParser {
                         columnsAdded = columnsAdded,
                         columnsRemoved = columnsRemoved,
                         removedColumnDefs = removedColumnDefs,
-                        totalStatements = migration.statements.size
-                    )
+                        totalStatements = migration.statements.size,
+                        risk = risk
+                    ),
+                    risk = risk
                 )
             )
         }
