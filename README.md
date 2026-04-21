@@ -30,6 +30,7 @@ Instead of piecing everything together manually, you can:
 - inspect relationships visually in an ER diagram
 - validate migration history before problems reach runtime
 - generate a draft for the next migration after schema changes
+- see a risk score before applying a migration (drops, missing defaults, type narrowing)
 
 ## What You Get
 
