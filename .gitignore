@@ -7,3 +7,6 @@
 .kotlin/
 build/
 out/
+AGENTS.md
+CLAUDE.md
+.claudeignore
