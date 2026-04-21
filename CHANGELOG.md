@@ -10,19 +10,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0] - 2026-04-21
 
 ### Added
-
-### Changed
-
-### Fixed
-
+- Expanded test coverage for `MigrationValidator`, `SchemaChangeRiskAnalyzer`, and `SqlParser`
 
 ## [1.0.1] - 2026-04-21
 
 ### Added
+- Risk analysis surfaced in schema change detection and pending migration prompts
+- CHANGELOG and `bump-version.sh` script
+- GPL-3.0 license file
 
 ### Changed
-
-### Fixed
+- README refreshed with branded feature board SVG and improved layout
 
 
 ## [1.0.0] - 2026-04-21
