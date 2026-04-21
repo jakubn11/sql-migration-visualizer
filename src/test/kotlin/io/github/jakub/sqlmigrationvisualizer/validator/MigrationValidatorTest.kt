@@ -5,8 +5,11 @@ import io.github.jakub.sqlmigrationvisualizer.model.MigrationFile
 import io.github.jakub.sqlmigrationvisualizer.model.SchemaVersion
 import io.github.jakub.sqlmigrationvisualizer.model.TableSchema
 import io.github.jakub.sqlmigrationvisualizer.model.ValidationIssueCode
+import io.github.jakub.sqlmigrationvisualizer.model.ForeignKey
+import io.github.jakub.sqlmigrationvisualizer.model.ValidationSeverity
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -93,6 +96,94 @@ class MigrationValidatorTest {
         assertEquals("posts", issue.tableName)
         assertEquals(listOf(0, 1), issue.contextVersions)
         assertTrue(issue.explanation.orEmpty().contains("precede"))
+    }
+
+    @Test
+    fun `no migrations returns info result that is still valid`() {
+        val result = validator.validate(migrations = emptyList(), schemaVersions = emptyList())
+
+        assertTrue(result.isValid)
+        val issue = result.issues.firstOrNull { it.code == ValidationIssueCode.NO_MIGRATIONS }
+        assertNotNull(issue)
+        assertEquals(ValidationSeverity.INFO, issue.severity)
+    }
+
+    @Test
+    fun `empty migration file produces warning`() {
+        val result = validator.validate(
+            migrations = listOf(migration(1, statements = emptyList())),
+            schemaVersions = emptyList()
+        )
+
+        val issue = result.issues.firstOrNull { it.code == ValidationIssueCode.EMPTY_MIGRATION }
+        assertNotNull(issue)
+        assertEquals(ValidationSeverity.WARNING, issue.severity)
+        assertEquals(1, issue.version)
+    }
+
+    @Test
+    fun `transaction statement in migration produces warning`() {
+        val result = validator.validate(
+            migrations = listOf(migration(1, statements = listOf("BEGIN", "INSERT INTO users VALUES (1)", "COMMIT"))),
+            schemaVersions = emptyList()
+        )
+
+        val issues = result.issues.filter { it.code == ValidationIssueCode.TRANSACTION_STATEMENT }
+        assertEquals(2, issues.size)
+    }
+
+    @Test
+    fun `drop table statement produces info issue`() {
+        val result = validator.validate(
+            migrations = listOf(migration(1, statements = listOf("DROP TABLE IF EXISTS users"))),
+            schemaVersions = emptyList()
+        )
+
+        val issue = result.issues.firstOrNull { it.code == ValidationIssueCode.DROP_TABLE_STATEMENT }
+        assertNotNull(issue)
+        assertEquals(ValidationSeverity.INFO, issue.severity)
+        assertEquals("users", issue.tableName)
+    }
+
+    @Test
+    fun `self-referencing foreign key does not produce missing table error`() {
+        val employeesTable = TableSchema(
+            name = "employees",
+            columns = listOf(
+                ColumnDef("id", "INTEGER", isPrimaryKey = true),
+                ColumnDef("manager_id", "INTEGER", nullable = true)
+            ),
+            primaryKey = listOf("id"),
+            foreignKeys = listOf(ForeignKey(listOf("manager_id"), "employees", listOf("id")))
+        )
+        val version = SchemaVersion(version = 1, tables = mapOf("employees" to employeesTable), migrationFile = null)
+
+        val result = validator.validate(
+            migrations = listOf(migration(1)),
+            schemaVersions = listOf(version)
+        )
+
+        assertFalse(result.issues.any { it.code == ValidationIssueCode.FOREIGN_KEY_TARGET_MISSING })
+    }
+
+    @Test
+    fun `foreign key referencing missing table produces error`() {
+        val ordersTable = TableSchema(
+            name = "orders",
+            columns = listOf(ColumnDef("id", "INTEGER", isPrimaryKey = true), ColumnDef("user_id", "INTEGER")),
+            primaryKey = listOf("id"),
+            foreignKeys = listOf(ForeignKey(listOf("user_id"), "users", listOf("id")))
+        )
+        val version = SchemaVersion(version = 1, tables = mapOf("orders" to ordersTable), migrationFile = null)
+
+        val result = validator.validate(
+            migrations = listOf(migration(1)),
+            schemaVersions = listOf(version)
+        )
+
+        val issue = result.issues.firstOrNull { it.code == ValidationIssueCode.FOREIGN_KEY_TARGET_MISSING }
+        assertNotNull(issue)
+        assertEquals("orders", issue.tableName)
     }
 
     private fun migration(

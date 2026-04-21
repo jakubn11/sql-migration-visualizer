@@ -3,6 +3,7 @@ package io.github.jakub.sqlmigrationvisualizer.parser
 import io.github.jakub.sqlmigrationvisualizer.model.MigrationFile
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -172,6 +173,57 @@ class SqlParserTest {
 
         assertNotNull(ordersTable)
         assertTrue(ordersTable.foreignKeys.isEmpty())
+    }
+
+    @Test
+    fun `buildSchemaTimeline accumulates schema across multiple sequential migrations`() {
+        val migration1 = MigrationFile(
+            version = 1, filePath = "/tmp/1.sql", fileName = "1.sql", rawContent = "",
+            statements = listOf("CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT NOT NULL)")
+        )
+        val migration2 = MigrationFile(
+            version = 2, filePath = "/tmp/2.sql", fileName = "2.sql", rawContent = "",
+            statements = listOf(
+                "CREATE TABLE posts (id INTEGER PRIMARY KEY, user_id INTEGER REFERENCES users(id))",
+                "ALTER TABLE users ADD COLUMN email TEXT"
+            )
+        )
+
+        val timeline = parser.buildSchemaTimeline(emptyList(), listOf(migration1, migration2))
+
+        assertEquals(3, timeline.size)
+        val finalState = timeline.last()
+        assertNotNull(finalState.tables["users"])
+        assertNotNull(finalState.tables["posts"])
+        val emailCol = finalState.tables["users"]!!.columns.firstOrNull { it.name == "email" }
+        assertNotNull(emailCol)
+        assertEquals(1, finalState.tables["posts"]!!.foreignKeys.size)
+        assertEquals("users", finalState.tables["posts"]!!.foreignKeys.first().referencedTable)
+    }
+
+    @Test
+    fun `buildSchemaTimeline parses table-level constraint foreign key`() {
+        val baseline = listOf(
+            "CREATE TABLE users (id INTEGER PRIMARY KEY)",
+            """
+            CREATE TABLE orders (
+              id INTEGER PRIMARY KEY,
+              user_id INTEGER NOT NULL,
+              CONSTRAINT fk_orders_user FOREIGN KEY (user_id) REFERENCES users(id)
+            )
+            """.trimIndent()
+        )
+
+        val timeline = parser.buildSchemaTimeline(baseline, emptyList())
+        val ordersTable = timeline.first().tables["orders"]
+
+        assertNotNull(ordersTable)
+        assertEquals(1, ordersTable.foreignKeys.size)
+        val fk = ordersTable.foreignKeys.first()
+        assertEquals(listOf("user_id"), fk.columns)
+        assertEquals("users", fk.referencedTable)
+        assertEquals(listOf("id"), fk.referencedColumns)
+        assertFalse(ordersTable.columns.any { it.name == "CONSTRAINT" })
     }
 
     @Test
