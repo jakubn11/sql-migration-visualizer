@@ -1,23 +1,19 @@
-<svg width="1200" height="912" viewBox="0 0 1200 912" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+<svg width="1200" height="660" viewBox="0 0 1200 660" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">SQL Migration Visualizer features</title>
-  <desc id="desc">A polished feature board for SQL Migration Visualizer showing Timeline View, Schema Diff, ER Diagram, Validation, Suggested Migrations, and Dialect Support in the plugin's blue and cyan palette.</desc>
+  <desc id="desc">Feature overview for SQL Migration Visualizer showing six capability cards: Timeline View, Schema Diff, ER Diagram, Validation, Suggested Migrations, and Risk Scoring.</desc>
   <defs>
-    <linearGradient id="pageBg" x1="98" y1="40" x2="1114" y2="912" gradientUnits="userSpaceOnUse">
+    <linearGradient id="pageBg" x1="98" y1="40" x2="1114" y2="660" gradientUnits="userSpaceOnUse">
       <stop stop-color="#131821"/>
       <stop offset="1" stop-color="#1B222D"/>
     </linearGradient>
-    <linearGradient id="accent" x1="180" y1="120" x2="1010" y2="750" gradientUnits="userSpaceOnUse">
+    <linearGradient id="accent" x1="180" y1="120" x2="1010" y2="600" gradientUnits="userSpaceOnUse">
       <stop stop-color="#58D1C9"/>
       <stop offset="0.58" stop-color="#6AA6FF"/>
       <stop offset="1" stop-color="#8ABBFF"/>
     </linearGradient>
-    <linearGradient id="cardBg" x1="138" y1="248" x2="1096" y2="864" gradientUnits="userSpaceOnUse">
+    <linearGradient id="cardBg" x1="138" y1="240" x2="1062" y2="600" gradientUnits="userSpaceOnUse">
       <stop stop-color="#202734"/>
       <stop offset="1" stop-color="#1B2230"/>
-    </linearGradient>
-    <linearGradient id="cardInset" x1="72" y1="248" x2="72" y2="412" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FFFFFF" stop-opacity="0.05"/>
-      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
     </linearGradient>
     <radialGradient id="glowA" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(204 126) rotate(41) scale(380 280)">
       <stop stop-color="#58D1C9" stop-opacity="0.2"/>
@@ -34,131 +30,103 @@
       <feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#03080F" flood-opacity="0.28"/>
     </filter>
     <clipPath id="frameClip">
-      <rect x="20" y="20" width="1160" height="872" rx="34"/>
+      <rect x="20" y="20" width="1160" height="620" rx="34"/>
     </clipPath>
   </defs>
 
   <g clip-path="url(#frameClip)">
-    <rect x="20" y="20" width="1160" height="872" rx="34" fill="url(#pageBg)"/>
-    <rect x="20" y="20" width="1160" height="872" rx="34" fill="url(#grid)" opacity="0.22"/>
+    <rect x="20" y="20" width="1160" height="620" rx="34" fill="url(#pageBg)"/>
+    <rect x="20" y="20" width="1160" height="620" rx="34" fill="url(#grid)" opacity="0.22"/>
     <circle cx="208" cy="126" r="300" fill="url(#glowA)"/>
     <circle cx="1040" cy="98" r="340" fill="url(#glowB)"/>
-    <rect x="20" y="20" width="1160" height="872" rx="34" stroke="#334050"/>
+    <rect x="20" y="20" width="1160" height="620" rx="34" stroke="#334050"/>
   </g>
 
   <rect x="72" y="56" width="194" height="38" rx="19" fill="#58D1C91A" stroke="#58D1C94D"/>
   <text x="169" y="80" text-anchor="middle" fill="#58D1C9" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="0.08em">FEATURE OVERVIEW</text>
   <rect x="72" y="108" width="205" height="10" rx="5" fill="url(#accent)"/>
   <text x="72" y="186" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="60" font-weight="800">What You Get</text>
-  <circle cx="80" cy="224" r="3.5" fill="#58D1C9"/>
-  <text x="94" y="224" dominant-baseline="middle" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">Follow how each table changed over time</text>
-  <circle cx="460" cy="224" r="3.5" fill="#6AA6FF"/>
-  <text x="474" y="224" dominant-baseline="middle" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">Validate history before runtime errors</text>
 
-  <circle cx="80" cy="250" r="3.5" fill="#58D1C9"/>
-  <text x="94" y="250" dominant-baseline="middle" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">Compare any two versions side by side</text>
-  <circle cx="460" cy="250" r="3.5" fill="#6AA6FF"/>
-  <text x="474" y="250" dominant-baseline="middle" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">Generate migrations from schema changes</text>
-
-  <circle cx="80" cy="276" r="3.5" fill="#58D1C9"/>
-  <text x="94" y="276" dominant-baseline="middle" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">Inspect relationships in a live ER diagram</text>
-  <circle cx="460" cy="276" r="3.5" fill="#6AA6FF"/>
-  <text x="474" y="276" dominant-baseline="middle" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">Score risk on drops and type changes</text>
-
+  <!-- Card 1: Timeline View -->
   <g>
-    <rect x="854" y="60" width="264" height="144" rx="24" fill="#1B2230" opacity="0.01" filter="url(#shadow)"/>
-    <rect x="854" y="60" width="264" height="144" rx="24" fill="url(#cardBg)" stroke="#334050"/>
-    <rect x="855.5" y="61.5" width="261" height="141" rx="22.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
-    <text x="884" y="86" fill="#8793A9" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="0.08em">WORKFLOW</text>
-    <circle cx="893" cy="117" r="9" fill="#58D1C9"/>
-    <text x="920" y="117" dominant-baseline="middle" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" font-weight="700">Inside the IDE</text>
-    <circle cx="893" cy="151" r="9" fill="#6AA6FF"/>
-    <text x="920" y="151" dominant-baseline="middle" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" font-weight="700">Visual by default</text>
-    <circle cx="893" cy="185" r="9" fill="#8ABBFF"/>
-    <text x="920" y="185" dominant-baseline="middle" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" font-weight="700">Built for migrations</text>
+    <rect x="72" y="240" width="504" height="100" rx="20" fill="#1B2230" opacity="0.01" filter="url(#shadow)"/>
+    <rect x="72" y="240" width="504" height="100" rx="20" fill="url(#cardBg)" stroke="#334050"/>
+    <rect x="73.5" y="241.5" width="501" height="97" rx="18.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
+    <rect x="96" y="270" width="40" height="40" rx="12" fill="#58D1C918" stroke="#58D1C940"/>
+    <polyline points="102,305 110,291 120,297 130,279" fill="none" stroke="#58D1C9" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="102" cy="305" r="2.5" fill="#58D1C9"/>
+    <circle cx="110" cy="291" r="2.5" fill="#58D1C9"/>
+    <circle cx="120" cy="297" r="2.5" fill="#58D1C9"/>
+    <circle cx="130" cy="279" r="2.5" fill="#58D1C9"/>
+    <text x="150" y="271" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" font-weight="800">Timeline View</text>
+    <text x="150" y="297" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13">Follow how each table changed over time</text>
   </g>
 
+  <!-- Card 2: Schema Diff -->
   <g>
-    <rect x="72" y="288" width="504" height="168" rx="26" fill="#1B2230" opacity="0.01" filter="url(#shadow)"/>
-    <rect x="72" y="288" width="504" height="168" rx="26" fill="url(#cardBg)" stroke="#334050"/>
-    <rect x="73.5" y="289.5" width="501" height="165" rx="24.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
-    <rect x="102" y="340" width="64" height="64" rx="20" fill="#58D1C918" stroke="#58D1C940"/>
-    <path d="M120 384L132 368L143 377L156 356" stroke="#58D1C9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="120" cy="384" r="4" fill="#58D1C9"/>
-    <circle cx="132" cy="368" r="4" fill="#58D1C9"/>
-    <circle cx="143" cy="377" r="4" fill="#58D1C9"/>
-    <circle cx="156" cy="356" r="4" fill="#58D1C9"/>
-    <text x="186" y="332" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" font-weight="800">Timeline View</text>
-    <text x="186" y="368" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15">Browse schema history version by version</text>
-    <text x="186" y="392" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15">with change summaries, table counts, and</text>
-    <text x="186" y="416" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15">source-aware navigation.</text>
+    <rect x="624" y="240" width="504" height="100" rx="20" fill="#1B2230" opacity="0.01" filter="url(#shadow)"/>
+    <rect x="624" y="240" width="504" height="100" rx="20" fill="url(#cardBg)" stroke="#334050"/>
+    <rect x="625.5" y="241.5" width="501" height="97" rx="18.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
+    <rect x="648" y="270" width="40" height="40" rx="12" fill="#6AA6FF18" stroke="#6AA6FF40"/>
+    <rect x="652" y="274" width="13" height="13" rx="3" stroke="#8ABBFF" stroke-width="2.5" fill="none"/>
+    <rect x="669" y="293" width="13" height="13" rx="3" stroke="#8ABBFF" stroke-width="2.5" fill="none"/>
+    <path d="M 665 281 H 676 V 293" stroke="#8ABBFF" stroke-width="2" stroke-linecap="round" fill="none"/>
+    <text x="702" y="271" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" font-weight="800">Schema Diff</text>
+    <text x="702" y="297" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13">Compare any two versions side by side</text>
   </g>
 
+  <!-- Card 3: ER Diagram -->
   <g>
-    <rect x="624" y="288" width="504" height="168" rx="26" fill="#1B2230" opacity="0.01" filter="url(#shadow)"/>
-    <rect x="624" y="288" width="504" height="168" rx="26" fill="url(#cardBg)" stroke="#334050"/>
-    <rect x="625.5" y="289.5" width="501" height="165" rx="24.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
-    <rect x="654" y="340" width="64" height="64" rx="20" fill="#6AA6FF18" stroke="#6AA6FF40"/>
-    <rect x="670" y="356" width="14" height="14" rx="4" stroke="#8ABBFF" stroke-width="3"/>
-    <rect x="689" y="375" width="14" height="14" rx="4" stroke="#8ABBFF" stroke-width="3"/>
-    <path d="M684 363H691M677 370V377" stroke="#8ABBFF" stroke-width="3" stroke-linecap="round"/>
-    <text x="738" y="332" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" font-weight="800">Schema Diff</text>
-    <text x="738" y="368" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15">Compare two versions to spot added, removed,</text>
-    <text x="738" y="392" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15">renamed, and changed tables or columns quickly.</text>
+    <rect x="72" y="360" width="504" height="100" rx="20" fill="#1B2230" opacity="0.01" filter="url(#shadow)"/>
+    <rect x="72" y="360" width="504" height="100" rx="20" fill="url(#cardBg)" stroke="#334050"/>
+    <rect x="73.5" y="361.5" width="501" height="97" rx="18.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
+    <rect x="96" y="390" width="40" height="40" rx="12" fill="#58D1C918" stroke="#58D1C940"/>
+    <line x1="112" y1="402" x2="120" y2="402" stroke="#58D1C9" stroke-width="2"/>
+    <line x1="108" y1="407" x2="114" y2="415" stroke="#58D1C9" stroke-width="2"/>
+    <line x1="124" y1="407" x2="118" y2="415" stroke="#58D1C9" stroke-width="2"/>
+    <circle cx="106" cy="402" r="5.5" stroke="#58D1C9" stroke-width="2" fill="none"/>
+    <circle cx="126" cy="402" r="5.5" stroke="#58D1C9" stroke-width="2" fill="none"/>
+    <circle cx="116" cy="420" r="5.5" stroke="#58D1C9" stroke-width="2" fill="none"/>
+    <text x="150" y="391" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" font-weight="800">ER Diagram</text>
+    <text x="150" y="417" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13">Inspect relationships in a live ER diagram</text>
   </g>
 
+  <!-- Card 4: Validation -->
   <g>
-    <rect x="72" y="480" width="504" height="168" rx="26" fill="#1B2230" opacity="0.01" filter="url(#shadow)"/>
-    <rect x="72" y="480" width="504" height="168" rx="26" fill="url(#cardBg)" stroke="#334050"/>
-    <rect x="73.5" y="481.5" width="501" height="165" rx="24.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
-    <rect x="102" y="532" width="64" height="64" rx="20" fill="#58D1C918" stroke="#58D1C940"/>
-    <rect x="117" y="547" width="13" height="13" rx="4" stroke="#58D1C9" stroke-width="3"/>
-    <rect x="139" y="547" width="13" height="13" rx="4" stroke="#58D1C9" stroke-width="3"/>
-    <rect x="128" y="569" width="13" height="13" rx="4" stroke="#58D1C9" stroke-width="3"/>
-    <path d="M130 553H139M145 560V569M123 560V569" stroke="#58D1C9" stroke-width="3" stroke-linecap="round"/>
-    <text x="186" y="524" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" font-weight="800">ER Diagram</text>
-    <text x="186" y="560" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15">Inspect table relationships visually with</text>
-    <text x="186" y="584" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15">zoomable, draggable table cards.</text>
+    <rect x="624" y="360" width="504" height="100" rx="20" fill="#1B2230" opacity="0.01" filter="url(#shadow)"/>
+    <rect x="624" y="360" width="504" height="100" rx="20" fill="url(#cardBg)" stroke="#334050"/>
+    <rect x="625.5" y="361.5" width="501" height="97" rx="18.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
+    <rect x="648" y="390" width="40" height="40" rx="12" fill="#F5C46B16" stroke="#F5C46B38"/>
+    <path d="M 668 395 L 681 401 L 681 412 C 681 420 668 425 668 425 C 668 425 655 420 655 412 L 655 401 Z" stroke="#F5C46B" stroke-width="2" fill="none" stroke-linejoin="round"/>
+    <path d="M 661 412 L 666 417 L 676 406" stroke="#F5C46B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <text x="702" y="391" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" font-weight="800">Validation</text>
+    <text x="702" y="417" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13">Validate history before runtime errors</text>
   </g>
 
+  <!-- Card 5: Suggested Migrations -->
   <g>
-    <rect x="624" y="480" width="504" height="168" rx="26" fill="#1B2230" opacity="0.01" filter="url(#shadow)"/>
-    <rect x="624" y="480" width="504" height="168" rx="26" fill="url(#cardBg)" stroke="#334050"/>
-    <rect x="625.5" y="481.5" width="501" height="165" rx="24.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
-    <rect x="654" y="532" width="64" height="64" rx="20" fill="#F5C46B16" stroke="#F5C46B38"/>
-    <path d="M686 549L701 557V570C701 577 694 583 686 586C678 583 671 577 671 570V557L686 549Z" stroke="#F5C46B" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M680 568L685 573L693 564" stroke="#F5C46B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    <text x="738" y="524" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" font-weight="800">Validation</text>
-    <text x="738" y="560" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15">Catch gaps, duplicates, invalid alters, and</text>
-    <text x="738" y="584" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15">inconsistent migration history before it causes damage.</text>
+    <rect x="72" y="480" width="504" height="100" rx="20" fill="#1B2230" opacity="0.01" filter="url(#shadow)"/>
+    <rect x="72" y="480" width="504" height="100" rx="20" fill="url(#cardBg)" stroke="#334050"/>
+    <rect x="73.5" y="481.5" width="501" height="97" rx="18.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
+    <rect x="96" y="510" width="40" height="40" rx="12" fill="#6AA6FF18" stroke="#6AA6FF40"/>
+    <line x1="101" y1="521" x2="117" y2="521" stroke="#8ABBFF" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="101" y1="530" x2="117" y2="530" stroke="#8ABBFF" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="101" y1="539" x2="117" y2="539" stroke="#8ABBFF" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 121 522 L 131 530 L 121 538" stroke="#8ABBFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <text x="150" y="511" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" font-weight="800">Suggested Migrations</text>
+    <text x="150" y="537" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13">Generate migrations from schema changes</text>
   </g>
 
+  <!-- Card 6: Risk Scoring -->
   <g>
-    <rect x="72" y="672" width="504" height="168" rx="26" fill="#1B2230" opacity="0.01" filter="url(#shadow)"/>
-    <rect x="72" y="672" width="504" height="168" rx="26" fill="url(#cardBg)" stroke="#334050"/>
-    <rect x="73.5" y="673.5" width="501" height="165" rx="24.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
-    <rect x="102" y="724" width="64" height="64" rx="20" fill="#6AA6FF18" stroke="#6AA6FF40"/>
-    <path d="M119 755H148" stroke="#8ABBFF" stroke-width="3" stroke-linecap="round"/>
-    <path d="M119 742H138" stroke="#8ABBFF" stroke-width="3" stroke-linecap="round"/>
-    <path d="M119 768H141" stroke="#8ABBFF" stroke-width="3" stroke-linecap="round"/>
-    <path d="M140 741L149 750L140 759" stroke="#8ABBFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    <text x="186" y="716" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" font-weight="800">Suggested Migrations</text>
-    <text x="186" y="752" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15">Detect saved schema changes and prepare</text>
-    <text x="186" y="776" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15">a draft migration for review when you are ready.</text>
-  </g>
-
-  <g>
-    <rect x="624" y="672" width="504" height="168" rx="26" fill="#1B2230" opacity="0.01" filter="url(#shadow)"/>
-    <rect x="624" y="672" width="504" height="168" rx="26" fill="url(#cardBg)" stroke="#334050"/>
-    <rect x="625.5" y="673.5" width="501" height="165" rx="24.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
-    <rect x="654" y="724" width="64" height="64" rx="20" fill="#58D1C918" stroke="#58D1C940"/>
-    <path d="M674 747H699" stroke="#58D1C9" stroke-width="3" stroke-linecap="round"/>
-    <path d="M674 759H687" stroke="#58D1C9" stroke-width="3" stroke-linecap="round"/>
-    <path d="M689 759H700" stroke="#58D1C9" stroke-width="3" stroke-linecap="round"/>
-    <path d="M674 771H693" stroke="#58D1C9" stroke-width="3" stroke-linecap="round"/>
-    <circle cx="704" cy="759" r="8" stroke="#58D1C9" stroke-width="3"/>
-    <text x="738" y="716" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" font-weight="800">Dialect Support</text>
-    <text x="738" y="752" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15">Generate SQL for Generic SQL, PostgreSQL,</text>
-    <text x="738" y="776" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15">and MySQL or MariaDB workflows.</text>
+    <rect x="624" y="480" width="504" height="100" rx="20" fill="#1B2230" opacity="0.01" filter="url(#shadow)"/>
+    <rect x="624" y="480" width="504" height="100" rx="20" fill="url(#cardBg)" stroke="#334050"/>
+    <rect x="625.5" y="481.5" width="501" height="97" rx="18.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
+    <rect x="648" y="510" width="40" height="40" rx="12" fill="#FF806018" stroke="#FF806038"/>
+    <rect x="654" y="538" width="8" height="8" rx="2" fill="#58D1C9"/>
+    <rect x="665" y="530" width="8" height="16" rx="2" fill="#F5C46B"/>
+    <rect x="676" y="520" width="8" height="26" rx="2" fill="#FF8060"/>
+    <text x="702" y="511" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" font-weight="800">Risk Scoring</text>
+    <text x="702" y="537" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13">Score risk on drops and type changes</text>
   </g>
 </svg>
