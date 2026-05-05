@@ -22,7 +22,7 @@
 ## What You Get
 
 <p align="center">
-  <img src="docs/readme-features.svg" alt="Feature board for SQL Migration Visualizer showing Timeline View, Schema Diff, ER Diagram, Validation, Suggested Migrations, and Dialect Support." width="100%">
+  <img src="docs/readme-features.svg" alt="Feature board for SQL Migration Visualizer showing Timeline View, Schema Diff, ER Diagram, Validation, Suggested Migrations, Risk Scoring, Search, Dialect Support, and Create Migration." width="100%">
 </p>
 
 ## Ideal For
