@@ -60,8 +60,8 @@
     <circle cx="102" cy="288" r="2.5" fill="#58D1C9"/>
     <circle cx="112" cy="294" r="2.5" fill="#58D1C9"/>
     <circle cx="122" cy="278" r="2.5" fill="#58D1C9"/>
-    <text x="136" y="271" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">Timeline View</text>
-    <text x="136" y="295" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">Browse each table's change history</text>
+    <text x="144" y="271" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">Timeline View</text>
+    <text x="144" y="295" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">Browse each table's change history</text>
   </g>
 
   <!-- Card 2: Schema Diff (430, 240) -->
@@ -73,8 +73,8 @@
     <rect x="450" y="274" width="13" height="13" rx="3" stroke="#8ABBFF" stroke-width="2.5" fill="none"/>
     <rect x="467" y="291" width="13" height="13" rx="3" stroke="#8ABBFF" stroke-width="2.5" fill="none"/>
     <path d="M 463 281 H 474 V 291" stroke="#8ABBFF" stroke-width="2" stroke-linecap="round" fill="none"/>
-    <text x="494" y="271" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">Schema Diff</text>
-    <text x="494" y="295" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">Compare any two versions side by side</text>
+    <text x="502" y="271" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">Schema Diff</text>
+    <text x="502" y="295" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">Compare any two versions side by side</text>
   </g>
 
   <!-- Card 3: ER Diagram (788, 240) -->
@@ -89,8 +89,8 @@
     <circle cx="814" cy="282" r="5" stroke="#58D1C9" stroke-width="2" fill="none"/>
     <circle cx="834" cy="282" r="5" stroke="#58D1C9" stroke-width="2" fill="none"/>
     <circle cx="824" cy="300" r="5" stroke="#58D1C9" stroke-width="2" fill="none"/>
-    <text x="852" y="271" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">ER Diagram</text>
-    <text x="852" y="295" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">Inspect table relationships visually</text>
+    <text x="860" y="271" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">ER Diagram</text>
+    <text x="860" y="295" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">Inspect table relationships visually</text>
   </g>
 
   <!-- Row 2 ─────────────────────────────────────────────── -->
@@ -103,8 +103,8 @@
     <rect x="88" y="390" width="40" height="40" rx="12" fill="#F5C46B16" stroke="#F5C46B38"/>
     <path d="M 108 394 L 121 400 L 121 411 C 121 419 108 425 108 425 C 108 425 95 419 95 411 L 95 400 Z" stroke="#F5C46B" stroke-width="2" fill="none" stroke-linejoin="round"/>
     <path d="M 101 411 L 106 416 L 116 405" stroke="#F5C46B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <text x="136" y="391" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">Validation</text>
-    <text x="136" y="415" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">Validate history before runtime errors</text>
+    <text x="144" y="391" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">Validation</text>
+    <text x="144" y="415" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">Validate history before runtime errors</text>
   </g>
 
   <!-- Card 5: Suggested Migrations (430, 360) -->
@@ -117,8 +117,8 @@
     <line x1="452" y1="410" x2="468" y2="410" stroke="#8ABBFF" stroke-width="2.5" stroke-linecap="round"/>
     <line x1="452" y1="420" x2="468" y2="420" stroke="#8ABBFF" stroke-width="2.5" stroke-linecap="round"/>
     <path d="M 472 403 L 481 410 L 472 417" stroke="#8ABBFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <text x="494" y="391" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">Suggested Migrations</text>
-    <text x="494" y="415" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">Generate migrations from schema changes</text>
+    <text x="502" y="391" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">Suggested Migrations</text>
+    <text x="502" y="415" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">Generate migrations from schema changes</text>
   </g>
 
   <!-- Card 6: Risk Scoring (788, 360) -->
@@ -130,8 +130,8 @@
     <rect x="809" y="416" width="8" height="8" rx="2" fill="#58D1C9"/>
     <rect x="820" y="408" width="8" height="16" rx="2" fill="#F5C46B"/>
     <rect x="831" y="394" width="8" height="30" rx="2" fill="#FF8060"/>
-    <text x="852" y="391" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">Risk Scoring</text>
-    <text x="852" y="415" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">Score risk on drops and type changes</text>
+    <text x="860" y="391" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">Risk Scoring</text>
+    <text x="860" y="415" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">Score risk on drops and type changes</text>
   </g>
 
   <!-- Row 3 ─────────────────────────────────────────────── -->
@@ -144,8 +144,8 @@
     <rect x="88" y="510" width="40" height="40" rx="12" fill="#6AA6FF18" stroke="#6AA6FF40"/>
     <circle cx="102" cy="524" r="8" stroke="#8ABBFF" stroke-width="2.5" fill="none"/>
     <line x1="108" y1="530" x2="118" y2="542" stroke="#8ABBFF" stroke-width="2.5" stroke-linecap="round"/>
-    <text x="136" y="511" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">Search</text>
-    <text x="136" y="535" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">Full-text search across all versions</text>
+    <text x="144" y="511" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">Search</text>
+    <text x="144" y="535" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">Full-text search across all versions</text>
   </g>
 
   <!-- Card 8: Dialect Support (430, 480) -->
@@ -157,8 +157,8 @@
     <line x1="452" y1="520" x2="472" y2="520" stroke="#58D1C9" stroke-width="2.5" stroke-linecap="round"/>
     <line x1="452" y1="530" x2="478" y2="530" stroke="#6AA6FF" stroke-width="2.5" stroke-linecap="round"/>
     <line x1="452" y1="540" x2="466" y2="540" stroke="#8ABBFF" stroke-width="2.5" stroke-linecap="round"/>
-    <text x="494" y="511" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">Dialect Support</text>
-    <text x="494" y="535" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">Generate SQL for PostgreSQL and MySQL</text>
+    <text x="502" y="511" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">Dialect Support</text>
+    <text x="502" y="535" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">Generate SQL for PostgreSQL and MySQL</text>
   </g>
 
   <!-- Card 9: Create Migration (788, 480) -->
@@ -172,7 +172,7 @@
     <line x1="812" y1="528" x2="828" y2="528" stroke="#A78BFF" stroke-width="2" stroke-linecap="round"/>
     <line x1="812" y1="534" x2="828" y2="534" stroke="#A78BFF" stroke-width="2" stroke-linecap="round"/>
     <line x1="812" y1="540" x2="824" y2="540" stroke="#A78BFF" stroke-width="2" stroke-linecap="round"/>
-    <text x="852" y="511" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">Create Migration</text>
-    <text x="852" y="535" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">Draft and save migrations in the IDE</text>
+    <text x="860" y="511" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">Create Migration</text>
+    <text x="860" y="535" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">Draft and save migrations in the IDE</text>
   </g>
 </svg>
