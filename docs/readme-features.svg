@@ -113,18 +113,12 @@
     <rect x="430" y="360" width="340" height="100" rx="20" fill="url(#cardBg)" stroke="#334050"/>
     <rect x="431.5" y="361.5" width="337" height="97" rx="18.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
     <rect x="446" y="390" width="40" height="40" rx="12" fill="#6AA6FF18" stroke="#6AA6FF40"/>
-    <rect x="452" y="398" width="13" height="18" rx="3" stroke="#8ABBFF" stroke-width="2" fill="none"/>
-    <line x1="456" y1="404" x2="461" y2="404" stroke="#8ABBFF" stroke-width="1.7" stroke-linecap="round"/>
-    <line x1="456" y1="409" x2="461" y2="409" stroke="#8ABBFF" stroke-width="1.7" stroke-linecap="round"/>
-    <line x1="456" y1="414" x2="459" y2="414" stroke="#8ABBFF" stroke-width="1.7" stroke-linecap="round"/>
-    <path d="M 467 407 H 474" stroke="#58D1C9" stroke-width="2" stroke-linecap="round"/>
-    <path d="M 471 403 L 475 407 L 471 411" stroke="#58D1C9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <path d="M 475 397 H 481 L 484 400 V 422 H 475 Z" stroke="#8ABBFF" stroke-width="2" fill="none" stroke-linejoin="round"/>
-    <path d="M 481 397 V 401 H 484" stroke="#8ABBFF" stroke-width="2" fill="none" stroke-linejoin="round"/>
-    <line x1="478" y1="407" x2="481" y2="407" stroke="#8ABBFF" stroke-width="1.6" stroke-linecap="round"/>
-    <line x1="478" y1="412" x2="481" y2="412" stroke="#8ABBFF" stroke-width="1.6" stroke-linecap="round"/>
-    <path d="M 478 417 L 480 419 L 483 414" stroke="#58D1C9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <path d="M 458 418 L 460 421 L 463 423 L 460 425 L 458 428 L 456 425 L 453 423 L 456 421 Z" fill="#58D1C9"/>
+    <path d="M 454 397 H 473 L 482 406 V 424 H 454 Z" stroke="#8ABBFF" stroke-width="2.2" fill="none" stroke-linejoin="round"/>
+    <path d="M 473 397 V 406 H 482" stroke="#8ABBFF" stroke-width="2.2" fill="none" stroke-linejoin="round"/>
+    <line x1="459" y1="408" x2="469" y2="408" stroke="#8ABBFF" stroke-width="2" stroke-linecap="round"/>
+    <line x1="459" y1="414" x2="466" y2="414" stroke="#8ABBFF" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 459 420 H 473" stroke="#58D1C9" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M 469 416 L 474 420 L 469 424" stroke="#58D1C9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
     <text x="502" y="391" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">Suggested Migrations</text>
     <text x="502" y="415" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">Generate migrations from schema changes</text>
   </g>
