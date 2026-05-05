@@ -113,10 +113,18 @@
     <rect x="430" y="360" width="340" height="100" rx="20" fill="url(#cardBg)" stroke="#334050"/>
     <rect x="431.5" y="361.5" width="337" height="97" rx="18.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
     <rect x="446" y="390" width="40" height="40" rx="12" fill="#6AA6FF18" stroke="#6AA6FF40"/>
-    <line x1="452" y1="400" x2="468" y2="400" stroke="#8ABBFF" stroke-width="2.5" stroke-linecap="round"/>
-    <line x1="452" y1="410" x2="468" y2="410" stroke="#8ABBFF" stroke-width="2.5" stroke-linecap="round"/>
-    <line x1="452" y1="420" x2="468" y2="420" stroke="#8ABBFF" stroke-width="2.5" stroke-linecap="round"/>
-    <path d="M 472 403 L 481 410 L 472 417" stroke="#8ABBFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <rect x="452" y="398" width="13" height="18" rx="3" stroke="#8ABBFF" stroke-width="2" fill="none"/>
+    <line x1="456" y1="404" x2="461" y2="404" stroke="#8ABBFF" stroke-width="1.7" stroke-linecap="round"/>
+    <line x1="456" y1="409" x2="461" y2="409" stroke="#8ABBFF" stroke-width="1.7" stroke-linecap="round"/>
+    <line x1="456" y1="414" x2="459" y2="414" stroke="#8ABBFF" stroke-width="1.7" stroke-linecap="round"/>
+    <path d="M 467 407 H 474" stroke="#58D1C9" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 471 403 L 475 407 L 471 411" stroke="#58D1C9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M 475 397 H 481 L 484 400 V 422 H 475 Z" stroke="#8ABBFF" stroke-width="2" fill="none" stroke-linejoin="round"/>
+    <path d="M 481 397 V 401 H 484" stroke="#8ABBFF" stroke-width="2" fill="none" stroke-linejoin="round"/>
+    <line x1="478" y1="407" x2="481" y2="407" stroke="#8ABBFF" stroke-width="1.6" stroke-linecap="round"/>
+    <line x1="478" y1="412" x2="481" y2="412" stroke="#8ABBFF" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M 478 417 L 480 419 L 483 414" stroke="#58D1C9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M 458 418 L 460 421 L 463 423 L 460 425 L 458 428 L 456 425 L 453 423 L 456 421 Z" fill="#58D1C9"/>
     <text x="502" y="391" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">Suggested Migrations</text>
     <text x="502" y="415" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">Generate migrations from schema changes</text>
   </g>
@@ -167,11 +175,11 @@
     <rect x="788" y="480" width="340" height="100" rx="20" fill="url(#cardBg)" stroke="#334050"/>
     <rect x="789.5" y="481.5" width="337" height="97" rx="18.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
     <rect x="804" y="510" width="40" height="40" rx="12" fill="#A78BFF18" stroke="#A78BFF40"/>
-    <path d="M 808 514 H 826 L 832 520 V 544 H 808 Z" stroke="#A78BFF" stroke-width="2" fill="none" stroke-linejoin="round"/>
-    <path d="M 826 514 V 520 H 832" stroke="#A78BFF" stroke-width="2" fill="none" stroke-linejoin="round"/>
-    <line x1="812" y1="528" x2="828" y2="528" stroke="#A78BFF" stroke-width="2" stroke-linecap="round"/>
-    <line x1="812" y1="534" x2="828" y2="534" stroke="#A78BFF" stroke-width="2" stroke-linecap="round"/>
-    <line x1="812" y1="540" x2="824" y2="540" stroke="#A78BFF" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 812 514 H 830 L 836 520 V 544 H 812 Z" stroke="#A78BFF" stroke-width="2" fill="none" stroke-linejoin="round"/>
+    <path d="M 830 514 V 520 H 836" stroke="#A78BFF" stroke-width="2" fill="none" stroke-linejoin="round"/>
+    <line x1="816" y1="528" x2="832" y2="528" stroke="#A78BFF" stroke-width="2" stroke-linecap="round"/>
+    <line x1="816" y1="534" x2="832" y2="534" stroke="#A78BFF" stroke-width="2" stroke-linecap="round"/>
+    <line x1="816" y1="540" x2="828" y2="540" stroke="#A78BFF" stroke-width="2" stroke-linecap="round"/>
     <text x="860" y="511" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">Create Migration</text>
     <text x="860" y="535" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">Draft and save migrations in the IDE</text>
   </g>
