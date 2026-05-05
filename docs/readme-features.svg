@@ -50,8 +50,20 @@
   <text x="169" y="80" text-anchor="middle" fill="#58D1C9" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="0.08em">FEATURE OVERVIEW</text>
   <rect x="72" y="108" width="205" height="10" rx="5" fill="url(#accent)"/>
   <text x="72" y="186" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="60" font-weight="800">What You Get</text>
-  <text x="72" y="224" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" font-weight="500">A cleaner way to follow schema history, compare versions,</text>
-  <text x="72" y="252" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" font-weight="500">validate changes, and draft the next migration.</text>
+  <circle cx="80" cy="224" r="3.5" fill="#58D1C9"/>
+  <text x="94" y="224" dominant-baseline="middle" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">Follow how each table changed over time</text>
+  <circle cx="460" cy="224" r="3.5" fill="#6AA6FF"/>
+  <text x="474" y="224" dominant-baseline="middle" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">Validate history before runtime errors</text>
+
+  <circle cx="80" cy="250" r="3.5" fill="#58D1C9"/>
+  <text x="94" y="250" dominant-baseline="middle" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">Compare any two versions side by side</text>
+  <circle cx="460" cy="250" r="3.5" fill="#6AA6FF"/>
+  <text x="474" y="250" dominant-baseline="middle" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">Generate migrations from schema changes</text>
+
+  <circle cx="80" cy="276" r="3.5" fill="#58D1C9"/>
+  <text x="94" y="276" dominant-baseline="middle" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">Inspect relationships in a live ER diagram</text>
+  <circle cx="460" cy="276" r="3.5" fill="#6AA6FF"/>
+  <text x="474" y="276" dominant-baseline="middle" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">Score risk on drops and type changes</text>
 
   <g>
     <rect x="854" y="60" width="264" height="144" rx="24" fill="#1B2230" opacity="0.01" filter="url(#shadow)"/>

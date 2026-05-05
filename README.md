@@ -19,19 +19,6 @@
   <img alt="Kotlin" src="https://img.shields.io/badge/kotlin-2.0.21-8ABBFF?style=flat-square">
 </p>
 
-## Why It Feels Useful
-
-SQL migrations often live in a messy gap between schema files, versioned scripts, and whatever context still exists in your head. This plugin turns that history into something you can browse and reason about directly inside the IDE.
-
-Instead of piecing everything together manually, you can:
-
-- follow how a table changed over time
-- compare two schema versions side by side
-- inspect relationships visually in an ER diagram
-- validate migration history before problems reach runtime
-- generate a draft for the next migration after schema changes
-- see a risk score before applying a migration (drops, missing defaults, type narrowing)
-
 ## What You Get
 
 <p align="center">
