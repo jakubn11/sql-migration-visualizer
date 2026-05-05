@@ -113,12 +113,15 @@
     <rect x="430" y="360" width="340" height="100" rx="20" fill="url(#cardBg)" stroke="#334050"/>
     <rect x="431.5" y="361.5" width="337" height="97" rx="18.5" stroke="#FFFFFF" stroke-opacity="0.04"/>
     <rect x="446" y="390" width="40" height="40" rx="12" fill="#6AA6FF18" stroke="#6AA6FF40"/>
-    <path d="M 454 397 H 473 L 482 406 V 424 H 454 Z" stroke="#8ABBFF" stroke-width="2.2" fill="none" stroke-linejoin="round"/>
-    <path d="M 473 397 V 406 H 482" stroke="#8ABBFF" stroke-width="2.2" fill="none" stroke-linejoin="round"/>
-    <line x1="459" y1="408" x2="469" y2="408" stroke="#8ABBFF" stroke-width="2" stroke-linecap="round"/>
-    <line x1="459" y1="414" x2="466" y2="414" stroke="#8ABBFF" stroke-width="2" stroke-linecap="round"/>
-    <path d="M 459 420 H 473" stroke="#58D1C9" stroke-width="2.4" stroke-linecap="round"/>
-    <path d="M 469 416 L 474 420 L 469 424" stroke="#58D1C9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <line x1="466" y1="395" x2="466" y2="398" stroke="#8ABBFF" stroke-width="2.2" stroke-linecap="round"/>
+    <line x1="455" y1="400" x2="457.5" y2="403" stroke="#8ABBFF" stroke-width="2.2" stroke-linecap="round"/>
+    <line x1="477" y1="400" x2="474.5" y2="403" stroke="#8ABBFF" stroke-width="2.2" stroke-linecap="round"/>
+    <line x1="450.5" y1="410.5" x2="453.5" y2="410.5" stroke="#8ABBFF" stroke-width="2.2" stroke-linecap="round"/>
+    <line x1="478.5" y1="410.5" x2="481.5" y2="410.5" stroke="#8ABBFF" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M 458.5 421 V 418.5 C 455.2 416.1 453.5 413.4 453.5 410.2 C 453.5 403.8 458.9 399 466 399 C 473.1 399 478.5 403.8 478.5 410.2 C 478.5 413.4 476.8 416.1 473.5 418.5 V 421" stroke="#8ABBFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M 461 410.5 L 464.5 414 L 471.5 407" stroke="#58D1C9" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <line x1="460" y1="424" x2="472" y2="424" stroke="#8ABBFF" stroke-width="2.2" stroke-linecap="round"/>
+    <line x1="462.5" y1="427" x2="469.5" y2="427" stroke="#58D1C9" stroke-width="2.2" stroke-linecap="round"/>
     <text x="502" y="391" dominant-baseline="hanging" fill="#EEF4FF" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="800">Suggested Migrations</text>
     <text x="502" y="415" dominant-baseline="hanging" fill="#C4CEE0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">Generate migrations from schema changes</text>
   </g>
