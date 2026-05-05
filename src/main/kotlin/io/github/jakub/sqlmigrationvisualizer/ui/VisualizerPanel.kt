@@ -568,10 +568,10 @@ $css
                     <div id="create-mig-risk-list" class="composer-risk-list"></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group" style="flex: 0 0 100px">
+                    <div class="form-group" style="flex: 0 0 auto">
                         <label class="form-label">Version</label>
                         <div class="form-input-group version-input-group">
-                            <input type="number" id="create-mig-version" class="form-input version-number-input" min="1" value="1">
+                            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="9" id="create-mig-version" class="form-input version-number-input" value="1">
                             <div class="version-stepper" aria-label="Version stepper">
                                 <button class="btn btn-ghost btn-sm version-step-btn" type="button" title="Decrease version" onclick="window.CreateMigrationModule && window.CreateMigrationModule.stepVersion(-1)">
                                     <svg viewBox="0 0 24 24" width="12" height="12"><path d="M19 13H5v-2h14v2z" fill="currentColor"/></svg>

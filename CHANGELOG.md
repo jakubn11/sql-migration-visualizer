@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-05-05
+
+### Added
+- Cmd+Enter (Ctrl+Enter on Windows/Linux) keyboard shortcut to submit the Create Migration form from the SQL editor
+
+### Changed
+- Version input auto-sizes based on digit count (44–92 px range) with pointer cursor; enforces digits-only and caps at 9 digits (up to 999 999 999)
+- Version stepper (+/−) buttons now have equal padding and gap on both sides
+- SQL editor layout: textarea is now in normal flow (drives container height); the syntax-highlight `<pre>` is positioned absolutely behind it — fixes clicking any row to place the cursor there
+- SQL editor auto-grows with content using a persistent mirror div for accurate, equal padding on all sides; no max-height cap — the dialog scrollbar handles long content
+- SQL editor internal resize handle removed; resize is no longer possible (no longer needed)
+- Autocomplete suggestion dropdown positions itself near the caret — above when near the bottom edge, below otherwise
+- Caret color in the SQL editor now matches the rest of the app (white)
+
+### Fixed
+- Version number displayed in scientific notation (e.g. `1.3e+40`) for very large inputs — now capped at 9 digits with digit-only enforcement
+- `submitLabel` option was injected into `innerHTML` unescaped — now passed through `escapeHtml`
+- `project.baseDir` deprecated API replaced with `LocalFileSystem.findFileByPath`
+
+### Performance
+- Caret mirror div for suggestion positioning is created once and reused across keystrokes instead of created/destroyed each time
+
 ## [1.1.0] - 2026-04-21
 
 ### Added
@@ -22,7 +44,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README refreshed with branded feature board SVG and improved layout
 
-
 ## [1.0.0] - 2026-04-21
 
 ### Added
@@ -37,7 +58,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Auto-detection of common migration directory layouts (SQLDelight, Flyway, generic)
 - Project-level settings for directories, SQL dialect, and default tab
 
-[Unreleased]: https://github.com/jakubn11/sql-migration-visualizer/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/jakubn11/sql-migration-visualizer/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/jakubn11/sql-migration-visualizer/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/jakubn11/sql-migration-visualizer/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/jakubn11/sql-migration-visualizer/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/jakubn11/sql-migration-visualizer/releases/tag/v1.0.0

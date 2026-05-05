@@ -58,7 +58,7 @@ io.github.jakub.sqlmigrationvisualizer/
 | `timeline.js` | Interactive version timeline |
 | `schema-diff.js` | Side-by-side version comparison |
 | `er-diagram.js` | Draggable/zoomable ER diagram |
-| `create-migration.js` | Pending migration preview & creation |
+| `create-migration.js` | Create/edit migration modal |
 | `search.js` | Full-text search across schema |
 | `sql-highlight.js` | Syntax highlighting |
 | `export.js` | Export functionality |
@@ -93,7 +93,7 @@ All models are `@Serializable` (kotlinx-serialization-json 1.7.3):
 
 ## Risk Analyser Rules
 
-HIGH: table drop, column drop, required column added without default, type narrowing  
+HIGH: table drop, column drop, required column added without default, type narrowing
 MEDIUM: NULL tightening, type change (non-narrowing), PK/FK changes
 
 ## Validator Issue Codes
@@ -151,11 +151,10 @@ MEDIUM: NULL tightening, type change (non-narrowing), PK/FK changes
 2. Register its handler in `setupQueryHandlers()`:
    ```kotlin
    myActionQuery.addHandler { payload ->
-       // handle payload (JSON string)
-       JBCefJSQuery.Response("ok")  // or Response(null, 0, "error msg")
+       JBCefJSQuery.Response("ok")
    }
    ```
-3. Expose it to JS in `buildBridgeFunctions()` — add to the `inject` block and to the `window.__bridge` object:
+3. Expose it to JS in `buildBridgeFunctions()`:
    ```kotlin
    val myActionJs = myActionQuery.inject("json")
    // inside the return """ ... """ block:
@@ -170,27 +169,90 @@ MEDIUM: NULL tightening, type change (non-narrowing), PK/FK changes
 - **Async services** (`SchemaChangePromptService`, `VisualizerPanel` alarm) run on `POOLED_THREAD`; always guard callbacks with `if (project.isDisposed) return`.
 - **Do not nest** `WriteCommandAction` inside another write action.
 
+## Security
+
+### Rules — always follow these
+
+- **Never inject unescaped user or plugin-supplied strings into `innerHTML`** — always pass through `escapeHtml()` first. Use `textContent` for plain text.
+- **Never use `eval`, `new Function(string)`, or `setTimeout(string)`.** All JS is static and bundled; no dynamic execution.
+- **Never trust JS → Kotlin payloads without parsing.** All `window.__bridge.*` handlers receive raw strings; parse as JSON and validate fields before use.
+- **Never write sensitive project data outside the project VFS.** The bridge only passes schema structure and file paths — nothing user-credential-related.
+- **Validate all file paths received from JS** — check the path is within the project before any file operation.
+
+### Checks — run mentally before every commit
+
+- Does any new code inject a string into `innerHTML` without `escapeHtml`? → Fix it.
+- Does any new bridge handler use a received file path without validating it's within the project? → Add a check.
+- Does any new code add a `console.log` that could leak file paths or schema content? → Remove it.
+- Does any new Kotlin code touch the file system from a JCEF callback without a `WriteCommandAction`? → Fix the threading.
+
+### Existing security measures (do not remove or weaken)
+
+- `escapeHtml()` in `create-migration.js` — used on all user-supplied strings before `innerHTML` assignment
+- All JS→Kotlin payloads parsed as JSON in `JcefBridge` handlers before field access
+- File write operations wrapped in `WriteCommandAction.runWriteCommandAction` — prevents concurrent write corruption
+- `if (project.isDisposed) return` guards on all async callbacks — prevents use-after-free on project close
+
+## UI Design System
+
+All web UI lives in `src/main/resources/web/styles.css`. Follow the existing design language when adding new components.
+
+### CSS Variables (key tokens)
+
+| Variable | Usage |
+|----------|-------|
+| `--accent-primary` | Blue accent (`#6aa6ff`) — borders, focus rings, active states |
+| `--bg-primary` / `--bg-secondary` / `--bg-tertiary` | Surface hierarchy |
+| `--text-primary` / `--text-secondary` / `--text-muted` | Text hierarchy |
+| `--border-default` | Neutral borders |
+| `--radius-sm` / `--radius-md` / `--radius-lg` | Border radii |
+| `--space-sm` / `--space-md` / `--space-lg` | Spacing scale |
+| `--font-mono` | Monospace stack for SQL and code |
+| `--transition-fast` | `0.15s ease` — use on hover/focus transitions |
+
+### Rules
+
+- **No inline styles on new components** — use CSS classes and variables only.
+- **No JS framework** — all UI is vanilla JS with DOM manipulation.
+- **SQL editor**: textarea is in normal flow (drives height); syntax-highlight `<pre>` is `position: absolute; inset: 0` behind it. Mirror divs (`_heightMirror`, `_caretMirror`) are persistent, created once on first use.
+- **Modal forms**: use `form-group` / `form-label` / `form-input` classes. Version inputs use `version-input-group` + `version-stepper` layout.
+- **Responsive breakpoints** are handled via `#app.compact-width`, `#app.very-compact`, `#app.short-height` class toggles set by `VisualizerPanel`.
+
+## Platform Target
+
+`platformType = IC` (IntelliJ IDEA Community), `platformVersion = 2024.1`. Avoid IntelliJ APIs added after 2024.1 — check compatibility before using newer platform classes.
+
 ## Do Not
 
 - Add a JS framework to the web frontend — stay vanilla JS.
 - Edit `build/*/plugin.xml` — it is generated; the source is `src/main/resources/META-INF/plugin.xml`.
 - Call IntelliJ file/VFS APIs from a background thread without a `ReadAction` or `WriteAction` wrapper.
 - Escape JS string literals with JSON encoding — manually escape `\`, `'`, `\n`, `\r` before injecting into single-quoted JS strings (see `JcefBridge`).
+- Use `project.baseDir` (deprecated) — use `project.basePath?.let { LocalFileSystem.getInstance().findFileByPath(it) }`.
 
-## Platform Target
+## Documentation
 
-`platformType = IC` (IntelliJ IDEA Community), `platformVersion = 2024.1`. Avoid IntelliJ APIs that were added after 2024.1 — check compatibility before using newer platform classes.
+- Update `CHANGELOG.md` for every commit — add an entry under the appropriate version.
+- Update `README.md` when a change is user-facing: new features, changed behaviour, new keyboard shortcuts, new supported file patterns.
+- Update `INSTALL.md` when installation steps, requirements, or supported IntelliJ versions change.
+- Internal refactors and non-visible bug fixes do not require README or INSTALL updates.
 
-## Conventions
+## Before Every Commit
 
-- No comments unless the WHY is non-obvious
-- Prefer editing existing files over creating new ones
-- All inter-layer communication is JSON via `JcefBridge`
-- Threading: file watchers run on background threads; UI updates dispatched to EDT
+1. **Bump `pluginVersion`** in `gradle.properties` using these rules:
 
-## Versioning
+   | Change | Bump | Example |
+   |--------|------|---------|
+   | New user-facing feature | **minor** `x.+1.0` | `1.1.x → 1.2.0` |
+   | Bug fix, style tweak, refactor | **patch** `x.x.+1` | `1.1.x → 1.1.x+1` |
+   | Breaking change or major rewrite | **major** `+1.0.0` | `1.x.x → 2.0.0` |
 
-After every commit+push, run `./bump-version.sh <version>` and update CHANGELOG:
-- New feature → minor bump (1.0.0 → 1.1.0)
-- Bug fix → patch bump (1.0.0 → 1.0.1)
-- Breaking change → major bump (1.0.0 → 2.0.0)
+2. **Update `CHANGELOG.md`** — add an entry under the new version with a short summary of what changed.
+3. **Update `README.md`** if the change is user-facing.
+
+4. **Suggest a GitHub Release** after every commit if any of the following apply — say "this looks like a good point to publish a GitHub Release":
+   - A security fix was made
+   - A user-facing feature was added
+   - A bug affecting core functionality was fixed (timeline not loading, migrations not creating, validation not running)
+
+   Do NOT suggest a release for: docs-only changes, internal refactors, style tweaks the user won't notice.

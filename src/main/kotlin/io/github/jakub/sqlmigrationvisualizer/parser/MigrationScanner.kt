@@ -3,6 +3,7 @@ package io.github.jakub.sqlmigrationvisualizer.parser
 import io.github.jakub.sqlmigrationvisualizer.model.BaselineSchemaFile
 import io.github.jakub.sqlmigrationvisualizer.model.MigrationFile
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileVisitor
@@ -198,13 +199,12 @@ class MigrationScanner(private val project: Project) {
      * Returns them sorted by version number.
      */
     fun scanMigrations(): List<MigrationFile> {
-        val baseDir = project.baseDir ?: return emptyList()
+        val baseDir = projectBaseDir() ?: return emptyList()
         val migrationFiles = mutableListOf<MigrationFile>()
 
         VfsUtilCore.visitChildrenRecursively(baseDir, object : VirtualFileVisitor<Unit>() {
             override fun visitFile(file: VirtualFile): Boolean {
                 // Skip build directories, hidden directories, and VCS
-                val path = file.path
                 if (file.isDirectory) {
                     val name = file.name
                     return name != "build" && name != ".gradle" && name != ".idea" &&
@@ -241,7 +241,7 @@ class MigrationScanner(private val project: Project) {
     }
 
     fun scanBaselineSchemaFiles(): List<BaselineSchemaFile> {
-        val baseDir = project.baseDir ?: return emptyList()
+        val baseDir = projectBaseDir() ?: return emptyList()
         val schemaFiles = mutableListOf<BaselineSchemaFile>()
 
         VfsUtilCore.visitChildrenRecursively(baseDir, object : VirtualFileVisitor<Unit>() {
@@ -274,5 +274,8 @@ class MigrationScanner(private val project: Project) {
 
         return schemaFiles.sortedBy { it.filePath }
     }
+
+    private fun projectBaseDir(): VirtualFile? =
+        project.basePath?.let { LocalFileSystem.getInstance().findFileByPath(it) }
 
 }

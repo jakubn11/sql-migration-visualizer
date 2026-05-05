@@ -5,6 +5,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.project.Project
+import io.github.jakub.sqlmigrationvisualizer.generator.SqlDialect
 import kotlinx.serialization.Serializable
 
 @Service(Service.Level.PROJECT)
@@ -16,8 +17,8 @@ class VisualizerSettings : PersistentStateComponent<VisualizerSettings.State> {
 
     @Serializable
     data class ErTablePosition(
-        val x: Double,
-        val y: Double
+        var x: Double = 0.0,
+        var y: Double = 0.0
     )
 
     @Serializable
@@ -48,13 +49,16 @@ class VisualizerSettings : PersistentStateComponent<VisualizerSettings.State> {
     override fun getState(): State = myState
 
     override fun loadState(state: State) {
-        myState = state
+        myState = state.sanitized()
     }
 
     fun saveErLayout(version: String, positions: Map<String, ErTablePosition>) {
+        val versionKey = version.trim()
+        if (versionKey.isEmpty()) return
+
         myState = myState.copy(
             erTablePositions = myState.erTablePositions.toMutableMap().apply {
-                this[version] = positions
+                this[versionKey] = positions.sanitizedPositions()
             }
         )
     }
@@ -68,17 +72,17 @@ class VisualizerSettings : PersistentStateComponent<VisualizerSettings.State> {
     }
 
     fun updateDefaultTab(tabId: String) {
-        myState = myState.copy(defaultTab = tabId)
+        myState = myState.copy(defaultTab = sanitizeDefaultTab(tabId))
     }
 
     fun updatePreferredSqlDialect(dialectId: String) {
-        myState = myState.copy(preferredSqlDialect = dialectId)
+        myState = myState.copy(preferredSqlDialect = SqlDialect.fromId(dialectId).id)
     }
 
     fun saveDiffSelection(fromVersion: Int, toVersion: Int) {
         myState = myState.copy(
-            lastDiffFromVersion = fromVersion,
-            lastDiffToVersion = toVersion
+            lastDiffFromVersion = fromVersion.coerceAtLeast(0),
+            lastDiffToVersion = toVersion.coerceAtLeast(0)
         )
     }
 
@@ -88,7 +92,46 @@ class VisualizerSettings : PersistentStateComponent<VisualizerSettings.State> {
             .map { it.trim() }
             .filter { it.isNotEmpty() }
 
+    private fun State.sanitized(): State =
+        copy(
+            defaultTab = sanitizeDefaultTab(defaultTab),
+            preferredSqlDialect = SqlDialect.fromId(preferredSqlDialect).id,
+            erLayoutColumns = erLayoutColumns.coerceIn(0, 10),
+            erTablePositions = erTablePositions.mapValues { (_, positions) ->
+                positions.sanitizedPositions()
+            },
+            lastDiffFromVersion = lastDiffFromVersion.coerceAtLeast(0),
+            lastDiffToVersion = lastDiffToVersion.coerceAtLeast(0),
+            searchResultLimit = searchResultLimit.coerceIn(5, 100),
+            defaultMigrationDirectory = defaultMigrationDirectory.trim(),
+            additionalMigrationDirectories = additionalMigrationDirectories.trim(),
+            migrationFileNamePattern = migrationFileNamePattern.trim().ifBlank { "{version}" }
+        )
+
+    private fun Map<String, ErTablePosition>.sanitizedPositions(): Map<String, ErTablePosition> =
+        entries
+            .mapNotNull { (tableName, position) ->
+                val sanitizedName = tableName.trim()
+                if (sanitizedName.isEmpty()) {
+                    null
+                } else {
+                    sanitizedName to ErTablePosition(
+                        x = position.x.finiteOrZero(),
+                        y = position.y.finiteOrZero()
+                    )
+                }
+            }
+            .toMap()
+
+    private fun Double.finiteOrZero(): Double =
+        if (isFinite()) this else 0.0
+
     companion object {
+        private val DEFAULT_TABS = setOf("timeline", "diff", "er-diagram", "validation")
+
+        private fun sanitizeDefaultTab(tabId: String): String =
+            tabId.trim().takeIf { it in DEFAULT_TABS } ?: "timeline"
+
         fun getInstance(project: Project): VisualizerSettings =
             project.getService(VisualizerSettings::class.java)
     }

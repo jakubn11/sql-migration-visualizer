@@ -14,6 +14,7 @@ import io.github.jakub.sqlmigrationvisualizer.util.MigrationFileNaming
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.AnActionResult
 import com.intellij.openapi.actionSystem.ex.AnActionListener
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationAction
@@ -26,7 +27,6 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.util.Alarm
@@ -75,11 +75,11 @@ class SchemaChangePromptService(
 
         ApplicationManager.getApplication().messageBus.connect(this).subscribe(
             AnActionListener.TOPIC,
-            object : AnActionListener.Adapter() {
+            object : AnActionListener {
                 override fun afterActionPerformed(
                     action: AnAction,
-                    dataContext: DataContext,
-                    event: AnActionEvent
+                    event: AnActionEvent,
+                    result: AnActionResult
                 ) {
                     if (event.project != null && event.project != project) return
 

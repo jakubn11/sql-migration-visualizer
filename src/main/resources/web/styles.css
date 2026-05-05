@@ -32,6 +32,7 @@
     --text-muted: #8793A9;
     --text-accent: #8ABBFF;
     --text-inverse: #0E131A;
+    --editor-input-ghost: rgba(238, 244, 255, 0.01);
 
     /* Borders */
     --border-default: #334050;
@@ -109,6 +110,7 @@
     --text-muted: #79889E;
     --text-accent: #216BDB;
     --text-inverse: #FFFFFF;
+    --editor-input-ghost: rgba(23, 34, 51, 0.01);
 
     --border-default: #D6E0EC;
     --border-focus: #216BDB;
@@ -1785,6 +1787,10 @@ code {
     border-bottom: 1px solid var(--border-default);
 }
 
+#diff-summary:empty {
+    display: none;
+}
+
 .diff-summary-card {
     display: flex;
     align-items: center;
@@ -2979,8 +2985,13 @@ code {
 }
 
 #app.very-compact .version-stepper {
-    width: 100%;
-    justify-content: space-between;
+    width: auto;
+    justify-content: center;
+}
+
+#app.very-compact .version-input-group {
+    flex-direction: row;
+    align-items: stretch;
 }
 
 #app.ultra-compact .logo-area,
@@ -3361,6 +3372,10 @@ code {
 }
 
 /* ===== Create Migration Form ===== */
+#create-migration-modal .modal-body {
+    --migration-control-height: 44px;
+}
+
 .form-row {
     display: flex;
     gap: var(--space-md);
@@ -3392,6 +3407,7 @@ code {
     border-radius: var(--radius-md);
     padding: var(--space-sm) var(--space-md);
     font-size: 13px;
+    line-height: 1.3;
     color: var(--text-primary);
     outline: none;
     transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
@@ -3441,16 +3457,27 @@ code {
     align-items: stretch;
 }
 
+#create-migration-modal .form-input {
+    height: var(--migration-control-height);
+    min-height: var(--migration-control-height);
+}
+
 .version-number-input {
     text-align: center;
-    min-width: 0;
+    min-width: 44px;
+    max-width: 92px;
+    width: 44px;
+    flex: 0 0 auto;
+    cursor: pointer;
 }
 
 .version-stepper {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 4px;
+    gap: 6px;
+    padding: 4px 6px;
+    height: var(--migration-control-height);
+    min-height: var(--migration-control-height);
     border: 1px solid var(--border-default);
     border-radius: var(--radius-md);
     background: linear-gradient(180deg, rgba(106, 166, 255, 0.08), rgba(106, 166, 255, 0.02));
@@ -3459,13 +3486,30 @@ code {
 }
 
 .version-step-btn {
-    min-width: 28px;
-    min-height: 28px;
+    appearance: none;
+    -webkit-appearance: none;
+    display: grid;
+    place-items: center;
+    flex: 0 0 34px;
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
+    min-height: 34px;
     padding: 0;
+    margin: 0;
     border-radius: var(--radius-sm);
+    font-size: 0;
+    line-height: 0;
     color: var(--accent-primary);
     background: rgba(106, 166, 255, 0.08);
     border: 1px solid rgba(106, 166, 255, 0.16);
+}
+
+.version-step-btn svg {
+    display: block;
+    width: 14px;
+    height: 14px;
+    margin: 0;
 }
 
 .version-step-btn:hover {
@@ -3503,27 +3547,28 @@ code {
 }
 
 .sql-editor-highlight {
-    min-height: 180px;
+    position: absolute;
+    inset: 0;
     pointer-events: none;
     color: var(--text-primary);
     overflow: hidden;
 }
 
 .sql-editor-input {
-    position: absolute;
-    inset: 0;
+    position: relative;
+    display: block;
     width: 100%;
-    height: 100%;
+    min-height: 180px;
     border: none;
     border-radius: 0;
     background: transparent;
-    color: transparent;
+    color: var(--editor-input-ghost);
     caret-color: var(--text-primary);
-    resize: vertical;
-    min-height: 180px;
+    resize: none;
     outline: none;
-    overflow: auto;
+    overflow: hidden;
     box-shadow: none;
+    cursor: text;
 }
 
 .sql-editor-input::placeholder {
@@ -3534,18 +3579,15 @@ code {
 .sql-editor-suggestions {
     position: absolute;
     left: 12px;
-    bottom: 12px;
-    width: min(320px, calc(100% - 24px));
-    max-height: 180px;
+    width: 300px;
+    max-width: calc(100% - 24px);
+    max-height: 142px;
     overflow-y: auto;
-    padding: 4px;
-    border-radius: 12px;
+    padding: 3px;
+    border-radius: 8px;
     border: 1px solid rgba(106, 166, 255, 0.18);
-    background:
-        linear-gradient(180deg, rgba(106, 166, 255, 0.08), rgba(106, 166, 255, 0.02)),
-        color-mix(in srgb, var(--bg-secondary) 96%, var(--bg-primary));
+    background: var(--bg-secondary);
     box-shadow: 0 10px 24px rgba(3, 8, 15, 0.28);
-    backdrop-filter: blur(10px);
     z-index: 4;
 }
 
@@ -3553,9 +3595,10 @@ code {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
-    padding: 7px 10px;
-    border-radius: 10px;
+    gap: 8px;
+    min-height: 28px;
+    padding: 4px 7px;
+    border-radius: 6px;
     border: 1px solid transparent;
     cursor: pointer;
     transition: background var(--transition-fast), border-color var(--transition-fast);
@@ -3568,33 +3611,34 @@ code {
 }
 
 .sql-suggestion-main {
-    display: grid;
-    gap: 1px;
+    display: block;
     min-width: 0;
     flex: 1;
 }
 
 .sql-suggestion-value {
     font-family: var(--font-mono);
-    font-size: 11px;
-    line-height: 1.35;
+    font-size: 10px;
+    line-height: 1.2;
     color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .sql-suggestion-meta {
-    font-size: 9px;
-    line-height: 1.25;
-    color: var(--text-muted);
+    display: none;
 }
 
 .sql-suggestion-type {
     display: inline-flex;
     align-items: center;
-    padding: 2px 7px;
+    padding: 1px 6px;
     border-radius: var(--radius-full);
     border: 1px solid var(--border-default);
     background: var(--bg-primary);
-    font-size: 9px;
+    font-size: 8px;
+    line-height: 1.4;
     font-weight: 700;
     color: var(--text-secondary);
     flex-shrink: 0;
@@ -3636,8 +3680,9 @@ code {
     border: none;
     border-radius: 0;
     background: transparent;
-    color: transparent;
+    color: var(--editor-input-ghost);
     box-shadow: none;
+    resize: none;
 }
 
 .form-error {

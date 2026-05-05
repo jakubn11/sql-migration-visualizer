@@ -120,7 +120,7 @@
             }
             if (submitButton) {
                 submitButton.innerHTML = opts.submitLabel
-                    ? '<svg viewBox="0 0 24 24" width="14" height="14"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/></svg>' + opts.submitLabel
+                    ? '<svg viewBox="0 0 24 24" width="14" height="14"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/></svg>' + escapeHtml(opts.submitLabel)
                     : isEditMode
                         ? '<svg viewBox="0 0 24 24" width="14" height="14"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-2 14H7v-2h8v2zm0-4H7v-2h8v2zm-1-6V4.5L18.5 8H14z" fill="currentColor"/></svg>Save Changes'
                     : opts.sql
@@ -130,6 +130,8 @@
             }
 
             this.renderContext();
+            this.resizeVersionInput();
+            this.growSqlEditor();
             modal.style.display = 'flex';
             // Focus the SQL textarea after animation
             setTimeout(function() {
@@ -157,10 +159,26 @@
             ['create-mig-version', 'create-mig-directory', 'create-mig-name'].forEach(function(id) {
                 var input = document.getElementById(id);
                 if (!input) return;
-                input.addEventListener('input', function() {
-                    CreateMigrationModule.renderContext();
-                });
+                if (id === 'create-mig-version') {
+                    input.addEventListener('keydown', function(event) {
+                        var allowed = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End'];
+                        if (allowed.indexOf(event.key) === -1 && !/^[0-9]$/.test(event.key)) {
+                            event.preventDefault();
+                        }
+                    });
+                    input.addEventListener('input', function() {
+                        var clean = input.value.replace(/\D/g, '').slice(0, 9);
+                        if (input.value !== clean) input.value = clean;
+                        CreateMigrationModule.resizeVersionInput();
+                        CreateMigrationModule.renderContext();
+                    });
+                } else {
+                    input.addEventListener('input', function() {
+                        CreateMigrationModule.renderContext();
+                    });
+                }
                 input.addEventListener('change', function() {
+                    if (id === 'create-mig-version') CreateMigrationModule.resizeVersionInput();
                     CreateMigrationModule.renderContext();
                 });
             });
@@ -268,6 +286,7 @@
             sqlInput.dataset.sqlEditorBound = 'true';
             sqlInput.addEventListener('input', function() {
                 CreateMigrationModule.syncSqlHighlight();
+                CreateMigrationModule.growSqlEditor();
                 CreateMigrationModule.updateSuggestions();
                 CreateMigrationModule.renderContext();
             });
@@ -284,6 +303,13 @@
                 CreateMigrationModule.updateSuggestions();
             });
             sqlInput.addEventListener('keydown', function(event) {
+                if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+                    event.preventDefault();
+                    CreateMigrationModule.hideSuggestions();
+                    CreateMigrationModule.submit();
+                    return;
+                }
+
                 if (!CreateMigrationModule.completionState || !CreateMigrationModule.completionState.items.length) {
                     return;
                 }
@@ -331,7 +357,12 @@
                 return;
             }
 
-            var items = this.buildSuggestions(context).slice(0, 8);
+            if (context.fragment.length < 2) {
+                this.hideSuggestions();
+                return;
+            }
+
+            var items = this.buildSuggestions(context).slice(0, 5);
             if (!items.length) {
                 this.hideSuggestions();
                 return;
@@ -433,6 +464,73 @@
             return versions.length ? versions[versions.length - 1] : null;
         },
 
+        _caretMirror: null,
+        _caretSpan: null,
+        _heightMirror: null,
+
+        _ensureHeightMirror: function(sqlInput) {
+            if (this._heightMirror) return;
+            var mirror = document.createElement('div');
+            var style = window.getComputedStyle(sqlInput);
+            ['fontFamily', 'fontSize', 'lineHeight', 'padding', 'paddingTop', 'paddingBottom',
+             'paddingLeft', 'paddingRight', 'boxSizing', 'whiteSpace', 'wordBreak', 'tabSize'].forEach(function(p) {
+                mirror.style[p] = style[p];
+            });
+            mirror.style.position = 'absolute';
+            mirror.style.visibility = 'hidden';
+            mirror.style.top = '0';
+            mirror.style.left = '-9999px';
+            mirror.style.overflow = 'hidden';
+            document.body.appendChild(mirror);
+            this._heightMirror = mirror;
+        },
+
+        _ensureCaretMirror: function(sqlInput) {
+            if (this._caretMirror) return;
+            var mirror = document.createElement('div');
+            var style = window.getComputedStyle(sqlInput);
+            ['fontFamily', 'fontSize', 'lineHeight', 'padding', 'border', 'boxSizing', 'whiteSpace', 'wordBreak', 'tabSize'].forEach(function(p) {
+                mirror.style[p] = style[p];
+            });
+            mirror.style.position = 'absolute';
+            mirror.style.visibility = 'hidden';
+            mirror.style.top = '0';
+            mirror.style.left = '-9999px';
+            mirror.style.height = 'auto';
+            mirror.style.overflow = 'hidden';
+            var span = document.createElement('span');
+            span.textContent = '|';
+            mirror.appendChild(span);
+            document.body.appendChild(mirror);
+            this._caretMirror = mirror;
+            this._caretSpan = span;
+        },
+
+        getCaretTopInEditor: function() {
+            var sqlInput = document.getElementById('create-mig-sql');
+            if (!sqlInput) return null;
+            this._ensureCaretMirror(sqlInput);
+            var mirror = this._caretMirror;
+            mirror.style.width = sqlInput.offsetWidth + 'px';
+            var textBeforeCaret = sqlInput.value.substring(0, sqlInput.selectionStart);
+            mirror.firstChild.textContent = textBeforeCaret;
+            mirror.appendChild(this._caretSpan);
+            var caretTop = this._caretSpan.offsetTop - sqlInput.scrollTop;
+            var lineHeight = parseInt(window.getComputedStyle(sqlInput).lineHeight) || 19;
+            return { top: caretTop, lineHeight: lineHeight };
+        },
+
+        growSqlEditor: function() {
+            var sqlInput = document.getElementById('create-mig-sql');
+            if (!sqlInput) return;
+            this._ensureHeightMirror(sqlInput);
+            var mirror = this._heightMirror;
+            mirror.style.width = sqlInput.offsetWidth + 'px';
+            var val = sqlInput.value;
+            mirror.textContent = val.endsWith('\n') ? val + ' ' : val;
+            sqlInput.style.height = Math.max(180, mirror.offsetHeight) + 'px';
+        },
+
         renderSuggestions: function() {
             var suggestionsEl = document.getElementById('create-mig-sql-suggestions');
             if (!suggestionsEl || !this.completionState) return;
@@ -451,6 +549,21 @@
                     '</div>';
             }).join('');
             suggestionsEl.style.display = 'block';
+
+            var caret = this.getCaretTopInEditor();
+            if (caret) {
+                var editorEl = suggestionsEl.parentElement;
+                var editorHeight = editorEl ? editorEl.offsetHeight : 300;
+                var dropdownHeight = suggestionsEl.offsetHeight || 142;
+                var spaceBelow = editorHeight - (caret.top + caret.lineHeight);
+                if (spaceBelow >= dropdownHeight + 8 || caret.top < dropdownHeight + 8) {
+                    suggestionsEl.style.top = (caret.top + caret.lineHeight + 4) + 'px';
+                    suggestionsEl.style.bottom = '';
+                } else {
+                    suggestionsEl.style.bottom = (editorHeight - caret.top + 4) + 'px';
+                    suggestionsEl.style.top = '';
+                }
+            }
 
             Array.prototype.forEach.call(suggestionsEl.querySelectorAll('.sql-suggestion-item'), function(itemEl) {
                 itemEl.addEventListener('mousedown', function(event) {
@@ -619,6 +732,14 @@
             }
         },
 
+        resizeVersionInput: function() {
+            var versionInput = document.getElementById('create-mig-version');
+            if (!versionInput) return;
+            var digits = String(versionInput.value || '1').replace(/\D/g, '').length || 1;
+            var width = Math.min(76, Math.max(44, digits * 11 + 22));
+            versionInput.style.width = width + 'px';
+        },
+
         stepVersion: function(delta) {
             var versionInput = document.getElementById('create-mig-version');
             if (!versionInput) return;
@@ -631,6 +752,7 @@
             var nextValue = Math.max(1, currentValue + delta);
             versionInput.value = nextValue;
             versionInput.dispatchEvent(new Event('input', { bubbles: true }));
+            this.resizeVersionInput();
             versionInput.focus();
         }
     };
