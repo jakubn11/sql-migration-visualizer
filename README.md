@@ -15,7 +15,7 @@
 <p align="center">
   <img alt="License" src="https://img.shields.io/badge/license-GPLv3-58D1C9?style=flat-square">
   <img alt="Platform" src="https://img.shields.io/badge/intellij-2024.1%2B-6AA6FF?style=flat-square">
-  <img alt="Java" src="https://img.shields.io/badge/java-17-334050?style=flat-square">
+  <img alt="Java" src="https://img.shields.io/badge/java-17-6AA6FF?style=flat-square">
   <img alt="Kotlin" src="https://img.shields.io/badge/kotlin-2.0.21-8ABBFF?style=flat-square">
 </p>
 
@@ -38,8 +38,6 @@ Instead of piecing everything together manually, you can:
   <img src="docs/readme-features.svg" alt="Feature board for SQL Migration Visualizer showing Timeline View, Schema Diff, ER Diagram, Validation, Suggested Migrations, and Dialect Support." width="100%">
 </p>
 
-The plugin keeps the full migration workflow in one place: browse history, compare versions, inspect relationships, validate drift, and draft the next migration without bouncing between folders, SQL files, and mental notes.
-
 ## Ideal For
 
 - SQLDelight-based projects
@@ -47,25 +45,36 @@ The plugin keeps the full migration workflow in one place: browse history, compa
 - projects with baseline schema files that drift over time
 - developers who want migration history to be reviewable instead of tribal knowledge
 
+## Installation
+
+See [INSTALL.md](INSTALL.md) for full instructions.
+
+Build from source:
+```bash
+./gradlew buildPlugin
+```
+Then install the ZIP via **Settings → Plugins → ⚙ → Install Plugin from Disk**.
+
 ## Supported Layouts
 
-The plugin auto-detects common migration and schema locations such as:
+The plugin auto-detects common migration and schema locations:
 
-- `src/main/sqldelight`
-- `src/commonMain/sqldelight`
-- `src/androidMain/sqldelight`
-- `db/migrations`
-- `database/migrations`
-- `migrations`
-- `src/main/resources/db/migrations`
-- `src/main/resources/schema`
+| Directory |
+|-----------|
+| `src/main/sqldelight` |
+| `src/commonMain/sqldelight` |
+| `src/androidMain/sqldelight` |
+| `db/migrations` · `database/migrations` · `migrations` |
+| `src/main/resources/db/migrations` |
+| `src/main/resources/schema` |
 
-It also recognizes common naming patterns like:
+Recognised file naming patterns:
 
-- `1.sql`
-- `2.sqm`
-- `12_add_users.sql`
-- `V3__create_orders.sql`
+| Pattern | Example |
+|---------|---------|
+| Plain version | `1.sql`, `2.sqm` |
+| Version + name | `12_add_users.sql` |
+| Flyway | `V3__create_orders.sql` |
 
 ## Usage
 
@@ -92,24 +101,13 @@ Open the **SQL Migrations** panel at the bottom of the IDE. The plugin scans you
 
 ## Local Development
 
-Requirements:
-
-- JDK 17
-- IntelliJ Platform `2024.1`
-
-Useful commands:
+Requirements: JDK 17 · IntelliJ Platform `2024.1`
 
 ```bash
-./gradlew test
-./gradlew runIde
-./gradlew buildPlugin
+./gradlew test          # run unit tests
+./gradlew runIde        # launch sandbox IDE with plugin loaded
+./gradlew buildPlugin   # produce distributable ZIP
 ```
-
-## Project Status
-
-Current version: `1.2.0`
-
-This repository contains the source for the IntelliJ plugin. If you want to build, test, or iterate on the plugin locally, the Gradle tasks above are the quickest path in.
 
 ## License
 
