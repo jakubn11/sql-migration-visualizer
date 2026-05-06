@@ -30,6 +30,12 @@
         completionState: null,
         metadataInputsBound: false,
 
+        normalizeVersionValue: function(value) {
+            var clean = String(value || '').replace(/\D/g, '').slice(0, 9);
+            clean = clean.replace(/^0+/, '');
+            return clean || '0';
+        },
+
         getSuggestedDefaults: function() {
             var state = window.AppHelpers ? window.AppHelpers.getState() : null;
             var versions = state ? state.schemaVersions : [];
@@ -80,7 +86,7 @@
             var namingPattern = state && state.settings ? state.settings.migrationFileNamePattern || '{version}' : '{version}';
             var patternUsesName = namingPattern.indexOf('{name}') !== -1;
 
-            versionInput.value = opts.version || defaults.version;
+            versionInput.value = opts.version != null ? opts.version : defaults.version;
             dirInput.value = opts.directory || defaults.directory;
             nameInput.value = opts.name || defaults.name;
             modal.dataset.migrationExtension = opts.extension || defaults.extension || 'sql';
@@ -93,7 +99,8 @@
             errorEl.style.display = 'none';
             errorEl.textContent = '';
             this.setSubmitting(false);
-            this.syncSqlHighlight();
+            this.clearValidationState();
+            this.syncSqlHighlight(true);
             this.hideSuggestions();
             this.bindMetadataInputs();
 
@@ -167,18 +174,23 @@
                         }
                     });
                     input.addEventListener('input', function() {
-                        var clean = input.value.replace(/\D/g, '').slice(0, 9);
+                        var clean = CreateMigrationModule.normalizeVersionValue(input.value);
                         if (input.value !== clean) input.value = clean;
+                        CreateMigrationModule.clearValidationState(input);
                         CreateMigrationModule.resizeVersionInput();
                         CreateMigrationModule.renderContext();
                     });
                 } else {
                     input.addEventListener('input', function() {
+                        CreateMigrationModule.clearValidationState(input);
                         CreateMigrationModule.renderContext();
                     });
                 }
                 input.addEventListener('change', function() {
-                    if (id === 'create-mig-version') CreateMigrationModule.resizeVersionInput();
+                    if (id === 'create-mig-version') {
+                        input.value = CreateMigrationModule.normalizeVersionValue(input.value);
+                        CreateMigrationModule.resizeVersionInput();
+                    }
                     CreateMigrationModule.renderContext();
                 });
             });
@@ -200,8 +212,8 @@
             var riskList = document.getElementById('create-mig-risk-list');
 
             var version = parseInt(document.getElementById('create-mig-version').value, 10);
-            if (Number.isNaN(version) || version < 1) {
-                version = this.getSuggestedDefaults().version;
+            if (Number.isNaN(version) || version < 0) {
+                version = 0;
             }
             var directory = document.getElementById('create-mig-directory').value.trim();
             var nameValue = document.getElementById('create-mig-name').value.trim();
@@ -261,22 +273,47 @@
             card.style.display = (opts.summary || fileName || highlightItems.length > 0 || riskBadge.innerHTML) ? 'grid' : 'none';
         },
 
-        syncSqlHighlight: function() {
+        _lastHighlightedSql: null,
+        _highlightScrollFrame: null,
+
+        syncSqlHighlight: function(force) {
             var sqlInput = document.getElementById('create-mig-sql');
             var highlightEl = document.getElementById('create-mig-sql-highlight');
             if (!sqlInput || !highlightEl) return;
 
             var sql = sqlInput.value || '';
-            var highlighted = window.SqlHighlighter && window.SqlHighlighter.highlight
-                ? window.SqlHighlighter.highlight(sql)
-                : sql
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;');
+            if (force || sql !== this._lastHighlightedSql) {
+                var highlighted = window.SqlHighlighter && window.SqlHighlighter.highlight
+                    ? window.SqlHighlighter.highlight(sql)
+                    : sql
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
 
-            highlightEl.innerHTML = highlighted + (sql.endsWith('\n') ? '\n ' : '\n');
+                highlightEl.innerHTML = highlighted + (sql.endsWith('\n') ? '\n ' : '\n');
+                this._lastHighlightedSql = sql;
+            }
+
+            this.syncSqlHighlightScroll(sqlInput, highlightEl);
+        },
+
+        syncSqlHighlightScroll: function(sqlInput, highlightEl) {
+            sqlInput = sqlInput || document.getElementById('create-mig-sql');
+            highlightEl = highlightEl || document.getElementById('create-mig-sql-highlight');
+            if (!sqlInput || !highlightEl) return;
+
             highlightEl.scrollTop = sqlInput.scrollTop;
             highlightEl.scrollLeft = sqlInput.scrollLeft;
+        },
+
+        scheduleSqlHighlightScrollSync: function() {
+            if (this._highlightScrollFrame !== null) return;
+
+            var self = this;
+            this._highlightScrollFrame = window.requestAnimationFrame(function() {
+                self._highlightScrollFrame = null;
+                self.syncSqlHighlightScroll();
+            });
         },
 
         bindSqlEditor: function() {
@@ -287,12 +324,13 @@
             sqlInput.addEventListener('input', function() {
                 CreateMigrationModule.syncSqlHighlight();
                 CreateMigrationModule.growSqlEditor();
+                CreateMigrationModule.clearValidationState(sqlInput);
                 CreateMigrationModule.updateSuggestions();
                 CreateMigrationModule.renderContext();
             });
             sqlInput.addEventListener('scroll', function() {
-                CreateMigrationModule.syncSqlHighlight();
-            });
+                CreateMigrationModule.scheduleSqlHighlightScrollSync();
+            }, { passive: true });
             sqlInput.addEventListener('click', function() {
                 CreateMigrationModule.updateSuggestions();
             });
@@ -626,6 +664,76 @@
             }
         },
 
+        clearValidationState: function(field) {
+            var fields = field
+                ? [field]
+                : [
+                    document.getElementById('create-mig-version'),
+                    document.getElementById('create-mig-directory'),
+                    document.getElementById('create-mig-name'),
+                    document.getElementById('create-mig-sql')
+                ];
+
+            fields.forEach(function(input) {
+                if (!input) return;
+                input.classList.remove('is-invalid');
+                input.setAttribute('aria-invalid', 'false');
+                var editor = input.closest ? input.closest('.sql-editor') : null;
+                if (editor) {
+                    editor.classList.remove('is-invalid');
+                }
+            });
+            if (field) {
+                this.setFieldValidationMessage(field, '');
+            } else {
+                this.clearFieldValidationMessages();
+            }
+
+            var modal = document.getElementById('create-migration-modal');
+            var errorEl = document.getElementById('create-mig-error');
+            if (errorEl && (!modal || !modal.querySelector('.is-invalid'))) {
+                errorEl.textContent = '';
+                errorEl.style.display = 'none';
+            }
+        },
+
+        clearFieldValidationMessages: function() {
+            var sqlErrorEl = document.getElementById('create-mig-sql-error');
+            if (sqlErrorEl) {
+                sqlErrorEl.textContent = '';
+            }
+        },
+
+        setFieldValidationMessage: function(field, message) {
+            if (!field || field.id !== 'create-mig-sql') return;
+            var sqlErrorEl = document.getElementById('create-mig-sql-error');
+            if (sqlErrorEl) {
+                sqlErrorEl.textContent = message || '';
+            }
+        },
+
+        showValidationError: function(message, field) {
+            var errorEl = document.getElementById('create-mig-error');
+            if (errorEl) {
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
+            }
+
+            if (field) {
+                field.classList.add('is-invalid');
+                field.setAttribute('aria-invalid', 'true');
+                var editor = field.closest ? field.closest('.sql-editor') : null;
+                if (editor) {
+                    editor.classList.add('is-invalid');
+                }
+                this.setFieldValidationMessage(field, message);
+                field.focus();
+                if (field.select && field.tagName !== 'TEXTAREA') {
+                    field.select();
+                }
+            }
+        },
+
         validate: function() {
             var versionInput = document.getElementById('create-mig-version');
             var dirInput = document.getElementById('create-mig-directory');
@@ -635,7 +743,13 @@
             var modal = document.getElementById('create-migration-modal');
             var isEditMode = modal && modal.dataset.mode === 'edit';
 
-            var version = parseInt(versionInput.value);
+            this.clearValidationState();
+            var rawVersion = this.normalizeVersionValue(versionInput.value);
+            if (versionInput.value !== rawVersion) {
+                versionInput.value = rawVersion;
+                this.resizeVersionInput();
+            }
+            var version = parseInt(rawVersion, 10);
             var directory = dirInput.value.trim();
             var name = nameInput.value.trim();
             var sql = sqlInput.value.trim();
@@ -644,10 +758,8 @@
                 : '{version}';
             var patternUsesName = pattern.indexOf('{name}') !== -1;
 
-            // Validate version
-            if (isNaN(version) || version < 1) {
-                errorEl.textContent = 'Version must be a positive number.';
-                errorEl.style.display = 'block';
+            if (isNaN(version) || version < 0) {
+                this.showValidationError('Version must be zero or greater.', versionInput);
                 return null;
             }
 
@@ -660,28 +772,24 @@
                 return v.migrationFile.filePath !== modal.dataset.filePath;
             });
             if (exists) {
-                errorEl.textContent = 'Version ' + version + ' already exists. Choose a different version number.';
-                errorEl.style.display = 'block';
+                this.showValidationError('Version ' + version + ' already exists. Choose a different version number.', versionInput);
                 return null;
             }
 
             // Validate directory
             if (!directory) {
-                errorEl.textContent = 'Migration directory is required.';
-                errorEl.style.display = 'block';
+                this.showValidationError('Migration directory is required.', dirInput);
                 return null;
             }
 
             // Validate SQL
             if (!sql) {
-                errorEl.textContent = 'SQL content cannot be empty.';
-                errorEl.style.display = 'block';
+                this.showValidationError('SQL statements cannot be empty.', sqlInput);
                 return null;
             }
 
             if (patternUsesName && !name) {
-                errorEl.textContent = 'Migration name is required for the current naming pattern.';
-                errorEl.style.display = 'block';
+                this.showValidationError('Migration name is required for the current naming pattern.', nameInput);
                 return null;
             }
 
@@ -735,7 +843,7 @@
         resizeVersionInput: function() {
             var versionInput = document.getElementById('create-mig-version');
             if (!versionInput) return;
-            var digits = String(versionInput.value || '1').replace(/\D/g, '').length || 1;
+            var digits = String(versionInput.value || '0').replace(/\D/g, '').length || 1;
             var width = Math.min(76, Math.max(44, digits * 11 + 22));
             versionInput.style.width = width + 'px';
         },
@@ -745,11 +853,11 @@
             if (!versionInput) return;
 
             var currentValue = parseInt(versionInput.value, 10);
-            if (isNaN(currentValue) || currentValue < 1) {
-                currentValue = 1;
+            if (isNaN(currentValue) || currentValue < 0) {
+                currentValue = 0;
             }
 
-            var nextValue = Math.max(1, currentValue + delta);
+            var nextValue = Math.max(0, currentValue + delta);
             versionInput.value = nextValue;
             versionInput.dispatchEvent(new Event('input', { bubbles: true }));
             this.resizeVersionInput();
@@ -762,9 +870,11 @@
     // Callback when directory is selected from native dialog
     window.__onDirectorySelected = function(dir) {
         if (dir) {
-            document.getElementById('create-mig-directory').value = dir;
+            var directoryInput = document.getElementById('create-mig-directory');
+            directoryInput.value = dir;
             window.__defaultMigrationDir = dir;
             if (window.CreateMigrationModule) {
+                window.CreateMigrationModule.clearValidationState(directoryInput);
                 window.CreateMigrationModule.renderContext();
             }
         }

@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.6] - 2026-05-06
+
+### Changed
+- Added field-level required validation for SQL Statements in the Create Migration dialog, including an inline empty-content message
+- Version input in the Create Migration dialog now falls back to 0 instead of staying empty
+- Improved search field icon spacing
+
+### Fixed
+- Reduced Create Migration SQL editor scroll lag by avoiding syntax-highlight rerenders during scroll
+
 ## [1.2.5] - 2026-05-05
 
 ### Changed

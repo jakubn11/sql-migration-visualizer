@@ -571,7 +571,7 @@ $css
                     <div class="form-group" style="flex: 0 0 auto">
                         <label class="form-label">Version</label>
                         <div class="form-input-group version-input-group">
-                            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="9" id="create-mig-version" class="form-input version-number-input" value="1">
+                            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="9" id="create-mig-version" class="form-input version-number-input" value="0" required aria-required="true">
                             <div class="version-stepper" aria-label="Version stepper">
                                 <button class="btn btn-ghost btn-sm version-step-btn" type="button" title="Decrease version" onclick="window.CreateMigrationModule && window.CreateMigrationModule.stepVersion(-1)">
                                     <svg viewBox="0 0 24 24" width="12" height="12"><path d="M19 13H5v-2h14v2z" fill="currentColor"/></svg>
@@ -595,9 +595,10 @@ $css
                     <label class="form-label">SQL Statements</label>
                     <div class="sql-editor" data-placeholder="ALTER TABLE users ADD COLUMN email TEXT NOT NULL;&#10;&#10;CREATE TABLE posts (&#10;  id INTEGER PRIMARY KEY,&#10;  title TEXT NOT NULL&#10;);">
                         <pre id="create-mig-sql-highlight" class="sql-editor-highlight" aria-hidden="true"></pre>
-                        <textarea id="create-mig-sql" class="form-textarea sql-editor-input" placeholder="ALTER TABLE users ADD COLUMN email TEXT NOT NULL;&#10;&#10;CREATE TABLE posts (&#10;  id INTEGER PRIMARY KEY,&#10;  title TEXT NOT NULL&#10;);" rows="10" spellcheck="false"></textarea>
+                        <textarea id="create-mig-sql" class="form-textarea sql-editor-input" placeholder="ALTER TABLE users ADD COLUMN email TEXT NOT NULL;&#10;&#10;CREATE TABLE posts (&#10;  id INTEGER PRIMARY KEY,&#10;  title TEXT NOT NULL&#10;);" rows="10" spellcheck="false" required aria-required="true" aria-describedby="create-mig-sql-error"></textarea>
                         <div id="create-mig-sql-suggestions" class="sql-editor-suggestions" style="display:none"></div>
                     </div>
+                    <div id="create-mig-sql-error" class="field-error-message" role="alert"></div>
                 </div>
             </div>
             <div class="modal-actions">

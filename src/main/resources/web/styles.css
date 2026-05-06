@@ -2333,7 +2333,7 @@ code {
 
 .search-icon {
     position: absolute;
-    left: 8px;
+    left: 14px;
     color: var(--text-muted);
     pointer-events: none;
     z-index: 1;
@@ -2347,7 +2347,7 @@ code {
     font-family: var(--font-sans);
     font-size: 13px;
     font-weight: 500;
-    padding: 9px 14px 9px 40px;
+    padding: 9px 14px 9px 44px;
     min-height: 42px;
     width: 100%;
     outline: none;
@@ -3418,6 +3418,11 @@ code {
     box-shadow: 0 0 0 2px var(--accent-bg);
 }
 
+.form-input.is-invalid {
+    border-color: var(--color-error);
+    box-shadow: 0 0 0 2px var(--color-error-bg);
+}
+
 .form-input[type="number"] {
     font-family: var(--font-mono);
     font-weight: 600;
@@ -3532,6 +3537,11 @@ code {
 .sql-editor:focus-within {
     border-color: var(--accent-primary);
     box-shadow: 0 0 0 2px var(--accent-bg);
+}
+
+.sql-editor.is-invalid {
+    border-color: var(--color-error);
+    box-shadow: 0 0 0 2px var(--color-error-bg);
 }
 
 .sql-editor-highlight,
@@ -3693,6 +3703,18 @@ code {
     font-size: 12px;
     color: var(--color-error);
     margin-bottom: var(--space-md);
+}
+
+.field-error-message {
+    display: none;
+    margin-top: 6px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--color-error);
+}
+
+.field-error-message:not(:empty) {
+    display: block;
 }
 
 .composer-context-card {
