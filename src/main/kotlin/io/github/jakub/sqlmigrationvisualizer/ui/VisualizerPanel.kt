@@ -604,7 +604,6 @@ $css
             <div class="modal-actions">
                 <button class="btn btn-ghost btn-sm" onclick="window.CreateMigrationModule && window.CreateMigrationModule.closeModal()">Cancel</button>
                 <button class="btn btn-primary btn-sm" id="create-mig-submit" onclick="window.CreateMigrationModule && window.CreateMigrationModule.submit()">
-                    <svg viewBox="0 0 24 24" width="14" height="14"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/></svg>
                     Create File
                 </button>
             </div>
