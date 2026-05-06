@@ -126,13 +126,13 @@
                 modalTitle.textContent = opts.title || (isEditMode ? 'Edit Migration' : (opts.sql ? 'Review Pending Migration' : 'Create New Migration'));
             }
             if (submitButton) {
-                submitButton.innerHTML = opts.submitLabel
-                    ? '<svg viewBox="0 0 24 24" width="14" height="14"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/></svg>' + escapeHtml(opts.submitLabel)
+                submitButton.textContent = opts.submitLabel
+                    ? opts.submitLabel
                     : isEditMode
-                        ? '<svg viewBox="0 0 24 24" width="14" height="14"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-2 14H7v-2h8v2zm0-4H7v-2h8v2zm-1-6V4.5L18.5 8H14z" fill="currentColor"/></svg>Save Changes'
-                    : opts.sql
-                        ? '<svg viewBox="0 0 24 24" width="14" height="14"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 10H8v-2h5v2zm0 4H8v-2h5v2zm0-8V3.5L18.5 9H13z" fill="currentColor"/></svg>Create Suggested Migration'
-                        : '<svg viewBox="0 0 24 24" width="14" height="14"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/></svg>Create File';
+                        ? 'Save Changes'
+                        : opts.sql
+                            ? 'Create Suggested Migration'
+                            : 'Create File';
                 delete submitButton.dataset.defaultHtml;
             }
 
