@@ -196,85 +196,11 @@
             });
         },
 
-        renderContext: function() {
-            var modal = document.getElementById('create-migration-modal');
-            var card = document.getElementById('create-mig-context');
-            if (!modal || !card) return;
-
-            var opts = modal._composerOptions || {};
-            var sourceBadge = document.getElementById('create-mig-source-badge');
-            var summaryTitle = document.getElementById('create-mig-summary-title');
-            var summaryText = document.getElementById('create-mig-summary-text');
-            var riskBadge = document.getElementById('create-mig-risk-badge');
-            var filePreview = document.getElementById('create-mig-file-preview');
-            var pathPreview = document.getElementById('create-mig-path-preview');
-            var highlights = document.getElementById('create-mig-highlights');
-            var riskList = document.getElementById('create-mig-risk-list');
-
-            var version = parseInt(document.getElementById('create-mig-version').value, 10);
-            if (Number.isNaN(version) || version < 0) {
-                version = 0;
-            }
-            var directory = document.getElementById('create-mig-directory').value.trim();
-            var nameValue = document.getElementById('create-mig-name').value.trim();
-            var sqlValue = document.getElementById('create-mig-sql').value || '';
-            var fileName = (window.AppHelpers && window.AppHelpers.getSuggestedMigrationFileName
-                ? window.AppHelpers.getSuggestedMigrationFileName({
-                    version: version,
-                    sql: sqlValue,
-                    explicitName: nameValue || opts.name || '',
-                    extension: modal.dataset.migrationExtension || 'sql'
-                })
-                : '');
-            if (!fileName && opts.suggestedFileName) {
-                fileName = opts.suggestedFileName;
-            }
-            var highlightItems = Array.isArray(opts.changeHighlights) && opts.changeHighlights.length > 0
-                ? opts.changeHighlights
-                : (((opts.risk || {}).items || []).slice(0, 3).map(function(item) { return item.title; }));
-
-            sourceBadge.textContent = opts.sourceKind === 'pending'
-                ? 'Pending draft'
-                : opts.sourceKind === 'generated'
-                    ? 'Generated from diff'
-                    : (modal.dataset.mode === 'edit' ? 'Editing existing file' : 'Migration draft');
-            summaryTitle.textContent = modal.dataset.mode === 'edit'
-                ? 'Edit migration'
-                : (opts.sourceKind === 'pending' ? 'Review suggested migration' : 'Create migration');
-            summaryText.textContent = opts.summary || (opts.risk && opts.risk.headline) || 'Fill in the migration details and review the SQL before saving.';
-
-            if (opts.risk && opts.risk.items && opts.risk.items.length > 0 && window.AppUi && window.AppUi.renderRiskBadge) {
-                riskBadge.innerHTML = window.AppUi.renderRiskBadge(opts.risk);
-            } else {
-                riskBadge.innerHTML = '';
-            }
-
-            filePreview.textContent = fileName || 'Migration file preview unavailable';
-            pathPreview.textContent = directory
-                ? directory + '/' + fileName
-                : 'Choose a directory to preview the full path.';
-
-            if (highlightItems.length > 0) {
-                highlights.innerHTML = highlightItems.map(function(item) {
-                    return '<span class="composer-chip">' + escapeHtml(item) + '</span>';
-                }).join('');
-            } else {
-                highlights.innerHTML = '<span class="composer-chip composer-chip-muted">No special review notes</span>';
-            }
-
-            if (opts.risk && opts.risk.items && opts.risk.items.length > 0 && window.AppUi && window.AppUi.renderRiskList) {
-                riskList.innerHTML = window.AppUi.renderRiskList(opts.risk, 3);
-                riskList.style.display = 'grid';
-            } else {
-                riskList.innerHTML = '';
-                riskList.style.display = 'none';
-            }
-
-            card.style.display = (opts.summary || fileName || highlightItems.length > 0 || riskBadge.innerHTML) ? 'grid' : 'none';
-        },
+        renderContext: function() {},
 
         _lastHighlightedSql: null,
         _highlightScrollFrame: null,
+        _dialogScrollFrame: null,
 
         syncSqlHighlight: function(force) {
             var sqlInput = document.getElementById('create-mig-sql');
@@ -327,6 +253,7 @@
                 CreateMigrationModule.clearValidationState(sqlInput);
                 CreateMigrationModule.updateSuggestions();
                 CreateMigrationModule.renderContext();
+                CreateMigrationModule.scheduleSqlCaretIntoView();
             });
             sqlInput.addEventListener('scroll', function() {
                 CreateMigrationModule.scheduleSqlHighlightScrollSync();
@@ -503,6 +430,7 @@
         },
 
         _caretMirror: null,
+        _caretText: null,
         _caretSpan: null,
         _heightMirror: null,
 
@@ -536,11 +464,14 @@
             mirror.style.left = '-9999px';
             mirror.style.height = 'auto';
             mirror.style.overflow = 'hidden';
+            var text = document.createTextNode('');
             var span = document.createElement('span');
             span.textContent = '|';
+            mirror.appendChild(text);
             mirror.appendChild(span);
             document.body.appendChild(mirror);
             this._caretMirror = mirror;
+            this._caretText = text;
             this._caretSpan = span;
         },
 
@@ -551,11 +482,44 @@
             var mirror = this._caretMirror;
             mirror.style.width = sqlInput.offsetWidth + 'px';
             var textBeforeCaret = sqlInput.value.substring(0, sqlInput.selectionStart);
-            mirror.firstChild.textContent = textBeforeCaret;
-            mirror.appendChild(this._caretSpan);
+            this._caretText.textContent = textBeforeCaret;
+            this._caretSpan.textContent = '|';
             var caretTop = this._caretSpan.offsetTop - sqlInput.scrollTop;
             var lineHeight = parseInt(window.getComputedStyle(sqlInput).lineHeight) || 19;
             return { top: caretTop, lineHeight: lineHeight };
+        },
+
+        scheduleSqlCaretIntoView: function() {
+            if (this._dialogScrollFrame !== null) return;
+
+            var self = this;
+            this._dialogScrollFrame = window.requestAnimationFrame(function() {
+                self._dialogScrollFrame = null;
+                self.scrollDialogToSqlCaret();
+            });
+        },
+
+        scrollDialogToSqlCaret: function() {
+            var sqlInput = document.getElementById('create-mig-sql');
+            var modalBody = document.querySelector('#create-migration-modal .modal-body');
+            if (!sqlInput || !modalBody) return;
+
+            var caret = this.getCaretTopInEditor();
+            if (!caret) return;
+
+            var inputRect = sqlInput.getBoundingClientRect();
+            var bodyRect = modalBody.getBoundingClientRect();
+            var edgePadding = 24;
+            var caretTop = inputRect.top + caret.top;
+            var caretBottom = caretTop + caret.lineHeight;
+            var visibleTop = bodyRect.top + edgePadding;
+            var visibleBottom = bodyRect.bottom - edgePadding;
+
+            if (caretBottom > visibleBottom) {
+                modalBody.scrollTop += caretBottom - visibleBottom;
+            } else if (caretTop < visibleTop) {
+                modalBody.scrollTop -= visibleTop - caretTop;
+            }
         },
 
         growSqlEditor: function() {
@@ -640,6 +604,8 @@
             sqlInput.focus();
             sqlInput.setRangeText(insertValue + suffix, this.completionState.start, this.completionState.end, 'end');
             this.syncSqlHighlight();
+            this.growSqlEditor();
+            this.scheduleSqlCaretIntoView();
             this.hideSuggestions();
         },
 
@@ -683,32 +649,11 @@
                     editor.classList.remove('is-invalid');
                 }
             });
-            if (field) {
-                this.setFieldValidationMessage(field, '');
-            } else {
-                this.clearFieldValidationMessages();
-            }
-
             var modal = document.getElementById('create-migration-modal');
             var errorEl = document.getElementById('create-mig-error');
             if (errorEl && (!modal || !modal.querySelector('.is-invalid'))) {
                 errorEl.textContent = '';
                 errorEl.style.display = 'none';
-            }
-        },
-
-        clearFieldValidationMessages: function() {
-            var sqlErrorEl = document.getElementById('create-mig-sql-error');
-            if (sqlErrorEl) {
-                sqlErrorEl.textContent = '';
-            }
-        },
-
-        setFieldValidationMessage: function(field, message) {
-            if (!field || field.id !== 'create-mig-sql') return;
-            var sqlErrorEl = document.getElementById('create-mig-sql-error');
-            if (sqlErrorEl) {
-                sqlErrorEl.textContent = message || '';
             }
         },
 
@@ -726,7 +671,6 @@
                 if (editor) {
                     editor.classList.add('is-invalid');
                 }
-                this.setFieldValidationMessage(field, message);
                 field.focus();
                 if (field.select && field.tagName !== 'TEXTAREA') {
                     field.select();

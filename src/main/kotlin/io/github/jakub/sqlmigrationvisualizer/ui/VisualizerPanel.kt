@@ -545,28 +545,6 @@ $css
             </div>
             <div class="modal-body">
                 <div id="create-mig-error" class="form-error" style="display:none"></div>
-                <div id="create-mig-context" class="composer-context-card" style="display:none">
-                    <div class="composer-context-header">
-                        <div>
-                            <div class="composer-context-eyebrow" id="create-mig-source-badge">Migration Draft</div>
-                            <strong id="create-mig-summary-title">Create migration</strong>
-                            <div id="create-mig-summary-text" class="composer-context-summary"></div>
-                        </div>
-                        <div id="create-mig-risk-badge"></div>
-                    </div>
-                    <div class="composer-context-grid">
-                        <div class="composer-context-pane">
-                            <div class="composer-context-label">Planned file</div>
-                            <div id="create-mig-file-preview" class="composer-context-preview">1.sql</div>
-                            <div id="create-mig-path-preview" class="composer-context-helper">Choose a directory to preview the full path.</div>
-                        </div>
-                        <div class="composer-context-pane">
-                            <div class="composer-context-label">Why review it</div>
-                            <div id="create-mig-highlights" class="composer-chip-list"></div>
-                        </div>
-                    </div>
-                    <div id="create-mig-risk-list" class="composer-risk-list"></div>
-                </div>
                 <div class="form-row">
                     <div class="form-group" style="flex: 0 0 auto">
                         <label class="form-label">Version</label>
@@ -595,10 +573,9 @@ $css
                     <label class="form-label">SQL Statements</label>
                     <div class="sql-editor" data-placeholder="ALTER TABLE users ADD COLUMN email TEXT NOT NULL;&#10;&#10;CREATE TABLE posts (&#10;  id INTEGER PRIMARY KEY,&#10;  title TEXT NOT NULL&#10;);">
                         <pre id="create-mig-sql-highlight" class="sql-editor-highlight" aria-hidden="true"></pre>
-                        <textarea id="create-mig-sql" class="form-textarea sql-editor-input" placeholder="ALTER TABLE users ADD COLUMN email TEXT NOT NULL;&#10;&#10;CREATE TABLE posts (&#10;  id INTEGER PRIMARY KEY,&#10;  title TEXT NOT NULL&#10;);" rows="10" spellcheck="false" required aria-required="true" aria-describedby="create-mig-sql-error"></textarea>
+                        <textarea id="create-mig-sql" class="form-textarea sql-editor-input" placeholder="ALTER TABLE users ADD COLUMN email TEXT NOT NULL;&#10;&#10;CREATE TABLE posts (&#10;  id INTEGER PRIMARY KEY,&#10;  title TEXT NOT NULL&#10;);" rows="10" spellcheck="false" required aria-required="true"></textarea>
                         <div id="create-mig-sql-suggestions" class="sql-editor-suggestions" style="display:none"></div>
                     </div>
-                    <div id="create-mig-sql-error" class="field-error-message" role="alert"></div>
                 </div>
             </div>
             <div class="modal-actions">

@@ -5,10 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.7] - 2026-05-06
+
+### Changed
+- Removed the redundant context card from the Create Migration dialog
+- Create Migration dialog scrollbar now follows the SQL editor caret as the editor grows
+- Aligned main plugin chrome, search/stat rows, tabs, and panel content to shared horizontal padding
+- Unified plugin control styling across buttons, dropdowns, search fields, steppers, and status pills
+
+### Fixed
+- Made editable input caret/cursor styling explicit to avoid intermittent missing carets
+
 ## [1.2.6] - 2026-05-06
 
 ### Changed
-- Added field-level required validation for SQL Statements in the Create Migration dialog, including an inline empty-content message
+- Added field-level required validation for SQL Statements in the Create Migration dialog
 - Version input in the Create Migration dialog now falls back to 0 instead of staying empty
 - Improved search field icon spacing
 
