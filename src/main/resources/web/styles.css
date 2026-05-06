@@ -201,7 +201,7 @@ code {
     align-items: center;
     justify-content: space-between;
     gap: var(--space-lg);
-    padding: 14px var(--space-lg) 12px 32px;
+    padding: 14px var(--space-lg) 12px var(--space-xl);
     background: var(--bg-secondary);
     border-bottom: 1px solid var(--border-default);
     flex-shrink: 0;
@@ -2772,7 +2772,7 @@ code {
 }
 
 #app.compact-width #main-header {
-    padding-left: 28px;
+    padding-left: var(--space-lg);
     padding-right: var(--space-md);
 }
 
