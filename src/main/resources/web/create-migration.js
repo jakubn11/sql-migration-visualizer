@@ -96,6 +96,7 @@
 
             // Clear SQL and errors
             sqlInput.value = opts.sql || '';
+            modal.dataset.initialSql = sqlInput.value;
             errorEl.style.display = 'none';
             errorEl.textContent = '';
             this.setSubmitting(false);
@@ -157,6 +158,31 @@
             this.setSubmitting(false);
             document.getElementById('create-migration-modal').style.display = 'none';
             this.hideSuggestions();
+        },
+
+        requestClose: function() {
+            var modal = document.getElementById('create-migration-modal');
+            var sqlInput = document.getElementById('create-mig-sql');
+            var current = sqlInput ? sqlInput.value : '';
+            var initial = modal ? (modal.dataset.initialSql || '') : '';
+            var hasUnsavedSql = current.trim() !== '' && current !== initial;
+
+            if (!hasUnsavedSql || !window.AppUi || !window.AppUi.confirm) {
+                this.closeModal();
+                return;
+            }
+
+            var self = this;
+            var isEditMode = modal && modal.dataset.mode === 'edit';
+            window.AppUi.confirm({
+                title: isEditMode ? 'Discard changes?' : 'Discard migration?',
+                message: isEditMode
+                    ? 'You have unsaved changes to this migration. Are you sure you want to discard them?'
+                    : 'You have unsaved SQL statements. Are you sure you want to discard this migration?',
+                confirmLabel: 'Discard',
+                tone: 'danger',
+                onConfirm: function() { self.closeModal(); }
+            });
         },
 
         bindMetadataInputs: function() {
@@ -877,4 +903,21 @@
     };
 
     window.CreateMigrationModule = CreateMigrationModule;
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key !== 'Escape') return;
+        // The SQL editor's own Escape handler preventDefaults when it dismisses
+        // autocomplete suggestions, so skip closing the modal in that case.
+        if (event.defaultPrevented) return;
+
+        var modal = document.getElementById('create-migration-modal');
+        if (!modal || modal.style.display === 'none') return;
+
+        // If the confirm dialog is already on top of the modal, let it handle Escape.
+        var confirmModal = document.getElementById('confirm-modal');
+        if (confirmModal && confirmModal.style.display !== 'none') return;
+
+        event.preventDefault();
+        CreateMigrationModule.requestClose();
+    });
 })();

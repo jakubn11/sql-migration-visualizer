@@ -535,11 +535,11 @@ $css
     </div>
 
     <!-- Create Migration Modal -->
-    <div id="create-migration-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this) window.CreateMigrationModule && window.CreateMigrationModule.closeModal()">
+    <div id="create-migration-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this) window.CreateMigrationModule && window.CreateMigrationModule.requestClose()">
         <div class="modal-content" style="max-width: 520px">
             <div class="modal-header">
                 <h3>Create New Migration</h3>
-                <button class="btn btn-ghost btn-sm" onclick="window.CreateMigrationModule && window.CreateMigrationModule.closeModal()">
+                <button class="btn btn-ghost btn-sm" onclick="window.CreateMigrationModule && window.CreateMigrationModule.requestClose()">
                     <svg viewBox="0 0 24 24" width="16" height="16"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/></svg>
                 </button>
             </div>
@@ -579,7 +579,7 @@ $css
                 </div>
             </div>
             <div class="modal-actions">
-                <button class="btn btn-ghost btn-sm" onclick="window.CreateMigrationModule && window.CreateMigrationModule.closeModal()">Cancel</button>
+                <button class="btn btn-ghost btn-sm" onclick="window.CreateMigrationModule && window.CreateMigrationModule.requestClose()">Cancel</button>
                 <button class="btn btn-primary btn-sm" id="create-mig-submit" onclick="window.CreateMigrationModule && window.CreateMigrationModule.submit()">
                     Create File
                 </button>

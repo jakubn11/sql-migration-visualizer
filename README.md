@@ -74,7 +74,7 @@ Open the **SQL Migrations** panel at the bottom of the IDE. The plugin scans you
 | Cmd+Enter / Ctrl+Enter | Submit the migration (create or save) |
 | Tab | Accept the selected SQL autocomplete suggestion |
 | ↑ / ↓ | Navigate autocomplete suggestions |
-| Esc | Close autocomplete |
+| Esc | Close autocomplete, or close the dialog (with a confirmation if there are unsaved SQL statements) |
 
 ## Troubleshooting
 
@@ -82,6 +82,7 @@ Open the **SQL Migrations** panel at the bottom of the IDE. The plugin scans you
 |---------|-----|
 | No migrations appear | Check that your migration directory matches one of the supported layouts, or set it manually in **Settings → Tools → SQL Migration Visualizer**. |
 | Timeline shows gaps | Versions must be contiguous integers. Run **Validate** to see the exact gap locations. |
+| Two migrations have the same version | Open **Validate**, find the **Duplicate migration version** issue, and click **Renumber … to v&lt;N&gt;** on the file that should be bumped (typically the one from your feature branch). |
 | ER diagram is empty | Requires at least one parsed schema version with valid `CREATE TABLE` statements. |
 | Plugin panel is missing | Open **View → Tool Windows → SQL Migrations** or reopen the project. |
 | Changes not reflected | Click **Refresh** in the panel toolbar or re-save a migration file. |

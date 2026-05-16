@@ -55,6 +55,7 @@ class JcefBridge(
     private val createMigrationQuery = JBCefJSQuery.create(browser)
     private val browseDirectoryQuery = JBCefJSQuery.create(browser)
     private val deleteMigrationQuery = JBCefJSQuery.create(browser)
+    private val renumberMigrationQuery = JBCefJSQuery.create(browser)
     private val saveErLayoutQuery = JBCefJSQuery.create(browser)
     private val dismissPendingMigrationQuery = JBCefJSQuery.create(browser)
     private val openRelatedSchemaSourceQuery = JBCefJSQuery.create(browser)
@@ -276,6 +277,42 @@ class JcefBridge(
             }
         }
 
+        // Handle renumber-duplicate-migration requests (quick-fix on DUPLICATE_VERSION issues)
+        renumberMigrationQuery.addHandler { filePath ->
+            try {
+                val basePath = project.basePath
+                if (basePath != null && !filePath.startsWith(basePath)) {
+                    return@addHandler JBCefJSQuery.Response(null, 0, "File is outside the project: $filePath")
+                }
+                val newVersion = MigrationFileNaming.nextFreeVersion(schemaVersions.map { it.version })
+                ApplicationManager.getApplication().invokeLater {
+                    try {
+                        WriteAction.run<Throwable> {
+                            val virtualFile = LocalFileSystem.getInstance().refreshAndFindFileByPath(filePath)
+                                ?: throw IllegalStateException("Migration file not found: $filePath")
+                            val newName = MigrationFileNaming.renumberFileName(virtualFile.name, newVersion)
+                                ?: throw IllegalStateException("Unrecognised migration file name: ${virtualFile.name}")
+                            val parent = virtualFile.parent
+                            if (parent?.findChild(newName) != null) {
+                                throw IllegalStateException("A file named '$newName' already exists in this directory.")
+                            }
+                            virtualFile.rename(this@JcefBridge, newName)
+                            parent?.refresh(false, true)
+                        }
+                        onRefreshRequested?.invoke()
+                    } catch (e: Exception) {
+                        executeJavaScript(
+                            "window.alert(${("Failed to renumber migration: ${e.message ?: "Unknown error"}").asJsStringLiteral()});",
+                            "bridge://renumber-error"
+                        )
+                    }
+                }
+                JBCefJSQuery.Response("ok")
+            } catch (e: Exception) {
+                JBCefJSQuery.Response(null, 0, "Error: ${e.message}")
+            }
+        }
+
         saveErLayoutQuery.addHandler { jsonStr ->
             try {
                 val params = Json.parseToJsonElement(jsonStr).jsonObject
@@ -385,6 +422,10 @@ class JcefBridge(
             "function(response) { console.log('[Bridge] Migration deleted'); window.__onMigrationDeleted && window.__onMigrationDeleted(filePath); }",
             "function(errCode, errMsg) { console.error('[Bridge] Delete migration error:', errMsg); }"
         )
+        val renumberMigrationJs = renumberMigrationQuery.inject("filePath",
+            "function(response) { console.log('[Bridge] Migration renumbered'); window.__onMigrationRenumbered && window.__onMigrationRenumbered(filePath); }",
+            "function(errCode, errMsg) { console.error('[Bridge] Renumber migration error:', errMsg); }"
+        )
         val saveErLayoutJs = saveErLayoutQuery.inject("json",
             "function(response) { console.log('[Bridge] ER layout saved'); }",
             "function(errCode, errMsg) { console.error('[Bridge] Save ER layout error:', errMsg); }"
@@ -427,6 +468,9 @@ class JcefBridge(
                 },
                 deleteMigration: function(filePath) {
                     $deleteMigrationJs
+                },
+                renumberMigration: function(filePath) {
+                    $renumberMigrationJs
                 },
                 saveErLayout: function(json) {
                     $saveErLayoutJs

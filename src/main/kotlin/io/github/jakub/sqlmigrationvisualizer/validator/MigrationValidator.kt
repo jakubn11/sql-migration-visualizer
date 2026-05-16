@@ -74,22 +74,49 @@ class MigrationValidator {
         for (i in 0 until versions.size - 1) {
             val current = versions[i]
             val next = versions[i + 1]
-            if (next - current > 1) {
-                val missing = (current + 1 until next).toList()
-                issues.add(
-                    ValidationIssue(
-                        severity = ValidationSeverity.ERROR,
-                        message = "Missing migration version(s): ${missing.joinToString(", ")}",
-                        code = ValidationIssueCode.VERSION_GAP,
-                        details = "Gap detected between version $current and $next. This visualizer assumes sequential numeric versions for upgrade order.",
-                        explanation = "When a numeric version is skipped, it becomes harder to reason about upgrade order and schema history across environments.",
-                        suggestedFix = "Create the missing version file(s), or rename later migrations so the numbering is continuous again.",
-                        missingVersions = missing,
-                        contextVersions = listOf(current, next)
-                    )
-                )
+            val gapSize = next.toLong() - current.toLong() - 1L
+            if (gapSize <= 0L) continue
+
+            // Cap enumeration to avoid OOM when a project mixes small versions
+            // with Flyway-style timestamp versions (gap can be tens of millions).
+            // Only the first missing version is consumed by the UI's "draft missing
+            // migration" action, so a truncated list is sufficient.
+            val enumerationLimit = MAX_GAP_ENUMERATION
+            val enumerated = gapSize <= enumerationLimit
+            val missing: List<Int> = if (enumerated) {
+                (current + 1 until next).toList()
+            } else {
+                (1..enumerationLimit.toInt()).map { current + it }
             }
+
+            val message = if (enumerated) {
+                "Missing migration version(s): ${missing.joinToString(", ")}"
+            } else {
+                "Large version gap between $current and $next: $gapSize missing version(s)"
+            }
+            val details = if (enumerated) {
+                "Gap detected between version $current and $next. This visualizer assumes sequential numeric versions for upgrade order."
+            } else {
+                "Gap detected between version $current and $next ($gapSize missing version(s)). Showing the first $enumerationLimit. This often happens when sequential migrations are mixed with timestamp-style versions like Flyway's V<yyyyMMddHHmmss>."
+            }
+
+            issues.add(
+                ValidationIssue(
+                    severity = ValidationSeverity.ERROR,
+                    message = message,
+                    code = ValidationIssueCode.VERSION_GAP,
+                    details = details,
+                    explanation = "When a numeric version is skipped, it becomes harder to reason about upgrade order and schema history across environments.",
+                    suggestedFix = "Create the missing version file(s), or rename later migrations so the numbering is continuous again.",
+                    missingVersions = missing,
+                    contextVersions = listOf(current, next)
+                )
+            )
         }
+    }
+
+    private companion object {
+        const val MAX_GAP_ENUMERATION = 100L
     }
 
     private fun checkDuplicateVersions(

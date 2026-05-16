@@ -66,10 +66,19 @@
                     else if (changes.tablesRemoved.length > 0) dotClass += ' has-removals';
                     else if (changes.tablesModified.length > 0) dotClass += ' has-modifications';
                 }
+                const versionStr = String(version.version);
+                if (versionStr.length >= 5) dotClass += ' is-version-long';
+                else if (versionStr.length === 4) dotClass += ' is-version-medium';
+
+                // Truncate the version shown inside the 38px dot; the full version is
+                // visible in the label below and as the title tooltip.
+                const dotText = versionStr.length > 4
+                    ? '…' + versionStr.slice(-4)
+                    : versionStr;
 
                 node.innerHTML = `
-                    <div class="${dotClass}">
-                        ${version.version}
+                    <div class="${dotClass}" title="Version ${versionStr}">
+                        ${dotText}
                     </div>
                     <div class="timeline-label">
                         <div class="timeline-version">${version.migrationFile ? version.migrationFile.fileName : 'Baseline'}</div>

@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-05-16
+
+### Added
+- Confirmation dialog when closing the Create Migration dialog with unsaved SQL content — prevents accidentally discarding in-progress migrations
+- Escape key now closes the Create Migration dialog (routed through the same unsaved-content confirmation) and dismisses the confirmation dialog itself
+- One-click "Renumber to v&lt;N&gt;" quick-fix on duplicate-version validation issues — resolves the common feature-branch conflict where two branches landed migrations with the same version, and the button shows the exact target version so you know what to expect before confirming
+
+### Changed
+- Buttons now have a visible disabled state, and the Renumber quick-fix button disables itself while a rename is in flight to prevent accidental double-fires
+
+### Fixed
+- Prevented OOM crash when validating projects that mix sequential and Flyway-style timestamp versions — large version gaps are now summarised instead of enumerated
+- Text caret now reliably reappears in inputs and the SQL editor when the JCEF browser regains focus or after intermittent focus desyncs
+- Timeline version dots stay a consistent 38px circle for all version lengths — long versions are truncated to the last digits inside the dot (with the full version available on hover), and the migration filename label has more room to display in full
+
 ## [1.2.7] - 2026-05-06
 
 ### Changed

@@ -154,6 +154,46 @@
     initializeCustomDropdowns();
     bindUiControls();
     initializeSectionVisibilityControls();
+    initializeCaretRenderingFix();
+
+    // JCEF (embedded Chromium) intermittently fails to render the text caret
+    // when the browser's internal page-focus state desyncs from the DOM —
+    // typically after the tool window loses/regains focus or after a modal
+    // animation. The input is still :focus, but the caret stops blinking.
+    function initializeCaretRenderingFix() {
+        function isEditableTextInput(el) {
+            if (!el || el.disabled || el.readOnly) return false;
+            if (el.tagName === 'TEXTAREA') return true;
+            if (el.tagName !== 'INPUT') return false;
+            const type = (el.type || 'text').toLowerCase();
+            return /^(text|search|email|password|url|tel|number)$/.test(type);
+        }
+
+        document.addEventListener('focusin', function(event) {
+            const target = event.target;
+            if (!isEditableTextInput(target)) return;
+            requestAnimationFrame(function() {
+                if (document.activeElement !== target) return;
+                try {
+                    const start = target.selectionStart;
+                    const end = target.selectionEnd;
+                    if (typeof start === 'number') target.setSelectionRange(start, end);
+                } catch (e) { /* selection not supported on this input type */ }
+            });
+        });
+
+        window.addEventListener('focus', function() {
+            const active = document.activeElement;
+            if (!isEditableTextInput(active)) return;
+            const start = active.selectionStart;
+            const end = active.selectionEnd;
+            active.blur();
+            active.focus();
+            try {
+                if (typeof start === 'number') active.setSelectionRange(start, end);
+            } catch (e) { /* selection not supported on this input type */ }
+        });
+    }
 
     function initializeResponsiveLayout() {
         const appRoot = document.getElementById('app');
@@ -712,6 +752,18 @@
             '-- Fill in the SQL statements needed for this missing version.\n';
     }
 
+    // Must match MigrationFileNaming.nextFreeVersion on the Kotlin side: max(used) + 1.
+    function computeNextFreeVersion() {
+        var versions = state.schemaVersions || [];
+        var max = 0;
+        for (var i = 0; i < versions.length; i++) {
+            if (typeof versions[i].version === 'number' && versions[i].version > max) {
+                max = versions[i].version;
+            }
+        }
+        return max + 1;
+    }
+
     function handleValidationIssueClick(e) {
         var button = e.target.closest('.issue-action-btn');
         if (!button) return;
@@ -727,6 +779,33 @@
             var filePath = button.dataset.filePath || issue.filePath;
             if (filePath && window.__bridge && window.__bridge.openFile) {
                 window.__bridge.openFile(filePath);
+            }
+            return;
+        }
+
+        if (action === 'renumber-duplicate') {
+            if (button.disabled) return;
+            var renumberPath = button.dataset.filePath;
+            if (!renumberPath || !window.__bridge || !window.__bridge.renumberMigration) return;
+            var renumberFileName = renumberPath.split('/').pop() || 'this migration';
+            var targetVersion = parseInt(button.dataset.targetVersion, 10);
+            // Disabling on confirm (not on click) keeps the button usable if the user
+            // cancels the confirm dialog. The validation panel re-renders after the
+            // backend refresh, so we don't need to manually re-enable.
+            var runRenumber = function() {
+                button.disabled = true;
+                button.textContent = 'Renaming…';
+                window.__bridge.renumberMigration(renumberPath);
+            };
+            if (window.AppUi && window.AppUi.confirm) {
+                window.AppUi.confirm({
+                    title: 'Renumber migration?',
+                    message: 'Rename ' + renumberFileName + ' to version ' + (Number.isFinite(targetVersion) ? targetVersion : 'the next free number') + '. The file will be renamed in place. Continue?',
+                    confirmLabel: 'Renumber',
+                    onConfirm: runRenumber
+                });
+            } else {
+                runRenumber();
             }
             return;
         }
@@ -1032,6 +1111,14 @@
         }
     }
 
+    document.addEventListener('keydown', function(event) {
+        if (event.key !== 'Escape' || event.defaultPrevented) return;
+        const modal = document.getElementById('confirm-modal');
+        if (!modal || modal.style.display === 'none') return;
+        event.preventDefault();
+        closeConfirmDialog();
+    });
+
     // ===== Validation Badge =====
     function updateValidationBadge() {
         const badge = document.getElementById('validation-badge');
@@ -1062,12 +1149,15 @@
         }
 
         if (issue.code === 'DUPLICATE_VERSION' && issue.relatedFilePaths) {
+            var renumberTarget = computeNextFreeVersion();
             issue.relatedFilePaths.forEach(function(filePath, fileIndex) {
                 var fileName = filePath.split('/').pop();
+                var fileLabel = escapeHtml(fileName || ('File ' + (fileIndex + 1)));
                 actions.push(
-                    '<button type="button" class="btn btn-ghost btn-sm issue-action-btn" data-validation-action="open-file" data-issue-index="' + index + '" data-file-path="' + escapeHtml(filePath) + '">Open ' +
-                    escapeHtml(fileName || ('File ' + (fileIndex + 1))) +
-                    '</button>'
+                    '<button type="button" class="btn btn-ghost btn-sm issue-action-btn" data-validation-action="open-file" data-issue-index="' + index + '" data-file-path="' + escapeHtml(filePath) + '">Open ' + fileLabel + '</button>'
+                );
+                actions.push(
+                    '<button type="button" class="btn btn-ghost btn-sm issue-action-btn" data-validation-action="renumber-duplicate" data-issue-index="' + index + '" data-file-path="' + escapeHtml(filePath) + '" data-target-version="' + renumberTarget + '">Renumber ' + fileLabel + ' to v' + renumberTarget + '</button>'
                 );
             });
         } else if (issue.filePath) {
@@ -1344,6 +1434,11 @@
     window.__onMigrationDeleted = function(filePath) {
         const fileName = filePath ? filePath.split('/').pop() : 'Migration file';
         showToast(fileName + ' deleted successfully.', 'success');
+    };
+
+    window.__onMigrationRenumbered = function(filePath) {
+        const fileName = filePath ? filePath.split('/').pop() : 'Migration file';
+        showToast(fileName + ' renumbered to the next free version.', 'success');
     };
 
     window.__onPendingMigrationDismissed = function() {

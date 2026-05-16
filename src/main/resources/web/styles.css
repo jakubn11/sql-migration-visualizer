@@ -462,6 +462,15 @@ code {
     opacity: 0.92;
 }
 
+.btn:disabled,
+.btn[disabled] {
+    cursor: default;
+    opacity: 0.55;
+    filter: saturate(0.6);
+    pointer-events: none;
+    transform: none;
+}
+
 .btn-primary {
     background: var(--accent-gradient);
     color: white;
@@ -897,6 +906,9 @@ code {
 .timeline-dot {
     width: 38px;
     height: 38px;
+    min-width: 38px;
+    min-height: 38px;
+    flex: none;
     border-radius: 50%;
     background: var(--bg-tertiary);
     border: 2px solid var(--border-default);
@@ -909,6 +921,18 @@ code {
     transition: all var(--transition-normal);
     position: relative;
     z-index: 2;
+    overflow: hidden;
+    line-height: 1;
+}
+
+.timeline-dot.is-version-medium {
+    font-size: 11px;
+    letter-spacing: -0.25px;
+}
+
+.timeline-dot.is-version-long {
+    font-size: 10px;
+    letter-spacing: -0.4px;
 }
 
 .timeline-node:hover .timeline-dot {
@@ -940,13 +964,16 @@ code {
 .timeline-label {
     margin-top: 6px;
     text-align: center;
-    max-width: 80px;
+    max-width: 120px;
 }
 
 .timeline-version {
     font-size: var(--text-sm);
     font-weight: var(--weight-semibold);
     color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .timeline-connector {
@@ -3152,7 +3179,7 @@ code {
 
 #app.short-height .timeline-label {
     margin-top: 6px;
-    max-width: 72px;
+    max-width: 110px;
 }
 
 #app.short-height .timeline-version {
@@ -3278,7 +3305,7 @@ code {
 
 #app.very-short .timeline-label {
     margin-top: 4px;
-    max-width: 60px;
+    max-width: 90px;
 }
 
 #app.very-short .stats {

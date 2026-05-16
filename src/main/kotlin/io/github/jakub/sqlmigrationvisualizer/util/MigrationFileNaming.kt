@@ -47,4 +47,37 @@ internal object MigrationFileNaming {
             .lowercase()
             .replace(Regex("""[^a-z0-9]+"""), "_")
             .trim('_')
+
+    /**
+     * Rebuild a migration file name with a new version, preserving the original
+     * naming style. Recognises the three supported patterns:
+     *
+     *   123.sql          → newVersion.sql
+     *   123_foo.sql      → newVersion_foo.sql
+     *   V123__foo.sql    → Vnewversion__foo.sql
+     *
+     * Returns null if the original name doesn't match any recognised pattern,
+     * so the caller can decide how to recover.
+     */
+    fun renumberFileName(originalName: String, newVersion: Int): String? {
+        val flyway = Regex("""^([Vv])(\d+)(__.+)$""").matchEntire(originalName)
+        if (flyway != null) {
+            return "${flyway.groupValues[1]}$newVersion${flyway.groupValues[3]}"
+        }
+        val numericPrefix = Regex("""^(\d+)([._\-].*)?$""").matchEntire(originalName)
+        if (numericPrefix != null) {
+            val suffix = numericPrefix.groupValues[2]
+            return if (suffix.isEmpty()) "$newVersion" else "$newVersion$suffix"
+        }
+        return null
+    }
+
+    /**
+     * Lowest positive integer that is strictly greater than every used version.
+     * Returns 1 for an empty collection.
+     */
+    fun nextFreeVersion(usedVersions: Collection<Int>): Int {
+        val max = usedVersions.maxOrNull() ?: 0
+        return max + 1
+    }
 }

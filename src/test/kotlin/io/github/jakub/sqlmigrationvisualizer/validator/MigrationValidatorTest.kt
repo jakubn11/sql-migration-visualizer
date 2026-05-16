@@ -35,6 +35,24 @@ class MigrationValidatorTest {
     }
 
     @Test
+    fun `huge version gap is summarised without enumerating millions of versions`() {
+        val result = validator.validate(
+            migrations = listOf(
+                migration(1),
+                migration(20_260_101)
+            ),
+            schemaVersions = emptyList()
+        )
+
+        val issue = result.issues.firstOrNull { it.code == ValidationIssueCode.VERSION_GAP }
+        assertNotNull(issue)
+        assertTrue(issue.missingVersions.size <= 100)
+        assertEquals(2, issue.missingVersions.first())
+        assertTrue(issue.message.contains("Large version gap"))
+        assertEquals(listOf(1, 20_260_101), issue.contextVersions)
+    }
+
+    @Test
     fun `duplicate versions expose conflicting file paths`() {
         val result = validator.validate(
             migrations = listOf(
