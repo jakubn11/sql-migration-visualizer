@@ -77,9 +77,7 @@
                     : versionStr;
 
                 node.innerHTML = `
-                    <div class="${dotClass}" title="Version ${versionStr}">
-                        ${dotText}
-                    </div>
+                    <div class="${dotClass}" title="Version ${versionStr}">${dotText}</div>
                     <div class="timeline-label">
                         <div class="timeline-version">${version.migrationFile ? version.migrationFile.fileName : 'Baseline'}</div>
                     </div>
@@ -124,8 +122,6 @@
             const body = document.getElementById('schema-tables-grid');
             const gotoBtn = document.getElementById('btn-goto-source');
             const deleteBtn = document.getElementById('btn-delete-migration');
-            const changesSummaryEl = document.getElementById('changes-summary');
-            const changesList = document.getElementById('changes-list');
             const historyPanel = document.getElementById('table-history-panel');
             const focus = state && state.ui ? state.ui.timelineFocus : null;
             const focusedTableName = focus && focus.tableName ? focus.tableName : null;
@@ -317,7 +313,6 @@
                                 ${pkBadge}${fkBadge}${nullBadge}
                                 <span class="col-type">${escapeHtml(col.type)}</span>
                                 <button type="button" class="inline-source-btn" title="Focus column lineage" onclick="event.stopPropagation(); window.AppActions && window.AppActions.showTableHistory('${escapeJs(name)}', ${version.version}, '${escapeJs(col.name)}')">Lineage</button>
-                                <button type="button" class="inline-source-btn" title="Open related schema file" onclick="event.stopPropagation(); window.__bridge && window.__bridge.openRelatedSchemaSource && window.__bridge.openRelatedSchemaSource(JSON.stringify({tableName:'${escapeJs(name)}',columnName:'${escapeJs(col.name)}'}))">SQL</button>
                             </div>
                         `;
                     }).join('');
@@ -334,7 +329,6 @@
                                 ${pkBadge}${nullBadge}
                                 <span class="col-type">${escapeHtml(col.type)}</span>
                                 <button type="button" class="inline-source-btn" title="Focus column lineage" onclick="event.stopPropagation(); window.AppActions && window.AppActions.showTableHistory('${escapeJs(name)}', ${version.version}, '${escapeJs(col.name)}')">Lineage</button>
-                                <button type="button" class="inline-source-btn" title="Open related schema file" onclick="event.stopPropagation(); window.__bridge && window.__bridge.openRelatedSchemaSource && window.__bridge.openRelatedSchemaSource(JSON.stringify({tableName:'${escapeJs(name)}',columnName:'${escapeJs(col.name)}'}))">SQL</button>
                             </div>
                         `;
                     }).join('');
@@ -357,30 +351,6 @@
                         </div>
                     `;
                 }).join('');
-            }
-
-            if (changes && (changes.tablesAdded.length > 0 || changes.tablesRemoved.length > 0 || changes.tablesModified.length > 0)) {
-                changesSummaryEl.style.display = 'block';
-                let items = '';
-
-                changes.tablesAdded.forEach(t => {
-                    items += `<div class="change-item"><span class="change-icon add">+</span> Table <strong>${escapeHtml(t)}</strong> created</div>`;
-                });
-                changes.tablesRemoved.forEach(t => {
-                    items += `<div class="change-item"><span class="change-icon remove">−</span> Table <strong>${escapeHtml(t)}</strong> dropped</div>`;
-                });
-                changes.tablesModified.forEach(t => {
-                    const addedCols = changes.columnsAdded[t] || [];
-                    const removedCols = changes.columnsRemoved[t] || [];
-                    const details = [];
-                    if (addedCols.length > 0) details.push(`+${addedCols.join(', +')}`);
-                    if (removedCols.length > 0) details.push(`−${removedCols.join(', −')}`);
-                    items += `<div class="change-item"><span class="change-icon modify">~</span> Table <strong>${escapeHtml(t)}</strong> modified ${details.length > 0 ? `(${details.join('; ')})` : ''}</div>`;
-                });
-
-                changesList.innerHTML = items;
-            } else {
-                changesSummaryEl.style.display = 'none';
             }
 
             var rawSqlContainer = document.getElementById('raw-sql-section');
@@ -446,7 +416,11 @@
                                 <span class="table-history-status ${item.status}">${escapeHtml(item.statusLabel)}</span>
                             </div>
                             <div class="table-history-item-summary">${escapeHtml(item.summary)}</div>
-                            ${item.changeLines.length > 0 ? `<div class="table-history-changes">${item.changeLines.map(function(line) { return '<span class="table-history-change-chip">' + escapeHtml(line) + '</span>'; }).join('')}</div>` : ''}
+                            ${item.changeLines.length > 0 ? `<div class="table-history-changes">${item.changeLines.map(function(line) {
+                                var first = (line || '').charAt(0);
+                                var kindClass = first === '+' ? ' is-added' : (first === '−' || first === '-') ? ' is-removed' : '';
+                                return '<span class="table-history-change-chip' + kindClass + '">' + escapeHtml(line) + '</span>';
+                            }).join('')}</div>` : ''}
                             <div class="table-history-actions">
                                 <button type="button" class="btn btn-ghost btn-sm" onclick="window.AppActions && window.AppActions.showTableHistory('${escapeJs(tableName)}', ${item.version})">View Version</button>
                                 ${diffButton}
@@ -468,7 +442,11 @@
                                 <span class="table-history-status ${item.status}">${escapeHtml(item.statusLabel)}</span>
                             </div>
                             <div class="table-history-item-summary">${escapeHtml(item.summary)}</div>
-                            ${item.changeLines.length > 0 ? `<div class="table-history-changes">${item.changeLines.map(function(line) { return '<span class="table-history-change-chip">' + escapeHtml(line) + '</span>'; }).join('')}</div>` : ''}
+                            ${item.changeLines.length > 0 ? `<div class="table-history-changes">${item.changeLines.map(function(line) {
+                                var first = (line || '').charAt(0);
+                                var kindClass = first === '+' ? ' is-added' : (first === '−' || first === '-') ? ' is-removed' : '';
+                                return '<span class="table-history-change-chip' + kindClass + '">' + escapeHtml(line) + '</span>';
+                            }).join('')}</div>` : ''}
                         </div>
                     `;
                 }).join('')
@@ -518,7 +496,7 @@
                         statusLabel: version.migrationFile ? 'Added' : 'Baseline',
                         title: version.migrationFile ? 'Table introduced' : 'Present in baseline schema',
                         summary: currentTable.columns.length + ' column' + (currentTable.columns.length !== 1 ? 's' : '') + ' available from this point.',
-                        changeLines: currentTable.columns.slice(0, 4).map(function(column) { return '+' + column.name; }),
+                        changeLines: currentTable.columns.map(function(column) { return '+' + column.name; }),
                         version: version.version,
                         fromVersion: previous ? previous.version : null,
                         fileLabel: version.migrationFile ? version.migrationFile.fileName : 'Baseline'
@@ -532,7 +510,7 @@
                         statusLabel: 'Removed',
                         title: 'Table removed',
                         summary: 'This table disappears from the schema at this version.',
-                        changeLines: previousTable.columns.slice(0, 4).map(function(column) { return '−' + column.name; }),
+                        changeLines: previousTable.columns.map(function(column) { return '−' + column.name; }),
                         version: version.version,
                         fromVersion: previous ? previous.version : null,
                         fileLabel: version.migrationFile ? version.migrationFile.fileName : 'Baseline'
@@ -581,10 +559,7 @@
                         statusLabel: version.migrationFile ? 'Added' : 'Baseline',
                         title: 'Column introduced',
                         summary: this.renderColumnSummary(currentColumn),
-                        changeLines: [
-                            currentColumn.type,
-                            currentColumn.nullable ? 'NULL allowed' : 'NOT NULL'
-                        ],
+                        changeLines: [],
                         version: version.version,
                         fileLabel: version.migrationFile ? version.migrationFile.fileName : 'Baseline'
                     });
@@ -596,8 +571,8 @@
                         status: 'removed',
                         statusLabel: 'Removed',
                         title: 'Column removed',
-                        summary: columnName + ' disappears from ' + tableName + ' at this version.',
-                        changeLines: [previousColumn.type],
+                        summary: 'Was ' + this.renderColumnSummary(previousColumn) + '.',
+                        changeLines: [],
                         version: version.version,
                         fileLabel: version.migrationFile ? version.migrationFile.fileName : 'Baseline'
                     });

@@ -58,8 +58,7 @@
                 utilityBar: false,
                 pendingBanner: false,
                 timelineStrip: false,
-                schemaDetail: false,
-                changesSummary: false
+                schemaDetail: false
             }
         }
     };
@@ -289,8 +288,7 @@
             utilityBar: 'utility-bar',
             pendingBanner: 'migration-suggestion-banner',
             timelineStrip: 'timeline-container',
-            schemaDetail: 'schema-detail',
-            changesSummary: 'changes-summary'
+            schemaDetail: 'schema-detail'
         };
 
         Object.keys(sectionMap).forEach(function(sectionKey) {
@@ -319,8 +317,7 @@
             utilityBar: 'Search & stats',
             pendingBanner: 'Pending migration banner',
             timelineStrip: 'Timeline overview',
-            schemaDetail: 'Selected migration',
-            changesSummary: 'Change summary'
+            schemaDetail: 'Selected migration'
         };
         return labels[sectionKey] || 'section';
     }
@@ -1198,29 +1195,33 @@
         const warningCount = result.issues.filter(function(issue) { return issue.severity === 'WARNING'; }).length;
         const infoCount = result.issues.filter(function(issue) { return issue.severity === 'INFO'; }).length;
 
+        if (result.issues.length === 0) {
+            // When nothing's wrong the summary card is just noise — the empty
+            // state below already communicates "all good" with the migration count.
+            summaryEl.innerHTML = '';
+            issuesEl.innerHTML = `
+                <div class="empty-state" style="height: auto; padding: 40px">
+                    <h3 style="color: var(--color-success)">All checks passed</h3>
+                    <p>${escapeHtml(result.summary)}</p>
+                </div>
+            `;
+            return;
+        }
+
+        const pills = [];
+        if (errorCount > 0) pills.push(`<span class="validation-pill error"><strong>${errorCount}</strong> error${errorCount !== 1 ? 's' : ''}</span>`);
+        if (warningCount > 0) pills.push(`<span class="validation-pill warning"><strong>${warningCount}</strong> warning${warningCount !== 1 ? 's' : ''}</span>`);
+        if (infoCount > 0) pills.push(`<span class="validation-pill info"><strong>${infoCount}</strong> info</span>`);
+
         summaryEl.innerHTML = `
             <div class="validation-summary-card ${result.isValid ? 'valid' : 'invalid'}">
                 <div class="validation-icon ${result.isValid ? 'valid' : 'invalid'}">${iconSvg}</div>
                 <div class="validation-summary-copy">
                     <div class="validation-summary-text">${escapeHtml(result.summary)}</div>
-                    <div class="validation-summary-pills">
-                        <span class="validation-pill error"><strong>${errorCount}</strong> errors</span>
-                        <span class="validation-pill warning"><strong>${warningCount}</strong> warnings</span>
-                        <span class="validation-pill info"><strong>${infoCount}</strong> info</span>
-                    </div>
+                    ${pills.length > 0 ? `<div class="validation-summary-pills">${pills.join('')}</div>` : ''}
                 </div>
             </div>
         `;
-
-        if (result.issues.length === 0) {
-            issuesEl.innerHTML = `
-                <div class="empty-state" style="height: auto; padding: 40px">
-                    <h3 style="color: var(--color-success)">All checks passed!</h3>
-                    <p>No issues found in your migration files.</p>
-                </div>
-            `;
-            return;
-        }
 
         issuesEl.innerHTML = result.issues.map((issue, i) => {
             const severityClass = issue.severity.toLowerCase();

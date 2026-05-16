@@ -407,14 +407,6 @@ $css
                         <div id="table-history-panel" style="display:none"></div>
                         <div id="schema-tables-grid"></div>
                     </div>
-                    <div id="changes-summary" class="collapsible-section" style="display:none">
-                        <div class="section-collapsed-indicator">Change summary</div>
-                        <button type="button" class="section-inline-toggle" data-section-toggle="changesSummary" aria-expanded="true" title="Collapse change summary">
-                            <svg class="section-toggle-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg>
-                        </button>
-                        <h3>Changes in this version</h3>
-                        <div id="changes-list"></div>
-                    </div>
                     <div id="raw-sql-section" style="display:none">
                         <div class="raw-sql-toggle" onclick="document.getElementById('raw-sql-body').classList.toggle('expanded'); this.querySelector('.toggle-arrow').classList.toggle('rotated')">
                             <svg class="toggle-arrow" viewBox="0 0 24 24" width="12" height="12" style="transition: transform 0.2s"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>

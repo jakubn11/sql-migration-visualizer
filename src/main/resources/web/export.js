@@ -6,6 +6,48 @@
 (function() {
     'use strict';
 
+    function drawWatermark(ctx, canvasWidth, canvasHeight) {
+        // The export canvas is in device pixels (it was copied from the
+        // DPR-scaled ER canvas), so scale visual sizes by DPR to keep the
+        // watermark looking right on hi-DPI screens.
+        var dpr = window.devicePixelRatio || 1;
+        var logoImg = document.querySelector('.logo-icon-image');
+        var brand = 'SQL Migration Visualizer';
+
+        var padding = 16 * dpr;
+        var logoSize = 22 * dpr;
+        var spacing = 8 * dpr;
+        var fontSize = 12 * dpr;
+
+        var fontFamily = getComputedStyle(document.documentElement)
+            .getPropertyValue('--font-sans')
+            .trim() || 'system-ui, -apple-system, sans-serif';
+
+        ctx.save();
+        ctx.font = '600 ' + fontSize + 'px ' + fontFamily;
+        ctx.textBaseline = 'middle';
+        var textWidth = ctx.measureText(brand).width;
+
+        var totalWidth = logoSize + spacing + textWidth;
+        var centerY = canvasHeight - padding - logoSize / 2;
+        var startX = canvasWidth - padding - totalWidth;
+
+        ctx.globalAlpha = 0.18;
+
+        if (logoImg && logoImg.complete && logoImg.naturalWidth > 0) {
+            try {
+                // Recolor the logo to white while preserving its transparency.
+                ctx.filter = 'brightness(0) invert(1)';
+                ctx.drawImage(logoImg, startX, centerY - logoSize / 2, logoSize, logoSize);
+                ctx.filter = 'none';
+            } catch (e) { /* drawing the logo is best-effort */ }
+        }
+
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillText(brand, startX + logoSize + spacing, centerY);
+        ctx.restore();
+    }
+
     window.ExportModule = {
 
         /**
@@ -15,27 +57,43 @@
             var canvas = document.getElementById('er-canvas');
             if (!canvas || !window.__bridge) return;
 
-            // Create a white-background copy for export
-            var exportCanvas = document.createElement('canvas');
-            exportCanvas.width = canvas.width;
-            exportCanvas.height = canvas.height;
-            var ctx = exportCanvas.getContext('2d');
+            var er = window.ERDiagramModule;
+            var savedHovered = er ? er.hoveredTable : null;
+            var savedFocused = er ? er.focusedTable : null;
+            if (er) {
+                // Re-render without hover or focus highlights so the export is clean.
+                er.hoveredTable = null;
+                er.focusedTable = null;
+                er.draw();
+            }
 
-            // Fill background
-            var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-            ctx.fillStyle = isDark ? '#1E1F22' : '#F7F8FA';
-            ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+            try {
+                var exportCanvas = document.createElement('canvas');
+                exportCanvas.width = canvas.width;
+                exportCanvas.height = canvas.height;
+                var ctx = exportCanvas.getContext('2d');
 
-            // Draw original canvas on top
-            ctx.drawImage(canvas, 0, 0);
+                var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                ctx.fillStyle = isDark ? '#1E1F22' : '#F7F8FA';
+                ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+                ctx.drawImage(canvas, 0, 0);
 
-            var dataUrl = exportCanvas.toDataURL('image/png');
-            var base64 = dataUrl.replace('data:image/png;base64,', '');
-            window.__bridge.saveFile(JSON.stringify({
-                fileName: 'er-diagram.png',
-                content: base64,
-                encoding: 'base64'
-            }));
+                drawWatermark(ctx, exportCanvas.width, exportCanvas.height);
+
+                var dataUrl = exportCanvas.toDataURL('image/png');
+                var base64 = dataUrl.replace('data:image/png;base64,', '');
+                window.__bridge.saveFile(JSON.stringify({
+                    fileName: 'er-diagram.png',
+                    content: base64,
+                    encoding: 'base64'
+                }));
+            } finally {
+                if (er) {
+                    er.hoveredTable = savedHovered;
+                    er.focusedTable = savedFocused;
+                    er.draw();
+                }
+            }
         },
 
         /**

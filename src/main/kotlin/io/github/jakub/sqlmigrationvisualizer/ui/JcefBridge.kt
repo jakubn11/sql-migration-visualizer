@@ -128,6 +128,7 @@ class JcefBridge(
                             FileEditorManager.getInstance(project).openFile(virtualFile, true)
                         }
                     }
+                    schemaChangePromptService.checkPendingSuggestionAfterSave()
                     onRefreshRequested?.invoke()
                 }
                 JBCefJSQuery.Response(filePath)
@@ -199,6 +200,11 @@ class JcefBridge(
                             FileEditorManager.getInstance(project).openFile(virtualFile, true)
                         }
                     }
+                    // Re-evaluate the pending suggestion state — the new migration may
+                    // capture the schema changes that were being suggested. Without
+                    // this, the banner and header button stay stuck on "Create
+                    // Suggested Migration" until the next explicit save.
+                    schemaChangePromptService.checkPendingSuggestionAfterSave()
                     onRefreshRequested?.invoke()
                 }
                 val fileName = MigrationFileNaming.buildFileName(

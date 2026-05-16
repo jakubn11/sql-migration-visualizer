@@ -5,6 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2026-05-16
+
+### Changed
+- Pending Migration banner now uses the same success green as the validation panel — banner tint, badge, icon, and divider all aligned on `--color-success` instead of a teal that competed with it
+- Review Draft button uses the standard ghost button style, matching Cancel Pending — removes the one-off blue-text treatment that made it look like a different control type
+- Toned down the small primary button's drop shadow so it no longer overwhelms the ghost buttons next to it in tight banners
+- Unified the corner radius of `.btn-sm` and `.risk-badge` so the buttons and the High/Medium/Low risk pill on the Pending Migration row look like the same family of controls
+- Removed the redundant blue left border on info-severity validation cards (the severity badge already conveys the level)
+- Modal dialogs now size to their content instead of always filling 80vh — short forms (e.g. Review Pending Migration with a small SQL snippet) no longer leave a large empty area below the content; long content still scrolls within the same max-height
+- Fixed the SQL editor opening at an inflated height in the Create/Review Migration dialog — the autosize measurement ran while the modal was still hidden (zero width) and produced a hundreds-of-pixels-tall textarea; it now measures after the modal is visible
+- The Pending Migration banner and the "Create Suggested Migration" header button now clear correctly after the suggested migration is created — the pending-suggestion state is re-evaluated as soon as the new migration file is written, instead of only on the next explicit Save action
+- Timeline version dot no longer breaks the `…1234` truncation onto two lines for long versions — added `white-space: nowrap` and trimmed the template-literal whitespace that was letting the ellipsis wrap to its own line
+- Search-result and validation `v<N>` chips now use inline-flex centering, so the version text sits properly in the middle of the pill instead of riding the baseline
+- Table-card column rows now lay out on a single line — badges, type token, and Lineage/SQL buttons no longer wrap below the column name when the card is narrow; the column name truncates with an ellipsis if it's too long
+- ER diagram no longer shows a horizontal scrollbar at moderate tool-window widths — the toolbar (version, zoom, fit, export, legend) now wraps to a second line when it would otherwise overflow, instead of only wrapping below the compact-width breakpoint
+- Schema table cards now require ~480px of card width before they pack horizontally — the previous 260px minimum was forcing column names to truncate to a few characters (`ord…`, `pr…`) when 4 cards lined up on a wide tool window; the responsive grid now caps to 2–3 cards per row on typical widths so column names, FK target, type, and per-column action buttons all fit in one line
+- Removed the Name field from the Edit Migration dialog — the filename of an existing migration can't be changed through this dialog, so the disabled input was just visual noise
+- Removed the per-column "SQL" button from Timeline table cards — the same "Open SQL" affordance is still available on each table-card header, so the per-column button was redundant noise; column rows are now lighter and have more room for names and badges
+- Table-history summary cards no longer cap the introduced/removed column chips at four — when a table is introduced with eight columns, all eight chips are shown instead of `+id +name +username +birthday` and silently dropping the rest
+- Added-column chips (`+name`) are now tinted green and removed-column chips (`−birthday`) tinted red in the table history view, instead of both rendering as the same neutral gray pill
+- Column lineage cards for introduced/removed columns no longer duplicate `type` and `NULL allowed` as both a bullet-joined summary line and a pair of chips below — the chips were a literal copy of the summary and added nothing
+- `BASELINE` and `ADDED` status badges in table/column history no longer share the same green tint — baseline is now blue (informational, "this existed at the starting point") and added stays green (something genuinely new)
+- Schema Diff summary card simplified — dropped the long instructional subtitle and the four bordered counter pills, replaced with a compact `1 table changed · +1 column · −1 column` line; zero counts are hidden, and the risk badge moved to the top-right corner. Copy Summary button removed (the same info is one click away in the migration draft).
+- `CHANGED` / `ADDED` status pills in both the Schema Diff table headers (`.status-tag`) and the Timeline table cards (`.table-status-pill`) are now horizontally centered — they were `<span>`s with padding and `min-height` but no `display: inline-flex` / `justify-content: center`, so `letter-spacing: 0.5px` was pushing text off-center.
+- Centered text horizontally inside every pill/chip/tag/badge class — `.migration-suggestion-badge`, `.empty-state-badge`, `.preview-table-tag`, `.table-history-focus-chip`, `.table-history-change-chip`, `.diff-mini-pill`, `.diff-change-chip`, and `.validation-pill` all now have `display: inline-flex; justify-content: center; line-height: 1` for consistent vertical+horizontal centering across the design system.
+- Schema Diff summary no longer stacks per-risk-item "Column dropped" cards below the count line — the risk headline (e.g. `High-risk diff review recommended`) and the colored risk badge already signal the severity, and the per-table breakdown is right below in the diff body, so the list was duplicating information.
+- Removed the "Changes in this version" section from the Timeline migration detail view — the timeline strip and the table cards already convey which tables changed, and the one-line `~ Table user modified (+birthday_test; −birthday)` summary was the third place the same information appeared. The associated JS, HTML, CSS, and collapsible-section bookkeeping were all stripped.
+- Schema Diff summary card no longer renders the `<risk-level> diff review recommended` headline below the count line — the colored `High risk` / `Moderate risk` / `Low risk` badge in the top-right corner already signals severity, so the sentence was duplicating what the badge says.
+- Schema Diff summary card removed entirely — the title (`Version A → Version B`), the count line, and the risk badge were all duplicating information the per-table breakdown below already shows. The `#diff-summary:empty` rule keeps the container fully collapsed when no card is rendered, and the dead `renderSummary` JS function plus its CSS rules were stripped.
+- Validation summary card is now suppressed entirely when there are no issues — the `Validated N migration(s). All checks passed ✓` line plus three `0` pills was redundant with the existing "All checks passed" empty state below; the empty state now also surfaces the migration count
+- When issues exist, the validation summary only shows non-zero pills (e.g. just `1 error` instead of `1 error · 0 warnings · 0 info`)
+- Removed the thin grey horizontal divider running underneath the Timeline / Schema Diff / ER Diagram / Validation tab bar — the active-tab blue underline is already enough visual separation
+- ER diagram: the canvas now sizes from its own laid-out CSS box (with the ER panel clipped to `overflow: hidden`), so the chicken-and-egg between canvas width and the panel's scrollbar no longer produces a stray horizontal scroll
+- ER diagram: the viewport now always fits to the table layout on render — previously, when a project had stored table positions from earlier sessions, `fitToView()` was skipped and the saved layout rendered with the initial pan of (0, 0), leaving content stuck in the top-left corner
+
+### Added
+- ER diagram: click-drag the canvas to pan around the diagram (zoom remains button-only; table dragging stays disabled, so the layout is stable)
+- ER diagram PNG export now strips any hover or focus highlights so the image is clean, and stamps a subtle white "SQL Migration Visualizer" watermark with the plugin logo in the bottom-right corner
+- ER diagram zoom is now button-only (+, -, fit) — removed wheel zoom, canvas pan, and table-drag gestures for a more predictable view, especially on trackpads and touch surfaces
+
 ## [1.3.0] - 2026-05-16
 
 ### Added

@@ -109,7 +109,9 @@
             dirInput.disabled = isEditMode;
             nameInput.disabled = isEditMode;
             if (nameGroup) {
-                nameGroup.style.display = isEditMode || patternUsesName ? '' : 'none';
+                // Name is read-only and the filename can't be changed via this
+                // dialog in edit mode, so showing it is just clutter.
+                nameGroup.style.display = !isEditMode && patternUsesName ? '' : 'none';
             }
             if (versionStepper) {
                 versionStepper.style.display = isEditMode ? 'none' : '';
@@ -139,8 +141,15 @@
 
             this.renderContext();
             this.resizeVersionInput();
-            this.growSqlEditor();
             modal.style.display = 'flex';
+            // The SQL textarea has zero offsetWidth while the modal is hidden,
+            // which makes the mirror element wrap character-by-character and
+            // produces an inflated height. Resize after the browser has laid
+            // out the now-visible modal.
+            var self = this;
+            requestAnimationFrame(function() {
+                self.growSqlEditor();
+            });
             // Focus the SQL textarea after animation
             setTimeout(function() {
                 if (opts.sql) {

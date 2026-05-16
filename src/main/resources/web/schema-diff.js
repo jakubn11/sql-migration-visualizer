@@ -38,7 +38,7 @@
 
             const diff = this.computeDiff(fromSchema, toSchema);
             if (summary) {
-                summary.innerHTML = this.renderSummary(diff, fromSchema, toSchema);
+                summary.innerHTML = '';
             }
             content.innerHTML = this.renderDiff(diff);
 
@@ -244,51 +244,6 @@
             }
 
             return notes;
-        },
-
-        renderSummary: function(diff, fromSchema, toSchema) {
-            if (diff.length === 0) {
-                return `
-                    <div class="diff-summary-card">
-                        <div class="diff-summary-title">No schema changes</div>
-                        <div class="diff-summary-subtitle">Versions ${fromSchema.version} and ${toSchema.version} expose identical schemas.</div>
-                    </div>
-                `;
-            }
-
-            const totals = diff.reduce(function(acc, tableDiff) {
-                acc.tables += 1;
-                acc.added += tableDiff.counts.added;
-                acc.removed += tableDiff.counts.removed;
-                acc.modified += tableDiff.counts.modified;
-                acc.notes += tableDiff.notes.length;
-                return acc;
-            }, { tables: 0, added: 0, removed: 0, modified: 0, notes: 0 });
-            const risk = this.computeRisk(diff);
-            const riskBadge = window.AppUi && window.AppUi.renderRiskBadge
-                ? window.AppUi.renderRiskBadge(risk)
-                : '';
-            const riskList = window.AppUi && window.AppUi.renderRiskList
-                ? window.AppUi.renderRiskList(risk, 3)
-                : '';
-
-            return `
-                <div class="diff-summary-card">
-                    <div>
-                        <div class="diff-summary-title">Version ${fromSchema.version} -> Version ${toSchema.version}</div>
-                        <div class="diff-summary-subtitle">Review table additions, removals, and property-level column changes before generating a migration.</div>
-                        ${risk.headline ? `<div class="diff-summary-riskline">${riskBadge}<span>${escapeHtml(risk.headline)}</span></div>` : ''}
-                    </div>
-                    <div class="diff-summary-pills">
-                        <span class="diff-summary-pill"><strong>${totals.tables}</strong> tables changed</span>
-                        <span class="diff-summary-pill added"><strong>${totals.added}</strong> columns added</span>
-                        <span class="diff-summary-pill removed"><strong>${totals.removed}</strong> columns removed</span>
-                        <span class="diff-summary-pill modified"><strong>${totals.modified}</strong> columns modified</span>
-                        <button type="button" class="btn btn-ghost btn-sm diff-summary-copy-btn" onclick="window.AppUi && window.AppUi.copyText('Schema diff summary: Version ${fromSchema.version} to Version ${toSchema.version}. ${totals.tables} tables changed, ${totals.added} columns added, ${totals.removed} columns removed, ${totals.modified} columns modified.', 'Diff summary copied.')">Copy Summary</button>
-                    </div>
-                    ${riskList ? `<div class="diff-summary-risklist">${riskList}</div>` : ''}
-                </div>
-            `;
         },
 
         renderDiff: function(diff) {

@@ -57,7 +57,7 @@ io.github.jakub.sqlmigrationvisualizer/
 | `app.js` | Main controller, tab routing, validation display |
 | `timeline.js` | Interactive version timeline |
 | `schema-diff.js` | Side-by-side version comparison |
-| `er-diagram.js` | Draggable/zoomable ER diagram |
+| `er-diagram.js` | ER diagram — click-drag to pan, zoom via +/-/fit buttons |
 | `create-migration.js` | Create/edit migration modal |
 | `search.js` | Full-text search across schema |
 | `sql-highlight.js` | Syntax highlighting |
@@ -214,9 +214,18 @@ All web UI lives in `src/main/resources/web/styles.css`. Follow the existing des
 
 - **No inline styles on new components** — use CSS classes and variables only.
 - **No JS framework** — all UI is vanilla JS with DOM manipulation.
-- **SQL editor**: textarea is in normal flow (drives height); syntax-highlight `<pre>` is `position: absolute; inset: 0` behind it. Mirror divs (`_heightMirror`, `_caretMirror`) are persistent, created once on first use.
-- **Modal forms**: use `form-group` / `form-label` / `form-input` classes. Version inputs use `version-input-group` + `version-stepper` layout.
-- **Responsive breakpoints** are handled via `#app.compact-width`, `#app.very-compact`, `#app.short-height` class toggles set by `VisualizerPanel`.
+- **Pills / chips / tags / badges** (status pills, version chips, change chips, risk badges, etc.) must use `display: inline-flex; align-items: center; justify-content: center; line-height: 1`. Plain `<span>` with `padding` + `min-height` leaves text baseline-aligned and looks off-center, especially when `letter-spacing` or `text-transform: uppercase` is in play. Always centered on both axes.
+- **Use status colors consistently**: `--color-success` for added/created, `--color-error` for removed/dropped, `--color-warning` for modified/at-risk, `--accent-primary` for informational/baseline. Don't introduce new green/red/yellow tokens — extend the existing ones via `color-mix(in srgb, … X%, transparent)` for tints.
+- **Hide zero-count summary chips** instead of showing `0 errors · 0 warnings · 0 info` rows — render only non-zero pills. If everything's zero, skip the summary container entirely.
+- **Status badges**: `.added` (green) and `.baseline` (blue) are semantically distinct — don't reuse `--color-success` for both.
+- **Modal sizing**: `.modal-body` is `flex: 0 1 auto` so dialogs shrink to content; the body can scroll when it would exceed the modal's `max-height: 80vh`. Don't restore `flex: 1` — short dialogs (e.g. Review Pending Migration with a short snippet) will end up with a tall empty area below the content.
+- **SQL editor**: textarea is in normal flow (drives height); syntax-highlight `<pre>` is `position: absolute; inset: 0` behind it. Mirror divs (`_heightMirror`, `_caretMirror`) are persistent, created once on first use. The autosize routine must run *after* `display: flex` is applied to the modal — measuring while the textarea is hidden produces `offsetWidth = 0` and an inflated height.
+- **Modal forms**: use `form-group` / `form-label` / `form-input` classes. Version inputs use `version-input-group` + `version-stepper` layout. The Name field is hidden in edit mode (the filename can't be changed there).
+- **Modal close paths** route through `requestClose()` (Create Migration) for dirty-state confirmation; only the success callbacks (`__onMigrationCreated`, `__onMigrationSaved`) call `closeModal()` directly. Escape closes the topmost modal; the existing autocomplete `Escape` handler `preventDefault`s, and the outer modal handler skips if `event.defaultPrevented` so closing autocomplete doesn't also close the dialog.
+- **Buttons** must use the `.btn` base class plus a variant (`.btn-primary` for the single primary action per surface, `.btn-ghost` for secondary actions, `.btn-danger` for destructive). Don't add one-off button styles like `#some-id { color: var(--accent-primary) }` — every button on a row should look like a member of the same family.
+- **Disabled buttons** rely on the global `.btn:disabled` / `.btn[disabled]` rule (opacity 0.55 + saturation drop + `pointer-events: none`). Use this for in-flight async actions; the existing renderer typically replaces the button anyway, so don't manually re-enable.
+- **ER diagram**: zoom is button-only (`+`, `−`, Fit). Click-drag the canvas to pan. Table dragging and wheel zoom are intentionally disabled. The `#panel-er-diagram` panel has `overflow: hidden` so the canvas (sized from its own `getBoundingClientRect`) can't trigger panel scrollbars.
+- **Responsive breakpoints** are handled via `#app.compact-width` (≤860px), `#app.very-compact` (≤620px), `#app.short-height` (≤780px), `#app.ultra-compact` (≤460px), and `#app.very-short` (≤620px height) class toggles set by `VisualizerPanel`.
 
 ## Platform Target
 

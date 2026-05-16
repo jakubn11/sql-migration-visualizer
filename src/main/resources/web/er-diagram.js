@@ -3,7 +3,7 @@
  *
  * Canvas-based entity-relationship diagram showing tables as cards
  * with columns, and foreign key relationships as connecting lines.
- * Supports pan, zoom, and hover highlighting.
+ * Zoom is button-only (no wheel/drag gestures); hover highlights related tables.
  */
 (function() {
     'use strict';
@@ -20,10 +20,8 @@
         relationships: [],
         pan: { x: 0, y: 0 },
         zoom: 1,
-        dragging: false,
-        draggingTable: null,
-        dragStart: { x: 0, y: 0 },
-        tableDragOffset: { x: 0, y: 0 },
+        panning: false,
+        panStart: { x: 0, y: 0 },
         hoveredTable: null,
         focusedTable: null,
         animFrame: null,
@@ -93,19 +91,24 @@
         },
 
         resizeCanvas: function() {
-            const parent = this.canvas.parentElement;
-            const rect = parent.getBoundingClientRect();
+            // Read the canvas's own CSS-laid-out size, not the parent's bounding
+            // rect. The parent rect can include scrollbar space and stale
+            // dimensions during layout transitions, both of which produce a
+            // drawing buffer wider than the visible area and a horizontal
+            // scrollbar. Letting CSS (`width: 100%; flex: 1`) drive display
+            // size and only matching the drawing buffer to it avoids the cycle.
+            const rect = this.canvas.getBoundingClientRect();
             const dpr = window.devicePixelRatio || 1;
+            const cssWidth = Math.max(1, Math.round(rect.width));
+            const cssHeight = Math.max(1, Math.round(rect.height));
 
             this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-            this.canvas.width = rect.width * dpr;
-            this.canvas.height = rect.height * dpr;
-            this.canvas.style.width = rect.width + 'px';
-            this.canvas.style.height = rect.height + 'px';
+            this.canvas.width = cssWidth * dpr;
+            this.canvas.height = cssHeight * dpr;
             this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-            this.canvasWidth = rect.width;
-            this.canvasHeight = rect.height;
+            this.canvasWidth = cssWidth;
+            this.canvasHeight = cssHeight;
         },
 
         clampZoom: function(zoom) {
@@ -144,79 +147,44 @@
             const canvas = this.canvas;
             const self = this;
 
-            // Remove old listeners
-            canvas.onmousedown = null;
-            canvas.onmousemove = null;
-            canvas.onmouseup = null;
+            // Pan via click-drag is allowed (the user can move around the
+            // diagram); table dragging and wheel zoom remain disabled — zoom
+            // stays button-only for predictability on trackpads.
             canvas.onwheel = null;
 
-            // Pan
             canvas.onmousedown = function(e) {
-                const pointer = self.getWorldPoint(e.offsetX, e.offsetY);
-                const hitTable = self.findTableAt(pointer.x, pointer.y);
-                if (hitTable) {
-                    self.draggingTable = hitTable;
-                    self.tableDragOffset = {
-                        x: pointer.x - hitTable.x,
-                        y: pointer.y - hitTable.y
-                    };
-                } else {
-                    self.dragging = true;
-                    self.dragStart = { x: e.clientX - self.pan.x, y: e.clientY - self.pan.y };
-                }
+                if (e.button !== 0) return;
+                self.panning = true;
+                self.panStart = { x: e.clientX - self.pan.x, y: e.clientY - self.pan.y };
                 canvas.style.cursor = 'grabbing';
             };
 
             canvas.onmousemove = function(e) {
-                if (self.draggingTable) {
-                    const pointer = self.getWorldPoint(e.offsetX, e.offsetY);
-                    self.draggingTable.x = pointer.x - self.tableDragOffset.x;
-                    self.draggingTable.y = pointer.y - self.tableDragOffset.y;
-                    self.persistTablePositions();
-                    self.hoveredTable = self.draggingTable.name;
+                if (self.panning) {
+                    self.pan.x = e.clientX - self.panStart.x;
+                    self.pan.y = e.clientY - self.panStart.y;
                     self.draw();
-                } else if (self.dragging) {
-                    self.pan.x = e.clientX - self.dragStart.x;
-                    self.pan.y = e.clientY - self.dragStart.y;
-                    self.draw();
-                } else {
-                    // Hover detection
-                    const pointer = self.getWorldPoint(e.offsetX, e.offsetY);
-                    const hoveredTable = self.findTableAt(pointer.x, pointer.y);
-                    const hovered = hoveredTable ? hoveredTable.name : null;
-                    if (hovered !== self.hoveredTable) {
-                        self.hoveredTable = hovered;
-                        canvas.style.cursor = hovered ? 'move' : 'grab';
-                        self.draw();
-                    }
+                    return;
                 }
+                const pointer = self.getWorldPoint(e.offsetX, e.offsetY);
+                const hoveredTable = self.findTableAt(pointer.x, pointer.y);
+                const hovered = hoveredTable ? hoveredTable.name : null;
+                if (hovered !== self.hoveredTable) {
+                    self.hoveredTable = hovered;
+                    self.draw();
+                }
+                canvas.style.cursor = hovered ? 'pointer' : 'grab';
             };
 
             canvas.onmouseup = function() {
-                var shouldSaveLayout = !!self.draggingTable;
-                self.draggingTable = null;
-                self.dragging = false;
-                canvas.style.cursor = self.hoveredTable ? 'move' : 'grab';
-                if (shouldSaveLayout) {
-                    self.persistTablePositions(true);
-                }
+                if (!self.panning) return;
+                self.panning = false;
+                canvas.style.cursor = self.hoveredTable ? 'pointer' : 'grab';
             };
 
             canvas.onmouseleave = function() {
-                var shouldSaveLayout = !!self.draggingTable;
-                self.draggingTable = null;
-                self.dragging = false;
-                canvas.style.cursor = 'grab';
-                if (shouldSaveLayout) {
-                    self.persistTablePositions(true);
-                }
-            };
-
-            // Zoom
-            canvas.onwheel = function(e) {
-                e.preventDefault();
-                const factor = e.deltaY > 0 ? 1 / self.ZOOM_STEP : self.ZOOM_STEP;
-                self.zoomBy(factor, e.offsetX, e.offsetY);
+                self.panning = false;
+                self.hoveredTable = null;
             };
 
             const zoomInButton = document.getElementById('btn-er-zoom-in');
@@ -300,10 +268,10 @@
 
             this.persistTablePositions();
 
-            // Center the layout only when we are using the default arrangement
-            if (!hasStoredPositions) {
-                this.fitToView();
-            }
+            // Pan/zoom aren't persisted, so always center the viewport on the
+            // tables — otherwise after a fresh load the initial pan = {0, 0}
+            // leaves stored table layouts visible only in the top-left corner.
+            this.fitToView();
         },
 
         findRelationships: function(schema) {
