@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260602c">
+<link rel="stylesheet" href="styles.css?v=20260602e">
 </head>
 <body>
 
@@ -37,6 +37,7 @@
       <a href="#demo">Live demo</a>
       <a href="#features">Features</a>
       <a href="#dialects">Dialects</a>
+      <a href="#faq">FAQ</a>
       <a href="#install">Get it</a>
       <a class="nav-gh" href="https://github.com/jakubn11/sql-migration-visualizer" target="_blank" rel="noopener">GitHub ↗</a>
     </div>
@@ -200,6 +201,51 @@
   </div>
 </section>
 
+<section id="screenshots" class="section">
+  <div class="container">
+    <span class="eyebrow center">See it in action</span>
+    <h2 class="section-title center">Inside the tool window</h2>
+    <p class="section-lede center">Docked at the bottom of your IDE — the timeline, diagrams, and risk signals where you already work.</p>
+
+    <div class="shot-grid">
+      <!-- To use a real capture, replace the .shot-placeholder div with:
+           <img class="shot-img" src="screenshots/timeline.png" alt="Timeline view"> -->
+      <figure class="shot">
+        <div class="shot-frame">
+          <div class="shot-bar"><span class="tl-dot"></span><span class="tl-dot"></span><span class="tl-dot"></span><span class="shot-label">SQL Migrations — Timeline</span></div>
+          <div class="shot-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 17l5-5 4 3 6-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="18" cy="8" r="1.7" fill="currentColor"/></svg>
+            <span>Timeline View</span>
+          </div>
+        </div>
+        <figcaption>Every schema version on one strip.</figcaption>
+      </figure>
+
+      <figure class="shot">
+        <div class="shot-frame">
+          <div class="shot-bar"><span class="tl-dot"></span><span class="tl-dot"></span><span class="tl-dot"></span><span class="shot-label">SQL Migrations — ER Diagram</span></div>
+          <div class="shot-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="5" r="2.2" stroke="currentColor" stroke-width="2"/><circle cx="5" cy="18" r="2.2" stroke="currentColor" stroke-width="2"/><circle cx="19" cy="18" r="2.2" stroke="currentColor" stroke-width="2"/><path d="M10.5 7L6.5 16M13.5 7l4 9M7 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <span>ER Diagram</span>
+          </div>
+        </div>
+        <figcaption>Relationships with zoom, pan, and PNG export.</figcaption>
+      </figure>
+
+      <figure class="shot">
+        <div class="shot-frame">
+          <div class="shot-bar"><span class="tl-dot"></span><span class="tl-dot"></span><span class="tl-dot"></span><span class="shot-label">SQL Migrations — Validation</span></div>
+          <div class="shot-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Validation &amp; Risk</span>
+          </div>
+        </div>
+        <figcaption>Gaps, duplicates, and risky changes, flagged.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
 <section id="dialects" class="section">
   <div class="container narrow">
     <h2 class="section-title center">Generates the right SQL for your database</h2>
@@ -209,6 +255,38 @@
       <div class="dialect-row"><span class="dialect-name">PostgreSQL</span><span class="dialect-note">In-place <code>ALTER COLUMN … TYPE / SET NOT NULL / SET DEFAULT</code>.</span></div>
       <div class="dialect-row"><span class="dialect-name">MySQL / MariaDB</span><span class="dialect-note">In-place <code>MODIFY COLUMN</code> and <code>CHANGE COLUMN</code> for changes and renames.</span></div>
       <div class="dialect-row"><span class="dialect-name">SQLite</span><span class="dialect-note">Automatic 12-step rebuild with <code>PRAGMA foreign_keys</code> guards, since SQLite can't <code>ALTER COLUMN</code>.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" class="section section-alt">
+  <div class="container narrow">
+    <h2 class="section-title center">Frequently asked</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Which IDEs does it work with?</summary>
+        <p>Any IntelliJ-based IDE on build 2024.1 or newer — IntelliJ IDEA Community and Ultimate, plus the rest of the JetBrains family. No edition-specific features are required.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Does it need a database connection?</summary>
+        <p>No. It parses your migration and schema <code>.sql</code> files statically — it never connects to a database and works fully offline. Nothing leaves your machine.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What migration layouts does it detect?</summary>
+        <p>Common locations are auto-detected: <code>src/main/sqldelight</code>, <code>src/commonMain/sqldelight</code>, <code>db/migrations</code>, <code>database/migrations</code>, <code>migrations</code>, <code>src/main/resources/db/migration(s)</code>, and <code>…/schema</code>. You can also point it at any folder in <strong>Settings → Tools → SQL Migration Visualizer</strong>.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Which file naming patterns are recognised?</summary>
+        <p>Plain versions (<code>1.sql</code>, <code>2.sqm</code>), version + name (<code>12_add_users.sql</code>), and Flyway-style (<code>V3__create_orders.sql</code>).</p>
+      </details>
+      <details class="faq-item">
+        <summary>Which SQL dialects can it generate?</summary>
+        <p>Generic SQL, PostgreSQL, MySQL/MariaDB, and SQLite — each with its own <code>ALTER</code> rules and safe table rebuilds. Set your default in the plugin settings.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Is it free?</summary>
+        <p>Yes — free and open source under the GPL v3.0 license.</p>
+      </details>
     </div>
   </div>
 </section>

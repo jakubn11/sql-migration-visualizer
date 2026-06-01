@@ -13,6 +13,10 @@
 </p>
 
 <p align="center">
+  <a href="https://jakubn11.github.io/sql-migration-visualizer/"><strong>🌐 Website &amp; live demo</strong></a>
+</p>
+
+<p align="center">
   <img alt="License" src="https://img.shields.io/badge/license-GPLv3-58D1C9?style=flat-square">
   <img alt="Platform" src="https://img.shields.io/badge/intellij-2024.1%2B-6AA6FF?style=flat-square">
   <img alt="Java" src="https://img.shields.io/badge/java-17-6AA6FF?style=flat-square">
