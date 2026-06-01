@@ -5,6 +5,7 @@ import io.github.jakub.sqlmigrationvisualizer.model.SchemaVersion
 import io.github.jakub.sqlmigrationvisualizer.model.TableSchema
 import kotlin.test.Test
 import kotlin.test.assertContains
+import kotlin.test.assertFalse
 
 class MigrationGeneratorTest {
 
@@ -136,6 +137,75 @@ class MigrationGeneratorTest {
 
         assertContains(sql, "ALTER TABLE users CHANGE COLUMN name full_name TEXT;")
         assertContains(sql, "ALTER TABLE users MODIFY COLUMN email VARCHAR(255) NOT NULL;")
+    }
+
+    @Test
+    fun `sqlite dialect uses plain add column for additive change`() {
+        val from = schemaVersion(
+            version = 1,
+            table = TableSchema(
+                name = "users",
+                columns = listOf(
+                    ColumnDef(name = "id", type = "INTEGER", nullable = false, isPrimaryKey = true)
+                ),
+                primaryKey = listOf("id")
+            )
+        )
+        val to = schemaVersion(
+            version = 2,
+            table = TableSchema(
+                name = "users",
+                columns = listOf(
+                    ColumnDef(name = "id", type = "INTEGER", nullable = false, isPrimaryKey = true),
+                    ColumnDef(name = "email", type = "TEXT", nullable = false, defaultValue = "'unknown'")
+                ),
+                primaryKey = listOf("id")
+            )
+        )
+
+        val sql = generator.generateMigration(from, to, SqlDialect.SQLITE)
+
+        assertContains(sql, "ALTER TABLE users ADD COLUMN email TEXT NOT NULL DEFAULT 'unknown';")
+        assertFalse(sql.contains("PRAGMA foreign_keys"), "additive change should not trigger the rebuild dance")
+    }
+
+    @Test
+    fun `sqlite dialect forces rebuild with pragma wrap when column type changes`() {
+        val from = schemaVersion(
+            version = 1,
+            table = TableSchema(
+                name = "users",
+                columns = listOf(
+                    ColumnDef(name = "id", type = "INTEGER", nullable = false, isPrimaryKey = true),
+                    ColumnDef(name = "email", type = "TEXT")
+                ),
+                primaryKey = listOf("id")
+            )
+        )
+        val to = schemaVersion(
+            version = 2,
+            table = TableSchema(
+                name = "users",
+                columns = listOf(
+                    ColumnDef(name = "id", type = "INTEGER", nullable = false, isPrimaryKey = true),
+                    ColumnDef(name = "email", type = "VARCHAR(255)", nullable = false)
+                ),
+                primaryKey = listOf("id")
+            )
+        )
+
+        val sql = generator.generateMigration(from, to, SqlDialect.SQLITE)
+
+        assertContains(sql, "PRAGMA foreign_keys=OFF;")
+        assertContains(sql, "BEGIN TRANSACTION;")
+        assertContains(sql, "-- SQLite cannot ALTER COLUMN type/nullability/default in place")
+        assertContains(sql, "CREATE TABLE users__new")
+        assertContains(sql, "DROP TABLE users;")
+        assertContains(sql, "ALTER TABLE users__new RENAME TO users;")
+        assertContains(sql, "COMMIT;")
+        assertContains(sql, "PRAGMA foreign_keys=ON;")
+        assertFalse(sql.contains("ALTER TABLE users ALTER COLUMN"), "SQLite must not emit ALTER COLUMN")
+        assertFalse(sql.contains("MODIFY COLUMN"), "SQLite must not emit MODIFY COLUMN")
     }
 
     private fun schemaVersion(version: Int, table: TableSchema): SchemaVersion =

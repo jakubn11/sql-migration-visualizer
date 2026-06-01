@@ -6,7 +6,8 @@ enum class SqlDialect(
 ) {
     GENERIC("generic", "Generic SQL"),
     POSTGRESQL("postgresql", "PostgreSQL"),
-    MYSQL("mysql", "MySQL / MariaDB");
+    MYSQL("mysql", "MySQL / MariaDB"),
+    SQLITE("sqlite", "SQLite");
 
     override fun toString(): String = label
 

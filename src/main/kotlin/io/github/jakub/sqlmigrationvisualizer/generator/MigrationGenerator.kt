@@ -115,6 +115,7 @@ class MigrationGenerator {
 
             when (dialect) {
                 SqlDialect.GENERIC -> return null
+                SqlDialect.SQLITE -> return null
                 SqlDialect.POSTGRESQL -> {
                     if (!oldCol.type.equals(newCol.type, ignoreCase = true)) {
                         statements += "ALTER TABLE $tableName ALTER COLUMN ${newCol.name} TYPE ${newCol.type};"
@@ -177,6 +178,12 @@ class MigrationGenerator {
         }
 
         statements += "-- Rebuild ${toTable.name} to apply complex schema changes safely."
+        if (dialect == SqlDialect.SQLITE) {
+            statements += "-- SQLite cannot ALTER COLUMN type/nullability/default in place; a 12-step rebuild is the standard workaround."
+            statements += "-- Review any indexes, triggers, or views referencing ${fromTable.name} — they must be recreated after the rename."
+            statements += "PRAGMA foreign_keys=OFF;"
+            statements += "BEGIN TRANSACTION;"
+        }
         statements += generateCreateTable(toTable.copy(name = tempTableName))
 
         if (sharedColumns.isNotEmpty()) {
@@ -190,6 +197,10 @@ class MigrationGenerator {
         statements += notes
         statements += "DROP TABLE ${fromTable.name};"
         statements += renderRenameTable(tempTableName, toTable.name, dialect)
+        if (dialect == SqlDialect.SQLITE) {
+            statements += "COMMIT;"
+            statements += "PRAGMA foreign_keys=ON;"
+        }
         return statements
     }
 

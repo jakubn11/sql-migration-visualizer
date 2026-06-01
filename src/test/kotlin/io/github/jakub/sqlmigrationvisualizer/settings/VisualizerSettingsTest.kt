@@ -49,7 +49,7 @@ class VisualizerSettingsTest {
         settings.loadState(
             VisualizerSettings.State(
                 defaultTab = "missing",
-                preferredSqlDialect = "sqlite",
+                preferredSqlDialect = "oracle",
                 erLayoutColumns = 999,
                 erTablePositions = mapOf(
                     "1" to mapOf(

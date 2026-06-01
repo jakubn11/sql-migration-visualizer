@@ -32,6 +32,15 @@
 - projects with baseline schema files that drift over time
 - developers who want migration history to be reviewable instead of tribal knowledge
 
+## Generator Dialects
+
+| Dialect | Notes |
+|---------|-------|
+| Generic SQL | Lowest-common-denominator output; falls back to table rebuilds for any column modification |
+| PostgreSQL | Emits `ALTER COLUMN ... TYPE / SET NOT NULL / SET DEFAULT` for in-place changes |
+| MySQL / MariaDB | Emits `MODIFY COLUMN` / `CHANGE COLUMN` for in-place changes and renames |
+| SQLite | Wraps complex column changes in the standard 12-step rebuild with `PRAGMA foreign_keys` guards |
+
 ## Installation
 
 See [INSTALL.md](INSTALL.md) for full instructions.
