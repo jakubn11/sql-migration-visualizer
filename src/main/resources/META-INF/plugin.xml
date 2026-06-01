@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>io.github.jakub.sqlmigrationvisualizer</id>
     <name>SQL Migration Visualizer</name>
-    <vendor url="https://github.com/jakub/sql-migration-visualizer">Schema Tools</vendor>
+    <vendor email="jakubnl94@gmail.com" url="https://github.com/jakubn11/sql-migration-visualizer">Schema Tools</vendor>
 
     <description><![CDATA[
     <h2>SQL Migration Visualizer</h2>
