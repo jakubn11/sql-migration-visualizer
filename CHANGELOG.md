@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-06-01
+
+### Added
+
+### Changed
+
+### Fixed
+
+
 ### Added
 
 - SQLite as a first-class generator dialect (Settings → Tools → SQL Migration Visualizer → Preferred generator dialect). SQLite cannot `ALTER COLUMN` in place, so any column type / nullability / default change automatically falls back to the standard 12-step rebuild dance — `PRAGMA foreign_keys=OFF` + `BEGIN TRANSACTION` + new table + `INSERT … SELECT` + drop + rename + `COMMIT` + `PRAGMA foreign_keys=ON` — with comment guidance to recreate any indexes, triggers, or views that referenced the old table
