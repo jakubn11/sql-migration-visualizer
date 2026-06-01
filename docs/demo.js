@@ -323,14 +323,17 @@
     });
     if (!sections.length || !("IntersectionObserver" in window)) return;
 
+    var visible = {};
     var obs = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (e.isIntersecting) {
-          links.forEach(function (a) { a.classList.remove("active"); });
-          var active = map[e.target.id];
-          if (active) active.classList.add("active");
-        }
-      });
+      entries.forEach(function (e) { visible[e.target.id] = e.isIntersecting; });
+
+      var activeId = null;
+      for (var i = 0; i < sections.length; i++) {
+        if (visible[sections[i].id]) { activeId = sections[i].id; break; }
+      }
+
+      links.forEach(function (a) { a.classList.remove("active"); });
+      if (activeId && map[activeId]) map[activeId].classList.add("active");
     }, { rootMargin: "-45% 0px -50% 0px", threshold: 0 });
 
     sections.forEach(function (s) { obs.observe(s); });
