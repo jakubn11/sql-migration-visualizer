@@ -271,13 +271,14 @@
   }
 
   function flash(btn, label) {
-    var original = btn.dataset.label || btn.textContent;
-    btn.dataset.label = original;
+    if (!btn.dataset.label) btn.dataset.label = btn.textContent;
     btn.textContent = label;
     btn.classList.add("copied");
-    setTimeout(function () {
-      btn.textContent = original;
+    if (btn._resetTimer) clearTimeout(btn._resetTimer);
+    btn._resetTimer = setTimeout(function () {
+      btn.textContent = btn.dataset.label;
       btn.classList.remove("copied");
+      btn._resetTimer = null;
     }, 1800);
   }
 
