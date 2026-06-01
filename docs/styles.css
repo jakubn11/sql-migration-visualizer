@@ -99,7 +99,7 @@ code {
 .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
 .brand { display: inline-flex; align-items: center; gap: 0.6rem; color: var(--text-primary); font-weight: 600; font-size: 0.98rem; }
 .brand:hover { text-decoration: none; }
-.brand-icon { width: 26px; height: 26px; color: var(--accent-secondary); }
+.brand-icon { height: 26px; width: auto; display: block; }
 .nav-links { display: flex; gap: 1.5rem; font-size: 0.92rem; align-items: center; }
 .nav-links a { color: var(--text-muted); }
 .nav-links a:hover { color: var(--text-primary); text-decoration: none; }
