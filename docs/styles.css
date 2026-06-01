@@ -103,7 +103,20 @@ code {
 .nav-links { display: flex; gap: 1.5rem; font-size: 0.92rem; align-items: center; }
 .nav-links a { color: var(--text-muted); }
 .nav-links a:hover { color: var(--text-primary); text-decoration: none; }
-.nav-gh { color: var(--text-secondary) !important; }
+.nav-gh {
+  color: var(--text-inverse) !important;
+  background: var(--accent-gradient);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  box-shadow: var(--shadow-glow);
+  transition: transform 0.06s ease, box-shadow var(--transition);
+}
+.nav-gh:hover {
+  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: 0 0 30px rgba(106, 166, 255, 0.42);
+}
 
 /* Hero */
 .hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--border-subtle); }
