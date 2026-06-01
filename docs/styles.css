@@ -178,7 +178,7 @@ code {
 }
 .btn:hover { text-decoration: none; transform: translateY(-1px); }
 .btn-primary { background: var(--accent-gradient); color: var(--text-inverse); box-shadow: var(--shadow-glow); }
-.btn-primary:hover { box-shadow: 0 0 34px rgba(106, 166, 255, 0.4); }
+.btn-primary:hover { color: var(--text-inverse); box-shadow: 0 0 34px rgba(106, 166, 255, 0.4); }
 .btn-ghost { background: var(--bg-secondary); color: var(--text-primary); border-color: var(--border-default); }
 .btn-ghost:hover { border-color: var(--accent-primary); color: var(--accent-primary-hover); }
 
