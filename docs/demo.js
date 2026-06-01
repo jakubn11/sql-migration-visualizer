@@ -3,6 +3,13 @@
 (function () {
   "use strict";
 
+  var CREATE_AUDIT =
+    "CREATE TABLE audit_log (\n" +
+    "    id INTEGER PRIMARY KEY,\n" +
+    "    action TEXT NOT NULL,\n" +
+    "    created_at TIMESTAMP\n" +
+    ");";
+
   var SCENARIOS = {
     retype: {
       label: "Retype a column",
@@ -116,6 +123,39 @@
           "PRAGMA foreign_keys=ON;",
       },
     },
+    addtable: {
+      label: "Add a table",
+      sub: "new table audit_log",
+      risk: {
+        level: "MEDIUM",
+        headline: "Moderate migration review recommended",
+        items: ["audit_log adds required column(s): action"],
+      },
+      sql: {
+        generic: CREATE_AUDIT,
+        postgresql: CREATE_AUDIT,
+        mysql: CREATE_AUDIT,
+        sqlite: CREATE_AUDIT,
+      },
+    },
+    droptable: {
+      label: "Drop a table",
+      sub: "legacy_sessions · removed",
+      risk: {
+        level: "HIGH",
+        headline: "High-risk migration review recommended",
+        items: [
+          "legacy_sessions is removed entirely",
+          "can delete data for every environment applying this migration",
+        ],
+      },
+      sql: {
+        generic: "DROP TABLE IF EXISTS legacy_sessions;",
+        postgresql: "DROP TABLE IF EXISTS legacy_sessions;",
+        mysql: "DROP TABLE IF EXISTS legacy_sessions;",
+        sqlite: "DROP TABLE IF EXISTS legacy_sessions;",
+      },
+    },
   };
 
   var DIALECTS = [
@@ -225,36 +265,75 @@
     });
 
     render();
-    initCopy();
+    initInstallCopy();
+    initSqlCopy();
+    initScrollSpy();
   }
 
-  function initCopy() {
+  function flash(btn, label) {
+    var original = btn.dataset.label || btn.textContent;
+    btn.dataset.label = original;
+    btn.textContent = label;
+    btn.classList.add("copied");
+    setTimeout(function () {
+      btn.textContent = original;
+      btn.classList.remove("copied");
+    }, 1800);
+  }
+
+  function copy(text, btn) {
+    var done = function () { flash(btn, "Copied!"); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text, done); });
+    } else {
+      fallbackCopy(text, done);
+    }
+  }
+
+  function initInstallCopy() {
     var btn = document.getElementById("copyInstall");
     var cmd = document.getElementById("installCmd");
     if (!btn || !cmd) return;
-
     btn.addEventListener("click", function () {
       var text = cmd.innerText
         .split("\n")
         .map(function (l) { return l.replace(/^\$\s?/, ""); })
         .join("\n")
         .trim();
-
-      var done = function () {
-        btn.textContent = "Copied!";
-        btn.classList.add("copied");
-        setTimeout(function () {
-          btn.textContent = "Copy";
-          btn.classList.remove("copied");
-        }, 1800);
-      };
-
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text, done); });
-      } else {
-        fallbackCopy(text, done);
-      }
+      copy(text, btn);
     });
+  }
+
+  function initSqlCopy() {
+    var btn = document.getElementById("copySql");
+    if (!btn) return;
+    btn.addEventListener("click", function () {
+      copy(SCENARIOS[state.scenario].sql[state.dialect], btn);
+    });
+  }
+
+  function initScrollSpy() {
+    var links = Array.prototype.slice.call(document.querySelectorAll(".nav-links a[href^='#']"));
+    var map = {};
+    var sections = [];
+    links.forEach(function (a) {
+      var id = a.getAttribute("href").slice(1);
+      var sec = document.getElementById(id);
+      if (sec) { map[id] = a; sections.push(sec); }
+    });
+    if (!sections.length || !("IntersectionObserver" in window)) return;
+
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          links.forEach(function (a) { a.classList.remove("active"); });
+          var active = map[e.target.id];
+          if (active) active.classList.add("active");
+        }
+      });
+    }, { rootMargin: "-45% 0px -50% 0px", threshold: 0 });
+
+    sections.forEach(function (s) { obs.observe(s); });
   }
 
   function fallbackCopy(text, done) {

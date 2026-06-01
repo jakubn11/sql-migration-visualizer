@@ -5,16 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SQL Migration Visualizer — See your database history inside IntelliJ IDEA</title>
 <meta name="description" content="An IntelliJ IDEA plugin that turns scattered SQL migration files into a visual timeline. See how your schema evolved, score risky changes, and generate dialect-aware migrations — without leaving the IDE.">
+<meta name="theme-color" content="#131821">
 <meta property="og:title" content="SQL Migration Visualizer">
-<meta property="og:description" content="See your database history inside IntelliJ IDEA.">
+<meta property="og:description" content="See your database history inside IntelliJ IDEA — visual timeline, risk scoring, and dialect-aware migration generation.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://jakubn11.github.io/sql-migration-visualizer/">
+<meta property="og:image" content="https://jakubn11.github.io/sql-migration-visualizer/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SQL Migration Visualizer">
+<meta name="twitter:description" content="See your database history inside IntelliJ IDEA — visual timeline, risk scoring, and dialect-aware migration generation.">
+<meta name="twitter:image" content="https://jakubn11.github.io/sql-migration-visualizer/og-image.png">
 <link rel="icon" type="image/png" sizes="256x256" href="favicon.png?v=20260602">
 <link rel="shortcut icon" type="image/png" href="favicon.png?v=20260602">
 <link rel="apple-touch-icon" href="favicon.png?v=20260602">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260602b">
+<link rel="stylesheet" href="styles.css?v=20260602c">
 </head>
 <body>
 
@@ -101,7 +110,7 @@
         <div class="demo-output">
           <div class="output-head">
             <span class="output-file" id="outputFile">migration.sql</span>
-            <span class="output-hint">generated</span>
+            <button class="copy-btn" id="copySql" type="button">Copy SQL</button>
           </div>
           <pre class="sql-pane"><code id="sqlOutput"></code></pre>
         </div>
@@ -232,6 +241,6 @@
   </div>
 </footer>
 
-<script src="demo.js?v=20260602"></script>
+<script src="demo.js?v=20260602c"></script>
 </body>
 </html>
