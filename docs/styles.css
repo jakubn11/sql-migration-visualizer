@@ -192,6 +192,9 @@ code {
 .btn-ghost { background: var(--bg-secondary); color: var(--text-primary); border-color: var(--border-default); }
 .btn-ghost:hover { border-color: var(--accent-primary); color: var(--accent-primary-hover); }
 
+.has-ico { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; }
+.gh-ico { width: 1.05em; height: 1.05em; flex-shrink: 0; }
+
 .meta-row { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
 .badge {
   display: inline-flex; align-items: center; gap: 0.45rem;
