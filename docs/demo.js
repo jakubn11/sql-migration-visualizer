@@ -225,6 +225,47 @@
     });
 
     render();
+    initCopy();
+  }
+
+  function initCopy() {
+    var btn = document.getElementById("copyInstall");
+    var cmd = document.getElementById("installCmd");
+    if (!btn || !cmd) return;
+
+    btn.addEventListener("click", function () {
+      var text = cmd.innerText
+        .split("\n")
+        .map(function (l) { return l.replace(/^\$\s?/, ""); })
+        .join("\n")
+        .trim();
+
+      var done = function () {
+        btn.textContent = "Copied!";
+        btn.classList.add("copied");
+        setTimeout(function () {
+          btn.textContent = "Copy";
+          btn.classList.remove("copied");
+        }, 1800);
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text, done); });
+      } else {
+        fallbackCopy(text, done);
+      }
+    });
+  }
+
+  function fallbackCopy(text, done) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); done(); } catch (e) { /* no-op */ }
+    document.body.removeChild(ta);
   }
 
   if (document.readyState === "loading") {

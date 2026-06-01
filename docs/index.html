@@ -208,9 +208,16 @@
   <div class="container narrow center">
     <h2 class="section-title">Make your schema history reviewable today</h2>
     <p class="section-lede">Build from source in under a minute — no account, no telemetry.</p>
-    <pre class="install-block"><code>git clone https://github.com/jakubn11/sql-migration-visualizer.git
-cd sql-migration-visualizer
-./gradlew buildPlugin</code></pre>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <span class="tl-dot"></span><span class="tl-dot"></span><span class="tl-dot"></span>
+        <span class="terminal-label">bash</span>
+        <button class="copy-btn" id="copyInstall" type="button">Copy</button>
+      </div>
+      <pre class="terminal-body"><code id="installCmd"><span class="prompt">$</span> git clone https://github.com/jakubn11/sql-migration-visualizer.git
+<span class="prompt">$</span> cd sql-migration-visualizer
+<span class="prompt">$</span> ./gradlew buildPlugin</code></pre>
+    </div>
     <p class="muted">Then install the ZIP from <code>build/distributions/</code> via <strong>Settings → Plugins → ⚙ → Install Plugin from Disk</strong>.</p>
     <div class="cta-row center">
       <a class="btn btn-primary" href="https://github.com/jakubn11/sql-migration-visualizer" target="_blank" rel="noopener">View on GitHub</a>

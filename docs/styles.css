@@ -345,14 +345,44 @@ code {
     var(--bg-secondary);
   border-bottom: none;
 }
-pre.install-block {
-  max-width: 560px; margin: 0 auto; text-align: left;
-  background: var(--bg-primary); border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg); padding: 1.2rem 1.4rem;
-  font-family: var(--font-mono); font-size: 0.88rem; line-height: 1.7;
-  color: var(--text-secondary); overflow-x: auto;
+.terminal {
+  max-width: 620px;
+  margin: 0 auto;
+  text-align: left;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
 }
-pre.install-block code { background: none; padding: 0; color: inherit; }
+.terminal-bar {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.65rem 0.9rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.terminal-label { margin-left: 0.5rem; font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-muted); }
+.copy-btn {
+  margin-left: auto;
+  font-family: var(--font-sans);
+  font-size: 0.78rem; font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 0.32rem 0.8rem;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.copy-btn:hover { border-color: var(--accent-primary); color: var(--accent-primary-hover); }
+.copy-btn.copied { border-color: var(--color-success); color: var(--color-success); background: var(--color-success-bg); }
+.terminal-body {
+  margin: 0; padding: 1.2rem 1.4rem; overflow-x: auto;
+  font-family: var(--font-mono); font-size: 0.88rem; line-height: 1.85;
+  color: var(--text-secondary);
+}
+.terminal-body code { background: none; padding: 0; color: inherit; }
+.terminal-body .prompt { color: var(--accent-secondary); user-select: none; -webkit-user-select: none; margin-right: 0.5rem; }
 .muted { color: var(--text-muted); }
 .muted.small { font-size: 0.85rem; margin-top: 1.4rem; }
 
