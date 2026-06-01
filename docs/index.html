@@ -3,18 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SQL Migration Visualizer — Make your database history reviewable in IntelliJ IDEA</title>
-<meta name="description" content="An IntelliJ IDEA plugin that turns scattered SQL migration files into a visual timeline. See how your schema evolved, catch risky changes before they ship, and draft the next migration — without leaving the IDE.">
+<title>SQL Migration Visualizer — See your database history inside IntelliJ IDEA</title>
+<meta name="description" content="An IntelliJ IDEA plugin that turns scattered SQL migration files into a visual timeline. See how your schema evolved, score risky changes, and generate dialect-aware migrations — without leaving the IDE.">
 <meta property="og:title" content="SQL Migration Visualizer">
-<meta property="og:description" content="Make your database history reviewable in IntelliJ IDEA.">
+<meta property="og:description" content="See your database history inside IntelliJ IDEA.">
 <meta property="og:type" content="website">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<header class="hero">
-  <nav class="nav container">
+<nav class="nav">
+  <div class="nav-inner container">
     <a class="brand" href="./">
       <svg class="brand-icon" viewBox="0 0 40 40" aria-hidden="true">
         <ellipse cx="20" cy="9" rx="12" ry="3.5" stroke="currentColor" stroke-width="2.2" fill="none"/>
@@ -25,74 +28,126 @@
       <span>SQL Migration Visualizer</span>
     </a>
     <div class="nav-links">
+      <a href="#demo">Live demo</a>
       <a href="#features">Features</a>
-      <a href="#why">Why</a>
       <a href="#dialects">Dialects</a>
       <a href="#install">Get it</a>
-      <a href="https://github.com/jakubn11/sql-migration-visualizer" target="_blank" rel="noopener">GitHub</a>
+      <a class="nav-gh" href="https://github.com/jakubn11/sql-migration-visualizer" target="_blank" rel="noopener">GitHub ↗</a>
     </div>
-  </nav>
+  </div>
+</nav>
 
+<header class="hero">
+  <div class="hero-glow" aria-hidden="true"></div>
   <div class="hero-content container">
-    <span class="eyebrow">IntelliJ IDEA plugin</span>
-    <h1>Your migration history,<br><span class="grad">finally readable.</span></h1>
+    <span class="eyebrow">IntelliJ IDEA Plugin</span>
+    <h1>See your database history<br><span class="grad">the way you think about it.</span></h1>
     <p class="lede">
-      Dozens of <code>.sql</code> files in a folder tell you nothing at a glance.
-      SQL Migration Visualizer turns them into a visual timeline — so you can see how
-      your schema evolved, catch risky changes before they ship, and draft the next
-      migration without ever leaving the IDE.
+      A folder of numbered <code>.sql</code> files hides everything that matters.
+      SQL Migration Visualizer turns it into a visual timeline — scoring risky changes,
+      diffing any two versions, and generating the next migration in your database's dialect.
+      All inside the IDE.
     </p>
     <div class="cta-row">
       <a class="btn btn-primary" href="#install">Get the plugin</a>
-      <a class="btn btn-ghost" href="https://github.com/jakubn11/sql-migration-visualizer" target="_blank" rel="noopener">Star on GitHub</a>
+      <a class="btn btn-ghost" href="#demo">Try the live demo ↓</a>
     </div>
-    <p class="meta-row">
-      <span class="badge">IntelliJ 2024.1+</span>
-      <span class="badge">Works offline</span>
-      <span class="badge">No DB connection needed</span>
-      <span class="badge">Free &amp; open source</span>
-    </p>
+    <div class="meta-row">
+      <span class="badge"><span class="dot"></span>IntelliJ 2024.1+</span>
+      <span class="badge"><span class="dot"></span>Works fully offline</span>
+      <span class="badge"><span class="dot"></span>No DB connection needed</span>
+      <span class="badge"><span class="dot"></span>Free &amp; open source</span>
+    </div>
   </div>
 </header>
 
-<section id="why" class="section">
+<!-- ORIGINAL INTERACTIVE CENTERPIECE -->
+<section id="demo" class="section">
   <div class="container">
-    <h2 class="section-title">Migrations are tribal knowledge. This fixes that.</h2>
-    <div class="why-grid">
-      <div class="why-card">
-        <span class="why-num">01</span>
-        <h3>Stop reading raw SQL to understand history</h3>
-        <p>A folder of numbered files doesn't show you when a column was added, renamed, or dropped. The timeline does — at a glance.</p>
+    <span class="eyebrow center">Live, in your browser</span>
+    <h2 class="section-title center">One schema change. Four dialects. Real output.</h2>
+    <p class="section-lede center">
+      This is the actual generator. Pick a change, switch the target database, and watch the SQL —
+      and the risk score — react. Exactly what the plugin produces in your IDE.
+    </p>
+
+    <div class="demo-shell">
+      <div class="demo-titlebar">
+        <span class="tl-dot"></span><span class="tl-dot"></span><span class="tl-dot"></span>
+        <span class="demo-titlebar-label">SQL Migrations — Create Migration</span>
       </div>
-      <div class="why-card">
-        <span class="why-num">02</span>
-        <h3>Catch the dangerous migration before review does</h3>
-        <p>Dropped columns, narrowing types, and tightening nullability get scored High / Medium / Low risk automatically — before they reach production.</p>
-      </div>
-      <div class="why-card">
-        <span class="why-num">03</span>
-        <h3>Write the next migration in seconds</h3>
-        <p>Change your schema, and the plugin drafts the diff-based migration for you — in the right dialect, with the right <code>ALTER</code> rules.</p>
+
+      <div class="demo-body">
+        <aside class="demo-controls">
+          <div class="control-block">
+            <label class="control-label">Schema change</label>
+            <div class="seg seg-vertical" id="scenarioSeg" role="tablist"></div>
+          </div>
+
+          <div class="control-block">
+            <label class="control-label">Target dialect</label>
+            <div class="seg" id="dialectSeg" role="tablist"></div>
+          </div>
+
+          <div class="control-block">
+            <label class="control-label">Risk assessment</label>
+            <div class="risk-card" id="riskCard">
+              <div class="risk-head">
+                <span class="risk-badge" id="riskBadge">—</span>
+                <span class="risk-headline" id="riskHeadline"></span>
+              </div>
+              <ul class="risk-items" id="riskItems"></ul>
+            </div>
+          </div>
+        </aside>
+
+        <div class="demo-output">
+          <div class="output-head">
+            <span class="output-file" id="outputFile">migration.sql</span>
+            <span class="output-hint">generated</span>
+          </div>
+          <pre class="sql-pane"><code id="sqlOutput"></code></pre>
+        </div>
       </div>
     </div>
+    <p class="demo-foot muted small center">Same diff, same risk — the generator adapts the SQL strategy to each engine's <code>ALTER</code> rules.</p>
   </div>
 </section>
 
+<!-- HIGHLIGHTED TOP FEATURES -->
 <section id="features" class="section section-alt">
   <div class="container">
-    <span class="eyebrow center">Feature overview</span>
-    <h2 class="section-title center">Everything you need, in one tool window</h2>
-    <p class="section-lede center">Docked at the bottom of your IDE. Scans on open and after every save.</p>
+    <span class="eyebrow center">What makes it worth installing</span>
+    <h2 class="section-title center">The three things you'll use every day</h2>
 
-    <div class="feature-grid">
-      <article class="feature-card">
-        <div class="feature-icon icon-teal">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 17l5-5 4 3 6-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="18" cy="8" r="1.6" fill="currentColor"/></svg>
+    <div class="hl-grid">
+      <article class="hl-card">
+        <div class="hl-icon icon-blue">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 17l5-5 4 3 6-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="18" cy="8" r="1.7" fill="currentColor"/></svg>
         </div>
         <h3>Timeline View</h3>
-        <p>Browse every schema version with table counts, change summaries, and one-click jumps to the source file.</p>
+        <p>Every schema version on one strip — table counts, change summaries, and a jump to the exact migration file. Your history stops being tribal knowledge.</p>
       </article>
 
+      <article class="hl-card hl-featured">
+        <div class="hl-icon icon-rose">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="13" width="4" height="7" rx="1" stroke="currentColor" stroke-width="2"/><rect x="10" y="8" width="4" height="12" rx="1" stroke="currentColor" stroke-width="2"/><rect x="16" y="4" width="4" height="16" rx="1" stroke="currentColor" stroke-width="2"/></svg>
+        </div>
+        <span class="hl-tag">Most loved</span>
+        <h3>Risk Scoring</h3>
+        <p>Dropped columns, narrowing types, tightening nullability — each migration is scored High / Medium / Low before it ever reaches review. The dangerous one never slips through.</p>
+      </article>
+
+      <article class="hl-card">
+        <div class="hl-icon icon-teal">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 18h6M10 21h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 3a6 6 0 00-3.5 10.9c.6.4.9 1 .9 1.7V16h5.2v-.4c0-.7.3-1.3.9-1.7A6 6 0 0012 3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        </div>
+        <h3>Suggested Migrations</h3>
+        <p>Edit your schema and the plugin drafts the migration from the actual diff — in your dialect, with a banner the moment it detects a saved change.</p>
+      </article>
+    </div>
+
+    <div class="feature-grid">
       <article class="feature-card">
         <div class="feature-icon icon-blue">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="7" height="6" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="14" y="14" width="7" height="6" rx="1.5" stroke="currentColor" stroke-width="2"/><path d="M10 7h4a3 3 0 013 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -100,55 +155,34 @@
         <h3>Schema Diff</h3>
         <p>Compare any two versions side by side — added, removed, and modified tables and columns, highlighted.</p>
       </article>
-
       <article class="feature-card">
         <div class="feature-icon icon-teal">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="5" r="2.2" stroke="currentColor" stroke-width="2"/><circle cx="5" cy="18" r="2.2" stroke="currentColor" stroke-width="2"/><circle cx="19" cy="18" r="2.2" stroke="currentColor" stroke-width="2"/><path d="M10.5 7L6.5 16M13.5 7l4 9M7 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </div>
         <h3>ER Diagram</h3>
-        <p>See table relationships visually with zoom, pan, and clean PNG export for design docs and PRs.</p>
+        <p>Table relationships with zoom, pan, and clean PNG export for design docs and pull requests.</p>
       </article>
-
       <article class="feature-card">
         <div class="feature-icon icon-amber">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         <h3>Validation</h3>
-        <p>Surface gaps, duplicate versions, invalid alters, and inconsistent history before they cause runtime errors.</p>
+        <p>Catch version gaps, duplicates, invalid alters, and inconsistent history before they cause runtime errors.</p>
       </article>
-
-      <article class="feature-card">
-        <div class="feature-icon icon-blue">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 18h6M10 21h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 3a6 6 0 00-3.5 10.9c.6.4.9 1 .9 1.7V16h5.2v-.4c0-.7.3-1.3.9-1.7A6 6 0 0012 3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
-        </div>
-        <h3>Suggested Migrations</h3>
-        <p>Edit your schema and get a ready-to-review migration draft, generated from the actual diff.</p>
-      </article>
-
-      <article class="feature-card">
-        <div class="feature-icon icon-rose">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="13" width="4" height="7" rx="1" stroke="currentColor" stroke-width="2"/><rect x="10" y="8" width="4" height="12" rx="1" stroke="currentColor" stroke-width="2"/><rect x="16" y="4" width="4" height="16" rx="1" stroke="currentColor" stroke-width="2"/></svg>
-        </div>
-        <h3>Risk Scoring</h3>
-        <p>Destructive and narrowing changes are flagged High / Medium / Low — so the scary migrations never slip through.</p>
-      </article>
-
       <article class="feature-card">
         <div class="feature-icon icon-blue">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4.5-4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </div>
         <h3>Full-text Search</h3>
-        <p>Find any table or column across every version of your schema in one keystroke.</p>
+        <p>Find any table or column across every version of your schema in a single keystroke.</p>
       </article>
-
       <article class="feature-card">
         <div class="feature-icon icon-teal">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </div>
         <h3>Dialect-aware SQL</h3>
-        <p>Generate migrations for Generic SQL, PostgreSQL, MySQL/MariaDB, or SQLite — each with its own <code>ALTER</code> rules.</p>
+        <p>Generic, PostgreSQL, MySQL/MariaDB, and SQLite — each with its own <code>ALTER</code> rules and safe rebuilds.</p>
       </article>
-
       <article class="feature-card">
         <div class="feature-icon icon-violet">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 3v5h5" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
@@ -162,25 +196,13 @@
 
 <section id="dialects" class="section">
   <div class="container narrow">
-    <h2 class="section-title">Generates the right SQL for your database</h2>
-    <p class="section-lede">The generator respects each dialect's <code>ALTER</code> rules and falls back to a safe table rebuild when a change can't be done in place.</p>
+    <h2 class="section-title center">Generates the right SQL for your database</h2>
+    <p class="section-lede center">The generator respects each dialect's <code>ALTER</code> rules and falls back to a safe table rebuild when a change can't be made in place.</p>
     <div class="dialect-list">
-      <div class="dialect-row">
-        <span class="dialect-name">Generic SQL</span>
-        <span class="dialect-note">Portable, lowest-common-denominator output; rebuilds tables for any column change.</span>
-      </div>
-      <div class="dialect-row">
-        <span class="dialect-name">PostgreSQL</span>
-        <span class="dialect-note">In-place <code>ALTER COLUMN … TYPE / SET NOT NULL / SET DEFAULT</code>.</span>
-      </div>
-      <div class="dialect-row">
-        <span class="dialect-name">MySQL / MariaDB</span>
-        <span class="dialect-note">In-place <code>MODIFY COLUMN</code> and <code>CHANGE COLUMN</code> for changes and renames.</span>
-      </div>
-      <div class="dialect-row">
-        <span class="dialect-name">SQLite</span>
-        <span class="dialect-note">Automatic 12-step rebuild with <code>PRAGMA foreign_keys</code> guards, since SQLite can't <code>ALTER COLUMN</code>.</span>
-      </div>
+      <div class="dialect-row"><span class="dialect-name">Generic SQL</span><span class="dialect-note">Portable output; rebuilds tables for any column modification.</span></div>
+      <div class="dialect-row"><span class="dialect-name">PostgreSQL</span><span class="dialect-note">In-place <code>ALTER COLUMN … TYPE / SET NOT NULL / SET DEFAULT</code>.</span></div>
+      <div class="dialect-row"><span class="dialect-name">MySQL / MariaDB</span><span class="dialect-note">In-place <code>MODIFY COLUMN</code> and <code>CHANGE COLUMN</code> for changes and renames.</span></div>
+      <div class="dialect-row"><span class="dialect-name">SQLite</span><span class="dialect-note">Automatic 12-step rebuild with <code>PRAGMA foreign_keys</code> guards, since SQLite can't <code>ALTER COLUMN</code>.</span></div>
     </div>
   </div>
 </section>
@@ -188,14 +210,11 @@
 <section id="install" class="section section-cta">
   <div class="container narrow center">
     <h2 class="section-title">Make your schema history reviewable today</h2>
-    <p class="section-lede">Build it from source in under a minute — no account, no telemetry.</p>
+    <p class="section-lede">Build from source in under a minute — no account, no telemetry.</p>
     <pre class="install-block"><code>git clone https://github.com/jakubn11/sql-migration-visualizer.git
 cd sql-migration-visualizer
 ./gradlew buildPlugin</code></pre>
-    <p class="muted">
-      Then install the ZIP from <code>build/distributions/</code> via
-      <strong>Settings → Plugins → ⚙ → Install Plugin from Disk</strong>.
-    </p>
+    <p class="muted">Then install the ZIP from <code>build/distributions/</code> via <strong>Settings → Plugins → ⚙ → Install Plugin from Disk</strong>.</p>
     <div class="cta-row center">
       <a class="btn btn-primary" href="https://github.com/jakubn11/sql-migration-visualizer" target="_blank" rel="noopener">View on GitHub</a>
     </div>
@@ -205,13 +224,10 @@ cd sql-migration-visualizer
 
 <footer class="footer">
   <div class="container footer-inner">
-    <p>
-      Licensed under
-      <a href="https://github.com/jakubn11/sql-migration-visualizer/blob/main/LICENSE" target="_blank" rel="noopener">GPL v3.0</a>
-      · Source on <a href="https://github.com/jakubn11/sql-migration-visualizer" target="_blank" rel="noopener">GitHub</a>
-    </p>
+    <p>Licensed under <a href="https://github.com/jakubn11/sql-migration-visualizer/blob/main/LICENSE" target="_blank" rel="noopener">GPL v3.0</a> · Source on <a href="https://github.com/jakubn11/sql-migration-visualizer" target="_blank" rel="noopener">GitHub</a></p>
   </div>
 </footer>
 
+<script src="demo.js"></script>
 </body>
 </html>
