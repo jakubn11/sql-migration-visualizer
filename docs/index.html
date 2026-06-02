@@ -17,13 +17,14 @@
 <meta name="twitter:title" content="SQL Migration Visualizer">
 <meta name="twitter:description" content="See your database history inside IntelliJ IDEA — visual timeline, risk scoring, and dialect-aware migration generation.">
 <meta name="twitter:image" content="https://jakubn11.github.io/sql-migration-visualizer/og-image.png">
+<link rel="canonical" href="https://jakubn11.github.io/sql-migration-visualizer/">
 <link rel="icon" type="image/png" sizes="256x256" href="favicon.png?v=20260602">
 <link rel="shortcut icon" type="image/png" href="favicon.png?v=20260602">
 <link rel="apple-touch-icon" href="favicon.png?v=20260602">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260602f">
+<link rel="stylesheet" href="styles.css?v=20260602j">
 </head>
 <body>
 
@@ -48,10 +49,10 @@
   <div class="hero-glow" aria-hidden="true"></div>
   <div class="hero-content container">
     <span class="eyebrow">IntelliJ IDEA Plugin</span>
-    <h1>See your database history<br><span class="grad">the way you think about it.</span></h1>
+    <h1>See your database history <span class="grad">the way you think about it.</span></h1>
     <p class="lede">
       A folder of numbered <code>.sql</code> files hides everything that matters.
-      SQL Migration Visualizer turns it into a visual timeline — scoring risky changes,
+      SQL Migration Visualizer turns it into a navigable timeline — scoring risky changes,
       diffing any two versions, and generating the next migration in your database's dialect.
       All inside the IDE.
     </p>
@@ -197,51 +198,6 @@
         <h3>Create &amp; Manage</h3>
         <p>Draft, edit, delete, and renumber migration files right in the IDE — no folder spelunking.</p>
       </article>
-    </div>
-  </div>
-</section>
-
-<section id="screenshots" class="section">
-  <div class="container">
-    <span class="eyebrow center">See it in action</span>
-    <h2 class="section-title center">Inside the tool window</h2>
-    <p class="section-lede center">Docked at the bottom of your IDE — the timeline, diagrams, and risk signals where you already work.</p>
-
-    <div class="shot-grid">
-      <!-- To use a real capture, replace the .shot-placeholder div with:
-           <img class="shot-img" src="screenshots/timeline.png" alt="Timeline view"> -->
-      <figure class="shot">
-        <div class="shot-frame">
-          <div class="shot-bar"><span class="tl-dot"></span><span class="tl-dot"></span><span class="tl-dot"></span><span class="shot-label">SQL Migrations — Timeline</span></div>
-          <div class="shot-placeholder">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 17l5-5 4 3 6-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="18" cy="8" r="1.7" fill="currentColor"/></svg>
-            <span>Timeline View</span>
-          </div>
-        </div>
-        <figcaption>Every schema version on one strip.</figcaption>
-      </figure>
-
-      <figure class="shot">
-        <div class="shot-frame">
-          <div class="shot-bar"><span class="tl-dot"></span><span class="tl-dot"></span><span class="tl-dot"></span><span class="shot-label">SQL Migrations — ER Diagram</span></div>
-          <div class="shot-placeholder">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="5" r="2.2" stroke="currentColor" stroke-width="2"/><circle cx="5" cy="18" r="2.2" stroke="currentColor" stroke-width="2"/><circle cx="19" cy="18" r="2.2" stroke="currentColor" stroke-width="2"/><path d="M10.5 7L6.5 16M13.5 7l4 9M7 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            <span>ER Diagram</span>
-          </div>
-        </div>
-        <figcaption>Relationships with zoom, pan, and PNG export.</figcaption>
-      </figure>
-
-      <figure class="shot">
-        <div class="shot-frame">
-          <div class="shot-bar"><span class="tl-dot"></span><span class="tl-dot"></span><span class="tl-dot"></span><span class="shot-label">SQL Migrations — Validation</span></div>
-          <div class="shot-placeholder">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span>Validation &amp; Risk</span>
-          </div>
-        </div>
-        <figcaption>Gaps, duplicates, and risky changes, flagged.</figcaption>
-      </figure>
     </div>
   </div>
 </section>

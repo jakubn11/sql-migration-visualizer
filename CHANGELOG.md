@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Marketing site (`docs/`) is now properly responsive on mobile — fixed the nav cramping at narrow widths (brand text and "Live demo" link previously wrapped to two lines on a 375px viewport), tightened card and section paddings at ≤640px, and added a ≤420px breakpoint for compact phones
+- Hero headline is now a single inline sentence — the gradient phrase "the way you think about it." continues from "See your database history" instead of being forced onto its own line by a hard `<br>`, so it reads as one statement and wraps naturally at every width
+- Demo control chips (`.seg-chip`) on mobile now meet the 44px WCAG 2.5.5 touch-target recommendation — previously ~30px tall, which was uncomfortable to tap accurately on a phone
+- Sticky-nav anchor offset is now derived from a `--nav-h` variable instead of a hardcoded `72px` `scroll-padding-top` — anchored sections (`#demo`, `#dialects`, `#faq`, `#install`) now land with a consistent 8px gap below the nav at every breakpoint, instead of an oversized gap on phones where the nav is shorter
+- Lede copy no longer uses "visual" twice in one sentence — "turns it into a navigable timeline" replaces "turns it into a visual timeline"
+
+### Removed
+
+- Placeholder "Inside the tool window" screenshots section (`#screenshots`) — was showing three generic SVG icons in fake IDE chrome instead of real product captures, which made the section look unfinished; we'll bring it back once there are actual screenshots to ship
+
+### Added
+
+- `<link rel="canonical">` on the marketing site, paired with the existing `og:url`, so search engines and link unfurlers resolve the page to a single URL
+
 ## [1.4.0] - 2026-06-01
 
 ### Added
