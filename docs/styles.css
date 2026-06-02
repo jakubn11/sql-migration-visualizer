@@ -59,7 +59,7 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-h) + 8px); }
+html { scroll-behavior: smooth; scroll-padding-top: var(--nav-h); }
 
 body {
   margin: 0;
