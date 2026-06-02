@@ -12,7 +12,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Marketing site: "Download latest .zip" CTA in the install section that targets `releases/latest`, so visitors get a one-click path to the prebuilt plugin once a release is published — build-from-source is preserved behind an "Or build from source" disclosure
-- Marketing site: live GitHub star count chip on both the nav GitHub button and the install CTA — fetched from the GitHub API once per visit and cached in `localStorage` for an hour
 - Marketing site: `site.webmanifest` linked from the page for installable / PWA-style metadata
 - Marketing site: expanded footer with Source · Report an issue · Changelog · License links and a "Built by Jakub Neděla" credit line
 - `<link rel="canonical">` on the marketing site, paired with the existing `og:url`, so search engines and link unfurlers resolve the page to a single URL

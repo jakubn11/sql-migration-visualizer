@@ -141,22 +141,6 @@ code {
   box-shadow: 0 0 30px rgba(106, 166, 255, 0.42);
 }
 
-.gh-stars {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.22rem;
-  margin-left: 0.5rem;
-  padding: 0.1rem 0.45rem;
-  font-size: 0.78em;
-  font-weight: 700;
-  line-height: 1.2;
-  border-radius: var(--radius-full);
-  background: rgba(14, 19, 26, 0.22);
-  color: inherit;
-}
-.gh-stars[hidden] { display: none; }
-.gh-stars::before { content: "★"; font-size: 0.95em; line-height: 1; }
-.btn-ghost .gh-stars { background: var(--bg-tertiary); color: var(--text-secondary); }
 
 /* Hero */
 .hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--border-subtle); }
