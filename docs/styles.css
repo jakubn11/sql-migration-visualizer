@@ -212,7 +212,7 @@ code {
 /* Sections */
 .section { padding: 5.5rem 0; border-bottom: 1px solid var(--border-subtle); }
 .section-alt { background: var(--bg-secondary); }
-.section-title { font-size: clamp(1.7rem, 3.2vw, 2.5rem); margin: 0 0 0.7rem; letter-spacing: -0.025em; font-weight: 750; }
+.section-title { font-size: clamp(1.7rem, 3.2vw, 2.5rem); line-height: 1.15; margin: 0 0 0.7rem; letter-spacing: -0.025em; font-weight: 750; }
 .section-lede { color: var(--text-secondary); margin: 0 auto 3rem; font-size: 1.05rem; max-width: 680px; }
 
 /* ===== Interactive demo ===== */
