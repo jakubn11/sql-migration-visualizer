@@ -352,6 +352,15 @@ code {
 .hl-card h3 { font-size: 1.2rem; margin: 0 0 0.5rem; }
 .hl-card p { margin: 0; color: var(--text-secondary); font-size: 0.96rem; }
 
+.feature-subhead {
+  margin: 3rem 0 1.4rem;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
 .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 1.1rem; }
 .feature-card {
   background: var(--bg-tertiary);
