@@ -7,21 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-06-02
+
+### Added
+
+- Marketing site: "Download latest .zip" CTA in the install section that targets `releases/latest`, so visitors get a one-click path to the prebuilt plugin once a release is published — build-from-source is preserved behind an "Or build from source" disclosure
+- Marketing site: live GitHub star count chip on both the nav GitHub button and the install CTA — fetched from the GitHub API once per visit and cached in `localStorage` for an hour
+- Marketing site: `site.webmanifest` linked from the page for installable / PWA-style metadata
+- Marketing site: expanded footer with Source · Report an issue · Changelog · License links and a "Built by Jakub Neděla" credit line
+- `<link rel="canonical">` on the marketing site, paired with the existing `og:url`, so search engines and link unfurlers resolve the page to a single URL
+
 ### Changed
 
+- Marketing site: mobile nav (≤640px) now keeps the section links visible via a horizontally scrollable strip with edge-fade mask, replacing the previous behavior that hid every link except the GitHub button — brand collapses to icon-only on phones to leave room
+- Marketing site: inline `<code>` inside body prose (lede, FAQ answers, dialect notes) no longer renders as a chunky blue chip — it's now a soft monospace accent that flows with surrounding text; `<pre>`/`<code>` blocks keep their chip treatment
 - Marketing site (`docs/`) is now properly responsive on mobile — fixed the nav cramping at narrow widths (brand text and "Live demo" link previously wrapped to two lines on a 375px viewport), tightened card and section paddings at ≤640px, and added a ≤420px breakpoint for compact phones
 - Hero headline is now a single inline sentence — the gradient phrase "the way you think about it." continues from "See your database history" instead of being forced onto its own line by a hard `<br>`, so it reads as one statement and wraps naturally at every width
 - Demo control chips (`.seg-chip`) on mobile now meet the 44px WCAG 2.5.5 touch-target recommendation — previously ~30px tall, which was uncomfortable to tap accurately on a phone
 - Sticky-nav anchor offset is now derived from a `--nav-h` variable instead of a hardcoded `72px` `scroll-padding-top` — anchored sections (`#demo`, `#dialects`, `#faq`, `#install`) now land with a consistent 8px gap below the nav at every breakpoint, instead of an oversized gap on phones where the nav is shorter
 - Lede copy no longer uses "visual" twice in one sentence — "turns it into a navigable timeline" replaces "turns it into a visual timeline"
 
+### Fixed
+
+- Marketing site: FAQ summary marker now hidden cross-browser — added a `summary::marker { content: "" }` rule alongside the existing `::-webkit-details-marker` reset so the native disclosure triangle no longer leaks through on Firefox
+
 ### Removed
 
+- Marketing site: "Most loved" tag on the Risk Scoring feature card — was a social-proof claim without data to back it
 - Placeholder "Inside the tool window" screenshots section (`#screenshots`) — was showing three generic SVG icons in fake IDE chrome instead of real product captures, which made the section look unfinished; we'll bring it back once there are actual screenshots to ship
-
-### Added
-
-- `<link rel="canonical">` on the marketing site, paired with the existing `og:url`, so search engines and link unfurlers resolve the page to a single URL
 
 ## [1.4.0] - 2026-06-01
 

@@ -268,6 +268,51 @@
     initInstallCopy();
     initSqlCopy();
     initScrollSpy();
+    initGithubStars();
+  }
+
+  function initGithubStars() {
+    var targets = document.querySelectorAll("[data-gh-stars]");
+    if (!targets.length) return;
+
+    var CACHE_KEY = "sqlmv:gh-stars";
+    var CACHE_TTL = 60 * 60 * 1000; // 1 hour
+
+    var show = function (count) {
+      if (typeof count !== "number" || count < 1) return;
+      var label = formatStars(count);
+      Array.prototype.forEach.call(targets, function (el) {
+        el.textContent = label;
+        el.removeAttribute("hidden");
+      });
+    };
+
+    try {
+      var cached = JSON.parse(localStorage.getItem(CACHE_KEY) || "null");
+      if (cached && cached.count != null && Date.now() - cached.at < CACHE_TTL) {
+        show(cached.count);
+        return;
+      }
+    } catch (e) { /* ignore */ }
+
+    fetch("https://api.github.com/repos/jakubn11/sql-migration-visualizer", {
+      headers: { "Accept": "application/vnd.github+json" },
+    })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (!data || typeof data.stargazers_count !== "number") return;
+        show(data.stargazers_count);
+        try {
+          localStorage.setItem(CACHE_KEY, JSON.stringify({ count: data.stargazers_count, at: Date.now() }));
+        } catch (e) { /* ignore */ }
+      })
+      .catch(function () { /* silent */ });
+  }
+
+  function formatStars(n) {
+    if (n >= 10000) return (n / 1000).toFixed(0) + "k";
+    if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, "") + "k";
+    return String(n);
   }
 
   function flash(btn, label) {
