@@ -1,3 +1,4 @@
+*.swp
 .DS_Store
 .claude/
 .codex/
@@ -7,4 +8,5 @@
 .intellijPlatform/
 .kotlin/
 build/
+local.properties
 out/
