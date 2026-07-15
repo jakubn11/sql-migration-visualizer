@@ -64,8 +64,11 @@ The plugin auto-detects common migration and schema locations:
 | `src/main/sqldelight` |
 | `src/commonMain/sqldelight` |
 | `src/androidMain/sqldelight` |
+| `src/jvmMain/sqldelight` |
+| `src/iosMain/sqldelight` |
 | `db/migrations` · `database/migrations` · `migrations` |
-| `src/main/resources/db/migrations` |
+| `src/main/resources/db/migration` · `src/main/resources/db/migrations` |
+| `src/main/resources/migrations` · `src/main/resources/sql` |
 | `src/main/resources/schema` |
 
 Recognised file naming patterns:
