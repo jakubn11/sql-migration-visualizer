@@ -1483,9 +1483,18 @@
         }).join('');
     }
 
+    // Every call site embeds the result inside a double-quoted HTML attribute
+    // (onclick="...'VALUE'..."), so the HTML metacharacters have to go too —
+    // JS-level escaping alone lets a path containing a double quote close the
+    // attribute and inject a new one.
     function escapeJs(str) {
         if (!str) return '';
-        return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        return str.replace(/\\/g, '\\\\')
+                  .replace(/'/g, "\\'")
+                  .replace(/&/g, '&amp;')
+                  .replace(/"/g, '&quot;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;');
     }
 
     function escapeCss(str) {

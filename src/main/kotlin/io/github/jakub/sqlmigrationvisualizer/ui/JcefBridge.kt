@@ -82,8 +82,13 @@ class JcefBridge(
     private fun setupQueryHandlers() {
         // Handle "open file" requests from JavaScript
         openFileQuery.addHandler { filePath ->
-            openFileInEditor(filePath)
-            JBCefJSQuery.Response("ok")
+            try {
+                requireWithinProject(filePath)
+                openFileInEditor(filePath)
+                JBCefJSQuery.Response("ok")
+            } catch (e: Exception) {
+                JBCefJSQuery.Response(null, 0, "Error: ${e.message}")
+            }
         }
 
         // Handle refresh requests from JavaScript
@@ -120,6 +125,7 @@ class JcefBridge(
                 val filePath = params["filePath"]!!.jsonPrimitive.content
                 val content = params["content"]!!.jsonPrimitive.content
                 val openAfterSave = params["openAfterSave"]?.jsonPrimitive?.content?.toBooleanStrictOrNull() ?: true
+                requireWithinProject(filePath)
 
                 ApplicationManager.getApplication().invokeLater {
                     WriteCommandAction.runWriteCommandAction(project) {
@@ -183,16 +189,18 @@ class JcefBridge(
                     ?.lowercase()
                     ?.takeIf { it.matches(Regex("""[a-z0-9]+""")) }
                     ?: detectPreferredMigrationExtension()
+                requireWithinProject(directory)
+
+                val fileName = MigrationFileNaming.buildFileName(
+                    pattern = settings.state.migrationFileNamePattern,
+                    version = version,
+                    name = name,
+                    extension = extension
+                )
+                val filePath = File(directory, fileName).absolutePath
 
                 ApplicationManager.getApplication().invokeLater {
                     WriteCommandAction.runWriteCommandAction(project) {
-                        val fileName = MigrationFileNaming.buildFileName(
-                            pattern = settings.state.migrationFileNamePattern,
-                            version = version,
-                            name = name,
-                            extension = extension
-                        )
-                        val filePath = File(directory, fileName).absolutePath
                         val virtualFile = writeUtf8File(filePath, content)
                         settings.rememberMigrationDirectory(directory)
                         settingsState = settings.state
@@ -207,13 +215,7 @@ class JcefBridge(
                     schemaChangePromptService.checkPendingSuggestionAfterSave()
                     onRefreshRequested?.invoke()
                 }
-                val fileName = MigrationFileNaming.buildFileName(
-                    pattern = settings.state.migrationFileNamePattern,
-                    version = version,
-                    name = name,
-                    extension = extension
-                )
-                JBCefJSQuery.Response(File(directory, fileName).absolutePath)
+                JBCefJSQuery.Response(filePath)
             } catch (e: Exception) {
                 JBCefJSQuery.Response(null, 0, "Error: ${e.message}")
             }
@@ -260,6 +262,7 @@ class JcefBridge(
         // Handle delete migration file requests
         deleteMigrationQuery.addHandler { filePath ->
             try {
+                requireWithinProject(filePath)
                 ApplicationManager.getApplication().invokeLater {
                     try {
                         WriteAction.run<Throwable> {
@@ -286,10 +289,7 @@ class JcefBridge(
         // Handle renumber-duplicate-migration requests (quick-fix on DUPLICATE_VERSION issues)
         renumberMigrationQuery.addHandler { filePath ->
             try {
-                val basePath = project.basePath
-                if (basePath != null && !filePath.startsWith(basePath)) {
-                    return@addHandler JBCefJSQuery.Response(null, 0, "File is outside the project: $filePath")
-                }
+                requireWithinProject(filePath)
                 val newVersion = MigrationFileNaming.nextFreeVersion(schemaVersions.map { it.version })
                 ApplicationManager.getApplication().invokeLater {
                     try {
@@ -596,6 +596,25 @@ class JcefBridge(
         browser.cefBrowser.executeJavaScript(script, source, 0)
     }
 
+    /**
+     * Paths arriving from the JS layer may only address files inside the open project.
+     * Canonicalises both sides first: a plain prefix check treats `/foo-other` as living
+     * under `/foo`, and leaves `..` segments unresolved.
+     *
+     * Not applied to the export path — there the destination comes from the user's own
+     * Save As dialog, and saving an export outside the project is the point.
+     */
+    private fun requireWithinProject(path: String) {
+        val basePath = project.basePath ?: throw IllegalStateException("Project has no base path")
+        val base = File(basePath).canonicalFile
+        var cursor: File? = File(path).canonicalFile
+        while (cursor != null) {
+            if (cursor == base) return
+            cursor = cursor.parentFile
+        }
+        throw IllegalArgumentException("Path is outside the project: $path")
+    }
+
     private fun writeUtf8File(filePath: String, content: String): VirtualFile {
         val ioFile = File(filePath)
         val parentPath = ioFile.parent ?: throw IllegalArgumentException("Parent directory not found for $filePath")
@@ -640,6 +659,7 @@ class JcefBridge(
         createMigrationQuery.dispose()
         browseDirectoryQuery.dispose()
         deleteMigrationQuery.dispose()
+        renumberMigrationQuery.dispose()
         saveErLayoutQuery.dispose()
         dismissPendingMigrationQuery.dispose()
         openRelatedSchemaSourceQuery.dispose()
