@@ -140,14 +140,14 @@ class MigrationValidatorTest {
     }
 
     @Test
-    fun `transaction statement in migration produces warning`() {
+    fun `transaction statement in migration produces one warning per file`() {
         val result = validator.validate(
             migrations = listOf(migration(1, statements = listOf("BEGIN", "INSERT INTO users VALUES (1)", "COMMIT"))),
             schemaVersions = emptyList()
         )
 
         val issues = result.issues.filter { it.code == ValidationIssueCode.TRANSACTION_STATEMENT }
-        assertEquals(2, issues.size)
+        assertEquals(1, issues.size)
     }
 
     @Test
@@ -203,6 +203,72 @@ class MigrationValidatorTest {
         assertNotNull(issue)
         assertEquals("orders", issue.tableName)
     }
+
+    @Test
+    fun `schema-qualified alter target is not reported as missing`() {
+        val schemaVersions = listOf(
+            schemaVersion(0, mapOf("public.users" to table("public.users"))),
+            schemaVersion(1, mapOf("public.users" to table("public.users")), migration(
+                version = 1,
+                statements = listOf("ALTER TABLE ONLY public.users ADD COLUMN email TEXT")
+            ))
+        )
+
+        val result = validator.validate(listOf(schemaVersions[1].migrationFile!!), schemaVersions)
+
+        assertTrue(result.issues.none { it.code == ValidationIssueCode.ALTER_TABLE_TARGET_MISSING })
+    }
+
+    @Test
+    fun `alter target matching only by case is not reported as missing`() {
+        val schemaVersions = listOf(
+            schemaVersion(0, mapOf("users" to table("users"))),
+            schemaVersion(1, mapOf("users" to table("users")), migration(
+                version = 1,
+                statements = listOf("ALTER TABLE Users ADD COLUMN email TEXT")
+            ))
+        )
+
+        val result = validator.validate(listOf(schemaVersions[1].migrationFile!!), schemaVersions)
+
+        assertTrue(result.issues.none { it.code == ValidationIssueCode.ALTER_TABLE_TARGET_MISSING })
+    }
+
+    @Test
+    fun `the generated SQLite rebuild is not flagged as a manual transaction`() {
+        val result = validator.validate(
+            migrations = listOf(
+                migration(
+                    version = 1,
+                    statements = listOf(
+                        "PRAGMA foreign_keys=OFF",
+                        "BEGIN TRANSACTION",
+                        "CREATE TABLE users_new (id INTEGER PRIMARY KEY)",
+                        "COMMIT",
+                        "PRAGMA foreign_keys=ON"
+                    )
+                )
+            ),
+            schemaVersions = emptyList()
+        )
+
+        assertTrue(result.issues.none { it.code == ValidationIssueCode.TRANSACTION_STATEMENT })
+    }
+
+    private fun table(name: String) = TableSchema(
+        name = name,
+        columns = listOf(ColumnDef(name = "id", type = "INTEGER", isPrimaryKey = true))
+    )
+
+    private fun schemaVersion(
+        version: Int,
+        tables: Map<String, TableSchema>,
+        migrationFile: MigrationFile? = null
+    ) = SchemaVersion(
+        version = version,
+        tables = tables,
+        migrationFile = migrationFile
+    )
 
     private fun migration(
         version: Int,

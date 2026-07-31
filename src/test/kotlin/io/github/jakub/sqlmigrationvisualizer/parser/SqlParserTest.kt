@@ -251,4 +251,42 @@ class SqlParserTest {
         assertTrue(usersTable.primaryKey.isEmpty())
         assertTrue(usersTable.columns.none { it.isPrimaryKey })
     }
+
+    @Test
+    fun `alter table resolves the target regardless of identifier case`() {
+        val baselineStatements = listOf("CREATE TABLE users (id INTEGER PRIMARY KEY)")
+        val migration = MigrationFile(
+            version = 1,
+            filePath = "/tmp/1.sql",
+            fileName = "1.sql",
+            statements = listOf("ALTER TABLE Users ADD COLUMN email TEXT"),
+            rawContent = ""
+        )
+
+        val timeline = parser.buildSchemaTimeline(baselineStatements, listOf(migration))
+        val usersTable = timeline.last().tables["users"]
+
+        assertNotNull(usersTable)
+        assertEquals(listOf("id", "email"), usersTable.columns.map { it.name })
+    }
+
+    @Test
+    fun `case-insensitive lookup keeps the originally declared spelling as the key`() {
+        val baselineStatements = listOf("CREATE TABLE Orders (id INTEGER PRIMARY KEY)")
+        val migration = MigrationFile(
+            version = 1,
+            filePath = "/tmp/1.sql",
+            fileName = "1.sql",
+            statements = listOf("ALTER TABLE orders ADD COLUMN total INTEGER"),
+            rawContent = ""
+        )
+
+        val timeline = parser.buildSchemaTimeline(baselineStatements, listOf(migration))
+
+        assertEquals(listOf("Orders"), timeline.last().tables.keys.toList())
+        assertEquals(
+            listOf("id", "total"),
+            timeline.last().tables["Orders"]?.columns?.map { it.name }
+        )
+    }
 }

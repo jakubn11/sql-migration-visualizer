@@ -117,7 +117,39 @@ class MigrationValidator {
 
     private companion object {
         const val MAX_GAP_ENUMERATION = 100L
+
+        // Mirrors SqlParser's identifier handling so schema-qualified targets like
+        // `public.users` are captured whole — a bare `(\w+)` stops at the dot and
+        // reports the schema name as a missing table.
+        private const val OPTIONAL_ONLY = """(?:ONLY\s+)?"""
+        private const val IDENTIFIER_SEGMENT = """[`"\[]?[A-Za-z_][\w$]*[`"\]]?"""
+        private const val QUALIFIED_IDENTIFIER =
+            """($IDENTIFIER_SEGMENT(?:\s*\.\s*$IDENTIFIER_SEGMENT)*)"""
+
+        val ALTER_TABLE_TARGET_PATTERN = Regex(
+            """ALTER\s+TABLE\s+$OPTIONAL_ONLY$QUALIFIED_IDENTIFIER""",
+            RegexOption.IGNORE_CASE
+        )
+
+        val DROP_TABLE_TARGET_PATTERN = Regex(
+            """DROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?$OPTIONAL_ONLY$QUALIFIED_IDENTIFIER""",
+            RegexOption.IGNORE_CASE
+        )
+
+        fun normalizeTableName(raw: String): String =
+            raw.trim()
+                .split(".")
+                .joinToString(".") { segment ->
+                    segment.trim()
+                        .removeSurrounding("`")
+                        .removeSurrounding("\"")
+                        .removeSurrounding("[", "]")
+                }
     }
+
+    /** SQL identifiers are case-insensitive unless quoted, so the lookup must be too. */
+    private fun Map<String, *>.containsTable(normalizedName: String): Boolean =
+        keys.any { it.equals(normalizedName, ignoreCase = true) }
 
     private fun checkDuplicateVersions(
         migrations: List<MigrationFile>,
@@ -175,14 +207,11 @@ class MigrationValidator {
             val migration = currentVersion.migrationFile ?: continue
 
             for (stmt in migration.statements) {
-                val alterMatch = Regex(
-                    """ALTER\s+TABLE\s+[`"\[]?(\w+)[`"\]]?""",
-                    RegexOption.IGNORE_CASE
-                ).find(stmt)
+                val alterMatch = ALTER_TABLE_TARGET_PATTERN.find(stmt)
 
                 if (alterMatch != null) {
-                    val tableName = alterMatch.groupValues[1]
-                    if (!prevSchema.tables.containsKey(tableName)) {
+                    val tableName = normalizeTableName(alterMatch.groupValues[1])
+                    if (!prevSchema.tables.containsTable(tableName)) {
                         issues.add(
                             ValidationIssue(
                                 severity = ValidationSeverity.ERROR,
@@ -208,10 +237,19 @@ class MigrationValidator {
         issues: MutableList<ValidationIssue>
     ) {
         for (migration in migrations) {
-            for (stmt in migration.statements) {
-                val upper = stmt.trim().uppercase()
-
-                if (upper.startsWith("BEGIN") || upper.startsWith("COMMIT") || upper.startsWith("ROLLBACK")) {
+            // The SQLite table-rebuild this plugin generates is deliberately wrapped in
+            // BEGIN/COMMIT between PRAGMA foreign_keys guards — flagging it would mean
+            // warning about our own generated output. One issue per file either way:
+            // a wrapped migration has both a BEGIN and a COMMIT to report.
+            val isGeneratedSqliteRebuild = migration.statements.any {
+                it.trim().uppercase().startsWith("PRAGMA FOREIGN_KEYS")
+            }
+            if (!isGeneratedSqliteRebuild) {
+                val transactionStatement = migration.statements.firstOrNull {
+                    val upper = it.trim().uppercase()
+                    upper.startsWith("BEGIN") || upper.startsWith("COMMIT") || upper.startsWith("ROLLBACK")
+                }
+                if (transactionStatement != null) {
                     issues.add(
                         ValidationIssue(
                             severity = ValidationSeverity.WARNING,
@@ -225,12 +263,15 @@ class MigrationValidator {
                         )
                     )
                 }
+            }
+
+            for (stmt in migration.statements) {
+                val upper = stmt.trim().uppercase()
 
                 if (upper.startsWith("DROP TABLE")) {
-                    val droppedTable = Regex(
-                        """DROP\s+TABLE(?:\s+IF\s+EXISTS)?\s+[`"\[]?(\w+)[`"\]]?""",
-                        RegexOption.IGNORE_CASE
-                    ).find(stmt)?.groupValues?.getOrNull(1)
+                    val droppedTable = DROP_TABLE_TARGET_PATTERN.find(stmt)
+                        ?.groupValues?.getOrNull(1)
+                        ?.let { normalizeTableName(it) }
 
                     issues.add(
                         ValidationIssue(

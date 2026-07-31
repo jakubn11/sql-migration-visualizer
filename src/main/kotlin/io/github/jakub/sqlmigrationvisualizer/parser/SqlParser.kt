@@ -2,6 +2,7 @@ package io.github.jakub.sqlmigrationvisualizer.parser
 
 import io.github.jakub.sqlmigrationvisualizer.analyzer.SchemaChangeRiskAnalyzer
 import io.github.jakub.sqlmigrationvisualizer.model.*
+import java.util.TreeMap
 
 /**
  * Lightweight SQL parser for common SQL DDL statements.
@@ -133,7 +134,12 @@ class SqlParser {
         migrations: List<MigrationFile>
     ): List<SchemaVersion> {
         val versions = mutableListOf<SchemaVersion>()
-        val currentSchema = mutableMapOf<String, TableSchema>()
+        // Unquoted SQL identifiers are case-insensitive, so `ALTER TABLE Users` has to
+        // resolve against a table created as `users` — with a plain map the statement
+        // silently no-ops and the column never appears. The first spelling seen stays
+        // as the key; every view sorts table names before rendering, so order is moot.
+        val currentSchema: MutableMap<String, TableSchema> =
+            TreeMap { left, right -> left.compareTo(right, ignoreCase = true) }
 
         // Version 0: baseline from schema files
         for (stmt in baselineStatements) {
