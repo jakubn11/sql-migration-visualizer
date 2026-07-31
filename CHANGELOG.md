@@ -7,6 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.3] - 2026-08-01
+
+### Fixed
+
+- The validation count badge on the tab bar was unreadable in dark theme — white text sat on `--color-error`, which is a light pastel there, for a contrast ratio of 1.97:1 against the WCAG AA floor of 4.5:1 (the warnings-only amber variant was worse at 1.62:1). Both now use `--text-inverse`, reaching 9.44:1 and 11.53:1. The same white-on-pastel mistake in the validation summary icon is fixed with it
+- Light theme's `--color-warning` darkened from `#B56A00` to `#A35F00`. The old value failed AA both as badge background with white text (4.18:1) and as body text on the light page background (3.90:1); the new value clears both at 5.01:1 and 4.67:1
+- ER diagram table borders no longer look pinched around the title on hover. The header was filled *after* the border was stroked, and since a canvas stroke straddles its path, the fill covered the inner half — so the 2px hover border rendered at 1px alongside the header while the rest of the card kept full width. The border is now stroked last
+- Three light-theme tokens failed the WCAG AA 4.5:1 floor as body text and are now darkened, hue preserved: `--text-muted` `#79889E → #627187` (3.36:1 → 4.63:1, the default color for empty states and secondary labels, so the most widely felt), `--color-success` `#0B8D59 → #0A7F50` (3.94 → 4.70), and `--color-error` `#D14343 → #CE3737` (4.26 → 4.63). Every text/background pair in both themes now clears AA; dark theme was already passing and is untouched
+- ER diagram table boxes had all of their body padding at the bottom. The height was computed as `headerHeight + rows + padding` while the first row was drawn at exactly `headerHeight`, so the top row sat flush against the header divider and the full 12px collected under the last row. The padding is now split across both ends, leaving the box height unchanged
+- The version dropdown no longer looks lighter than the buttons beside it. Its trigger used `--control-bg`, the surface reserved for input fields, even though the trigger is a `<button>` in a toolbar row of `.btn-ghost` buttons and the only `<select>` in that group (`.version-select-native`) is invisible. It now uses the same `--control-bg-quiet` as its neighbours
+- Card status borders (added / removed / modified) were hardcoded to colors outside the palette — a green, red and amber that were near, but not equal to, `--color-success` / `--color-error` / `--color-warning`, and that stayed fixed when the theme changed. They now derive from the real tokens and follow light theme properly
+
+### Changed
+
+- The app-shell markup moved out of Kotlin into `web/index.html`. `VisualizerPanel.buildFullHtml()` held the entire HTML document — every panel, toolbar, modal and empty state — as a 429-line raw string, which meant no HTML tooling and a recompile for any markup edit, even though the CSS and all eight scripts were already loaded from resources. `VisualizerPanel` drops from 671 lines to 270 and is now just the panel controller; the Kotlin side substitutes `{{placeholder}}` tokens in a single pass, so injected CSS/JS is never rescanned. Verified the generated document is byte-identical to the previous output apart from one inert trailing newline
+- Every button in the web UI is now a member of the `.btn` family. The two bespoke button styles — `.inline-source-btn` (8 call sites) and `.search-action-btn` (3) — each re-implemented a full button from scratch, which the project's own UI rules forbid. They are replaced by two new reusable pieces, a `.btn-xs` size and a `.btn-accent` variant; `.search-action-btn` survives only as a modifier carrying its deliberate accent hover
+- 44 raw `rgba()` literals are now `color-mix()` over the design tokens, per the documented tint convention. The remaining literals are drop shadows, inset highlights and fixed gradient stops, which aren't token tints
+- Replaced the last hardcoded `font-size` / `font-weight` values on `.btn-sm` and `.risk-badge` with the matching scale tokens, and added the required `line-height: 1` to `.badge` and `.risk-badge`
+- Buttons now have a design-system focus ring (`.btn:focus-visible` using `--control-focus-shadow`, the same token the inputs already use). Previously no `.btn` focus rule existed at all, so keyboard focus fell back to the browser default
+- Removed dead styling for `.diff-selector select`. Every `<select>` in that container is `.version-select-native`, which is `opacity: 0` at 0×0 — the rules could never render
+- Moved the remaining inline styles out of the JS templates into classes (`.empty-state-inline`, `.empty-state-title-success`, `.empty-state-action`); only the per-index `animation-delay` values stay inline, since they're computed
+
+## [1.5.2] - 2026-08-01
+
+### Fixed
+
+- `ALTER TABLE` now resolves its target regardless of identifier case. Unquoted SQL identifiers are case-insensitive, but the parser kept its working schema in a case-sensitive map, so `ALTER TABLE Users …` against a table created as `users` silently did nothing — the statement was dropped and the column simply never appeared in the timeline, diff, or ER diagram. The table keeps whichever spelling it was first declared with
+- Schema-qualified table names no longer produce a phantom validation error. `ALTER TABLE public.users` was matched with a pattern that stopped at the dot, so every such statement reported "references non-existent table 'public'". Both the `ALTER TABLE` and `DROP TABLE` checks now use the same qualified-identifier handling as the parser, and compare case-insensitively
+- The validator no longer warns about the SQLite table rebuild this plugin generates itself — the `BEGIN`/`COMMIT` pair between `PRAGMA foreign_keys` guards is intentional, so creating a SQLite migration and then validating it no longer flags your own generated output
+
+### Changed
+
+- A migration wrapping its statements in `BEGIN` … `COMMIT` now reports a single transaction warning instead of one per transaction statement
+
+## [1.5.1] - 2026-08-01
+
+### Fixed
+
+- File paths arriving from the web UI are now checked against the project root before any file operation — `openFile`, `saveMigration`, `createMigration`, and `deleteMigration` previously acted on whatever absolute path they were handed. The check canonicalises both paths, so `..` segments and sibling directories that merely share a name prefix (`/project-other` vs `/project`) are rejected; `renumberMigration`'s existing prefix-only check was replaced with the same helper. Export ("Save As") is deliberately exempt — that destination comes from the user's own file dialog
+- `escapeJs()` now escapes HTML metacharacters in addition to quotes and backslashes. Its output is embedded in double-quoted `onclick` attributes, so a migration file path containing a double quote could close the attribute early and inject another one — table and column names were never affected, since the parser restricts identifiers to word characters
+- `JcefBridge.dispose()` was leaking `renumberMigrationQuery` — 13 `JBCefJSQuery` objects were created but only 12 released, so every tool-window close leaked a query slot
+
+### Changed
+
+- `createMigration` builds the target filename once instead of twice — the second copy re-read the mutable settings state, so a filename-pattern change landing mid-call could return a path that didn't match the file actually written
+
 ## [1.5.0] - 2026-06-02
 
 ### Added

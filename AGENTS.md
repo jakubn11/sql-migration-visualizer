@@ -36,7 +36,7 @@ io.github.jakub.sqlmigrationvisualizer/
 ├── MigrationVisualizerToolWindowFactory  # entry point, creates tool window
 ├── actions/          RefreshMigrationsAction, ValidateMigrationsAction
 ├── analyzer/         SchemaChangeRiskAnalyzer   — scores HIGH/MEDIUM/LOW risk
-├── generator/        MigrationGenerator, SqlDialect (GENERIC/POSTGRESQL/MYSQL)
+├── generator/        MigrationGenerator, SqlDialect (GENERIC/POSTGRESQL/MYSQL/SQLITE)
 ├── model/            all @Serializable data classes (JSON bridge)
 ├── parser/           SqlParser (DDL → SchemaVersion list), MigrationScanner
 ├── services/         ProjectSchemaSnapshotService, VisualizerPanelManager
@@ -54,6 +54,7 @@ io.github.jakub.sqlmigrationvisualizer/
 
 | File | Purpose |
 |------|---------|
+| `index.html` | App shell markup — panels, toolbars, modals. `{{placeholder}}` tokens are substituted by `VisualizerPanel.buildFullHtml()` |
 | `app.js` | Main controller, tab routing, validation display |
 | `timeline.js` | Interactive version timeline |
 | `schema-diff.js` | Side-by-side version comparison |
@@ -87,7 +88,7 @@ All models are `@Serializable` (kotlinx-serialization-json 1.7.3):
 - `SchemaVersion` — full DB state at one version; has `tables`, `migrationFile`, `changesSummary`, `risk`
 - `TableSchema` — `name`, `columns: List<ColumnDef>`, `primaryKey`, `foreignKeys`
 - `ColumnDef` — `name`, `type`, `nullable`, `defaultValue`, `isPrimaryKey`
-- `ValidationIssue` — codes: `VERSION_GAP`, `DUPLICATE_VERSION`, `EMPTY_MIGRATION`, `ALTER_TABLE_TARGET_MISSING`, `DROP_TABLE_STATEMENT`, `FOREIGN_KEY_TARGET_MISSING`
+- `ValidationIssue` — codes: `NO_MIGRATIONS`, `VERSION_GAP`, `DUPLICATE_VERSION`, `EMPTY_MIGRATION`, `ALTER_TABLE_TARGET_MISSING`, `TRANSACTION_STATEMENT`, `DROP_TABLE_STATEMENT`, `FOREIGN_KEY_TARGET_MISSING`
 - `MigrationRisk` — `level` (LOW/MEDIUM/HIGH), `score`, `headline`, `items`
 - `PendingMigrationSuggestion` — `hasPendingChanges`, `generatedSql`, `suggestedVersion`, `suggestedName`
 
@@ -98,7 +99,9 @@ MEDIUM: NULL tightening, type change (non-narrowing), PK/FK changes
 
 ## Validator Issue Codes
 
-`VERSION_GAP`, `DUPLICATE_VERSION`, `EMPTY_MIGRATION`, `ALTER_TABLE_TARGET_MISSING`, `TRANSACTION_STATEMENT`, `DROP_TABLE_STATEMENT`, `FOREIGN_KEY_TARGET_MISSING`
+`NO_MIGRATIONS`, `VERSION_GAP`, `DUPLICATE_VERSION`, `EMPTY_MIGRATION`, `ALTER_TABLE_TARGET_MISSING`, `TRANSACTION_STATEMENT`, `DROP_TABLE_STATEMENT`, `FOREIGN_KEY_TARGET_MISSING`
+
+`ALTER_TABLE_TARGET_MISSING` and `DROP_TABLE_STATEMENT` resolve their target using the same qualified-identifier pattern as `SqlParser`, matched case-insensitively — a bare `(\w+)` stops at the dot and reports the schema of `public.users` as a missing table. `TRANSACTION_STATEMENT` fires at most once per file, and is suppressed entirely when the migration contains a `PRAGMA foreign_keys` guard, since that is the SQLite rebuild `MigrationGenerator` emits itself.
 
 ## Plugin Entry Points (`plugin.xml`)
 
@@ -122,6 +125,9 @@ MEDIUM: NULL tightening, type change (non-narrowing), PK/FK changes
 | `erTablePositions` | Map | empty |
 | `diffShowUnchangedColumns` | Boolean | true |
 | `rememberDiffSelections` | Boolean | true |
+| `lastDiffFromVersion` | Int | 0 |
+| `lastDiffToVersion` | Int | 0 |
+| `searchResultLimit` | Int | 20 |
 | `validateOnRefresh` | Boolean | true |
 | `suggestPendingMigrationOnSave` | Boolean | true |
 | `confirmBeforeDeleteMigration` | Boolean | true |
@@ -140,7 +146,7 @@ MEDIUM: NULL tightening, type change (non-narrowing), PK/FK changes
 - `pushTheme(isDark)`, `pushMigrationDirectory()`
 
 **JS → Kotlin** (query handlers, all registered as `window.__bridge.*`):
-`openFile`, `requestRefresh`, `generateMigration`, `saveMigration`, `saveFile`, `createMigration`, `browseDirectory`, `deleteMigration`, `saveErLayout`, `dismissPendingMigration`, `openRelatedSchemaSource`, `saveDiffSelection`
+`openFile`, `requestRefresh`, `generateMigration`, `saveMigration`, `saveFile`, `createMigration`, `browseDirectory`, `deleteMigration`, `renumberMigration`, `saveErLayout`, `dismissPendingMigration`, `openRelatedSchemaSource`, `saveDiffSelection`
 
 **Adding a new JS → Kotlin call** requires changes in three places:
 
@@ -216,6 +222,8 @@ All web UI lives in `src/main/resources/web/styles.css`. Follow the existing des
 - **No JS framework** — all UI is vanilla JS with DOM manipulation.
 - **Pills / chips / tags / badges** (status pills, version chips, change chips, risk badges, etc.) must use `display: inline-flex; align-items: center; justify-content: center; line-height: 1`. Plain `<span>` with `padding` + `min-height` leaves text baseline-aligned and looks off-center, especially when `letter-spacing` or `text-transform: uppercase` is in play. Always centered on both axes.
 - **Use status colors consistently**: `--color-success` for added/created, `--color-error` for removed/dropped, `--color-warning` for modified/at-risk, `--accent-primary` for informational/baseline. Don't introduce new green/red/yellow tokens — extend the existing ones via `color-mix(in srgb, … X%, transparent)` for tints.
+- **Never put `color: white` on a `--color-*` status background.** In dark theme those tokens are light pastels meant for *foreground* use, so white on them lands around 1.6–2.0:1. Use `var(--text-inverse)` — it flips to near-black in dark theme and white in light theme, keeping both above the WCAG AA 4.5:1 floor. Literal white is only correct on genuinely dark fills like `--accent-gradient` or the `.btn-danger` gradient.
+- **Canvas (ER diagram) draw order**: stroke a shape's border *last*. A canvas stroke straddles its path, so any fill painted afterwards (e.g. the table header) covers the inner half and the border silently renders at half width there.
 - **Hide zero-count summary chips** instead of showing `0 errors · 0 warnings · 0 info` rows — render only non-zero pills. If everything's zero, skip the summary container entirely.
 - **Status badges**: `.added` (green) and `.baseline` (blue) are semantically distinct — don't reuse `--color-success` for both.
 - **Modal sizing**: `.modal-body` is `flex: 0 1 auto` so dialogs shrink to content; the body can scroll when it would exceed the modal's `max-height: 80vh`. Don't restore `flex: 1` — short dialogs (e.g. Review Pending Migration with a short snippet) will end up with a tall empty area below the content.
@@ -235,6 +243,7 @@ All web UI lives in `src/main/resources/web/styles.css`. Follow the existing des
 
 - Add a JS framework to the web frontend — stay vanilla JS.
 - Edit `build/*/plugin.xml` — it is generated; the source is `src/main/resources/META-INF/plugin.xml`.
+- Put app-shell markup back into `VisualizerPanel.kt` — it lives in `web/index.html`. The Kotlin side only substitutes `{{placeholder}}` tokens (one per inlined resource) in a single pass, so injected CSS/JS is never rescanned for placeholders.
 - Call IntelliJ file/VFS APIs from a background thread without a `ReadAction` or `WriteAction` wrapper.
 - Escape JS string literals with JSON encoding — manually escape `\`, `'`, `\n`, `\r` before injecting into single-quoted JS strings (see `JcefBridge`).
 - Use `project.baseDir` (deprecated) — use `project.basePath?.let { LocalFileSystem.getInstance().findFileByPath(it) }`.

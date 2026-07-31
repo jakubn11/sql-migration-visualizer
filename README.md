@@ -111,6 +111,7 @@ Requirements: JDK 17 · IntelliJ Platform `2024.1`
 ./gradlew test          # run unit tests
 ./gradlew runIde        # launch sandbox IDE with plugin loaded
 ./gradlew buildPlugin   # produce distributable ZIP
+./gradlew verifyPlugin  # binary compatibility check against the target platforms
 ```
 
 ## License

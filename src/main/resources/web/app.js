@@ -1200,8 +1200,8 @@
             // state below already communicates "all good" with the migration count.
             summaryEl.innerHTML = '';
             issuesEl.innerHTML = `
-                <div class="empty-state" style="height: auto; padding: 40px">
-                    <h3 style="color: var(--color-success)">All checks passed</h3>
+                <div class="empty-state empty-state-inline">
+                    <h3 class="empty-state-title-success">All checks passed</h3>
                     <p>${escapeHtml(result.summary)}</p>
                 </div>
             `;

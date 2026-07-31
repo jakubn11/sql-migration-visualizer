@@ -249,10 +249,10 @@
                             ? 'This version does not expose any tables yet. Add schema statements or open another version from the timeline above.'
                             : 'Start by creating your first schema or migration file, then come back here to inspect the structure.');
                 const emptyAction = focusedTableName
-                    ? '<div style="margin-top: 18px;"><button type="button" class="btn btn-ghost btn-sm" onclick="window.AppActions && window.AppActions.clearTableHistory()">Clear Focus</button></div>'
+                    ? '<div class="empty-state-action"><button type="button" class="btn btn-ghost btn-sm" onclick="window.AppActions && window.AppActions.clearTableHistory()">Clear Focus</button></div>'
                     : '';
                 body.innerHTML = `
-                    <div class="empty-state empty-state-compact" style="height: auto;">
+                    <div class="empty-state empty-state-compact">
                         <div class="empty-state-card">
                             <svg viewBox="0 0 64 64" width="56" height="56" class="empty-icon">
                                 <rect x="13" y="12" width="38" height="40" rx="10" fill="none" stroke="currentColor" stroke-width="2" opacity="0.32"/>
@@ -312,7 +312,7 @@
                                 <span class="col-name">${escapeHtml(col.name)}</span>
                                 ${pkBadge}${fkBadge}${nullBadge}
                                 <span class="col-type">${escapeHtml(col.type)}</span>
-                                <button type="button" class="inline-source-btn" title="Focus column lineage" onclick="event.stopPropagation(); window.AppActions && window.AppActions.showTableHistory('${escapeJs(name)}', ${version.version}, '${escapeJs(col.name)}')">Lineage</button>
+                                <button type="button" class="btn btn-accent btn-xs" title="Focus column lineage" onclick="event.stopPropagation(); window.AppActions && window.AppActions.showTableHistory('${escapeJs(name)}', ${version.version}, '${escapeJs(col.name)}')">Lineage</button>
                             </div>
                         `;
                     }).join('');
@@ -328,7 +328,7 @@
                                 <span class="col-name">${escapeHtml(col.name)}</span>
                                 ${pkBadge}${nullBadge}
                                 <span class="col-type">${escapeHtml(col.type)}</span>
-                                <button type="button" class="inline-source-btn" title="Focus column lineage" onclick="event.stopPropagation(); window.AppActions && window.AppActions.showTableHistory('${escapeJs(name)}', ${version.version}, '${escapeJs(col.name)}')">Lineage</button>
+                                <button type="button" class="btn btn-accent btn-xs" title="Focus column lineage" onclick="event.stopPropagation(); window.AppActions && window.AppActions.showTableHistory('${escapeJs(name)}', ${version.version}, '${escapeJs(col.name)}')">Lineage</button>
                             </div>
                         `;
                     }).join('');
@@ -341,8 +341,8 @@
                                 <div class="table-card-meta">
                                     ${statusLabel}
                                     <span class="table-col-count">${table.columns.length} col${table.columns.length !== 1 ? 's' : ''}</span>
-                                    <button type="button" class="inline-source-btn" title="Focus table history" onclick="event.stopPropagation(); window.AppActions && window.AppActions.showTableHistory('${escapeJs(name)}', ${version.version})">History</button>
-                                    <button type="button" class="inline-source-btn" title="Open related schema file" onclick="event.stopPropagation(); window.__bridge && window.__bridge.openRelatedSchemaSource && window.__bridge.openRelatedSchemaSource(JSON.stringify({tableName:'${escapeJs(name)}'}))">Open SQL</button>
+                                    <button type="button" class="btn btn-accent btn-xs" title="Focus table history" onclick="event.stopPropagation(); window.AppActions && window.AppActions.showTableHistory('${escapeJs(name)}', ${version.version})">History</button>
+                                    <button type="button" class="btn btn-accent btn-xs" title="Open related schema file" onclick="event.stopPropagation(); window.__bridge && window.__bridge.openRelatedSchemaSource && window.__bridge.openRelatedSchemaSource(JSON.stringify({tableName:'${escapeJs(name)}'}))">Open SQL</button>
                                 </div>
                             </div>
                             <div class="table-card-body">

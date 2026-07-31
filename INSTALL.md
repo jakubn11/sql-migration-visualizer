@@ -14,7 +14,7 @@ Visualizes SQL migration history as an interactive timeline inside IntelliJ IDEA
    cd sql-migration-visualizer
    ./gradlew buildPlugin
    ```
-   The ZIP is produced at `build/distributions/SQL Migration Visualizer-<version>.zip`.
+   The ZIP is produced at `build/distributions/sql-migration-visualizer-<version>.zip`.
 
 2. In IntelliJ IDEA, open **Settings → Plugins → ⚙ (gear icon) → Install Plugin from Disk…**
 

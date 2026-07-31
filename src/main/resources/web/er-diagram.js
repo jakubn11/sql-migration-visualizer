@@ -242,7 +242,11 @@
                 const col = index % cols;
                 const row = Math.floor(index / cols);
 
-                const height = headerHeight + table.columns.length * rowHeight + padding;
+                // Split the body padding across both ends. It used to be added only to
+                // the total height, which left the first row flush against the header
+                // divider and dumped the whole 12px below the last one.
+                const bodyPaddingY = padding / 2;
+                const height = headerHeight + bodyPaddingY + table.columns.length * rowHeight + bodyPaddingY;
 
                 // Calculate x/y with gap accounting for varying heights
                 const defaultX = startX + col * (cardWidth + gap);
@@ -262,7 +266,8 @@
                     width: cardWidth,
                     height: height,
                     headerHeight: headerHeight,
-                    rowHeight: rowHeight
+                    rowHeight: rowHeight,
+                    bodyPaddingY: bodyPaddingY
                 });
             });
 
@@ -462,11 +467,6 @@
             ctx.fill();
             ctx.shadowColor = 'transparent';
 
-            // Border
-            ctx.strokeStyle = isHovered ? c.cardBorderHover : (isRelated && activeTable ? c.fkLineHover : c.cardBorder);
-            ctx.lineWidth = isHovered ? 2 : 1;
-            ctx.stroke();
-
             // Header
             ctx.save();
             ctx.beginPath();
@@ -490,6 +490,25 @@
             ctx.lineWidth = 1;
             ctx.stroke();
 
+            // Border — stroked last so the header fill can't paint over its inner
+            // half. A canvas stroke straddles the path, so filling the header
+            // afterwards clipped the hover border to 1px around the title while the
+            // rest of the card kept the full 2px.
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + w - r, y);
+            ctx.arcTo(x + w, y, x + w, y + r, r);
+            ctx.lineTo(x + w, y + h - r);
+            ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+            ctx.lineTo(x + r, y + h);
+            ctx.arcTo(x, y + h, x, y + h - r, r);
+            ctx.lineTo(x, y + r);
+            ctx.arcTo(x, y, x + r, y, r);
+            ctx.closePath();
+            ctx.strokeStyle = isHovered ? c.cardBorderHover : (isRelated && activeTable ? c.fkLineHover : c.cardBorder);
+            ctx.lineWidth = isHovered ? 2 : 1;
+            ctx.stroke();
+
             // Table name
             ctx.font = 'bold 12px Inter, sans-serif';
             ctx.fillStyle = isHovered ? c.accent : c.text;
@@ -499,7 +518,7 @@
             // Columns
             for (let i = 0; i < table.columns.length; i++) {
                 const col = table.columns[i];
-                const cy = y + table.headerHeight + i * table.rowHeight + table.rowHeight / 2;
+                const cy = y + table.headerHeight + table.bodyPaddingY + i * table.rowHeight + table.rowHeight / 2;
 
                 // Column name
                 ctx.font = '11px "JetBrains Mono", monospace';

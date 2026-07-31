@@ -16,7 +16,7 @@
             if (!versions || versions.length < 2) {
                 if (summary) summary.innerHTML = '';
                 content.innerHTML = `
-                    <div class="empty-state" style="height: auto; padding: 40px">
+                    <div class="empty-state empty-state-inline">
                         <h3>Need at least 2 versions</h3>
                         <p>Add migration files to compare schema versions.</p>
                     </div>
@@ -249,7 +249,7 @@
         renderDiff: function(diff) {
             if (diff.length === 0) {
                 return `
-                    <div class="empty-state" style="height: auto; padding: 40px">
+                    <div class="empty-state empty-state-inline">
                         <h3>No differences</h3>
                         <p>The two selected versions have identical schemas.</p>
                     </div>
@@ -287,8 +287,8 @@
                         <div class="diff-table-header">
                             <span>${escapeHtml(tableDiff.name)}</span>
                             <span class="status-tag ${tableDiff.status}">${tableDiff.status}</span>
-                            <button type="button" class="inline-source-btn diff-source-btn" title="Focus table history" onclick="window.AppActions && window.AppActions.showTableHistory('${escapeJs(tableDiff.name)}', ${document.getElementById('diff-to').value})">History</button>
-                            <button type="button" class="inline-source-btn diff-source-btn" title="Open related schema file" onclick="window.__bridge && window.__bridge.openRelatedSchemaSource && window.__bridge.openRelatedSchemaSource(JSON.stringify({tableName:'${escapeJs(tableDiff.name)}'}))">Open SQL</button>
+                            <button type="button" class="btn btn-accent btn-xs diff-source-btn" title="Focus table history" onclick="window.AppActions && window.AppActions.showTableHistory('${escapeJs(tableDiff.name)}', ${document.getElementById('diff-to').value})">History</button>
+                            <button type="button" class="btn btn-accent btn-xs diff-source-btn" title="Open related schema file" onclick="window.__bridge && window.__bridge.openRelatedSchemaSource && window.__bridge.openRelatedSchemaSource(JSON.stringify({tableName:'${escapeJs(tableDiff.name)}'}))">Open SQL</button>
                             <div class="diff-table-pills">${summaryPills.join('')}</div>
                         </div>
                         <div class="diff-table-body">
@@ -323,7 +323,7 @@
                 <div class="diff-line ${lineClass}" data-column-name="${escapeHtml(column.name)}">
                     <span class="diff-prefix">${prefix}</span>
                     <div class="diff-line-content">
-                        <div class="diff-line-main">${main}<button type="button" class="inline-source-btn diff-source-btn" title="Focus column lineage" onclick="event.stopPropagation(); window.AppActions && window.AppActions.showTableHistory('${escapeJs(tableName)}', ${document.getElementById('diff-to').value}, '${escapeJs(column.name)}')">Lineage</button><button type="button" class="inline-source-btn diff-source-btn" title="Open related schema file" onclick="event.stopPropagation(); window.__bridge && window.__bridge.openRelatedSchemaSource && window.__bridge.openRelatedSchemaSource(JSON.stringify({tableName:'${escapeJs(tableName)}',columnName:'${escapeJs(column.name)}'}))">SQL</button></div>
+                        <div class="diff-line-main">${main}<button type="button" class="btn btn-accent btn-xs diff-source-btn" title="Focus column lineage" onclick="event.stopPropagation(); window.AppActions && window.AppActions.showTableHistory('${escapeJs(tableName)}', ${document.getElementById('diff-to').value}, '${escapeJs(column.name)}')">Lineage</button><button type="button" class="btn btn-accent btn-xs diff-source-btn" title="Open related schema file" onclick="event.stopPropagation(); window.__bridge && window.__bridge.openRelatedSchemaSource && window.__bridge.openRelatedSchemaSource(JSON.stringify({tableName:'${escapeJs(tableName)}',columnName:'${escapeJs(column.name)}'}))">SQL</button></div>
                         ${changeMeta ? `<div class="diff-line-meta">${changeMeta}</div>` : ''}
                     </div>
                 </div>

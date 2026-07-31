@@ -167,9 +167,9 @@
                     '<div class="search-result-meta">' + escapeHtml(meta) + '</div>' +
                 '</div>' +
                 '<div class="search-result-actions">' +
-                    '<button type="button" class="search-action-btn" data-view="timeline" data-index="' + index + '">Timeline</button>' +
-                    '<button type="button" class="search-action-btn" data-view="diff" data-index="' + index + '">Diff</button>' +
-                    '<button type="button" class="search-action-btn" data-view="er" data-index="' + index + '">ER</button>' +
+                    '<button type="button" class="btn btn-ghost btn-sm search-action-btn" data-view="timeline" data-index="' + index + '">Timeline</button>' +
+                    '<button type="button" class="btn btn-ghost btn-sm search-action-btn" data-view="diff" data-index="' + index + '">Diff</button>' +
+                    '<button type="button" class="btn btn-ghost btn-sm search-action-btn" data-view="er" data-index="' + index + '">ER</button>' +
                 '</div>' +
             '</div>';
         }).join('');
