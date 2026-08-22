@@ -233,7 +233,7 @@ All web UI lives in `src/main/resources/web/styles.css`. Follow the existing des
 - **Buttons** must use the `.btn` base class plus a variant (`.btn-primary` for the single primary action per surface, `.btn-ghost` for secondary actions, `.btn-danger` for destructive). Don't add one-off button styles like `#some-id { color: var(--accent-primary) }` — every button on a row should look like a member of the same family.
 - **Disabled buttons** rely on the global `.btn:disabled` / `.btn[disabled]` rule (opacity 0.55 + saturation drop + `pointer-events: none`). Use this for in-flight async actions; the existing renderer typically replaces the button anyway, so don't manually re-enable.
 - **ER diagram**: zoom is button-only (`+`, `−`, Fit). Click-drag the canvas to pan. Table dragging and wheel zoom are intentionally disabled. The `#panel-er-diagram` panel has `overflow: hidden` so the canvas (sized from its own `getBoundingClientRect`) can't trigger panel scrollbars.
-- **Responsive breakpoints** are handled via `#app.compact-width` (≤860px), `#app.very-compact` (≤620px), `#app.short-height` (≤780px), `#app.ultra-compact` (≤460px), and `#app.very-short` (≤620px height) class toggles set by `VisualizerPanel`.
+- **Responsive breakpoints** are handled via `#app.compact-width` (≤860px), `#app.very-compact` (≤620px), `#app.short-height` (≤780px), `#app.ultra-compact` (≤460px), and `#app.very-short` (≤620px height) class toggles set by `updateResponsiveLayout()` in `app.js`.
 
 ## Platform Target
 
