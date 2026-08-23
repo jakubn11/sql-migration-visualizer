@@ -255,6 +255,8 @@ All web UI lives in `src/main/resources/web/styles.css`. Follow the existing des
 - Update `INSTALL.md` when installation steps, requirements, or supported IntelliJ versions change.
 - Internal refactors and non-visible bug fixes do not require README or INSTALL updates.
 
+Do not add `Co-Authored-By:` trailers to git commits.
+
 ## Before Every Commit
 
 1. **Bump `pluginVersion`** in `gradle.properties` using these rules:
