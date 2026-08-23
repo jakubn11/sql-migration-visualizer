@@ -83,6 +83,8 @@ Recognised file naming patterns:
 
 Open the **SQL Migrations** panel at the bottom of the IDE. The plugin scans your project on open and after every file save.
 
+**Export:** the toolbar's **Export** button offers **Schema as JSON** (every parsed version, as `schema-versions.json`) and **Schema as SQL** (the latest version's `CREATE TABLE` statements, as `schema-v<version>.sql`). The ER Diagram tab has its own **Export PNG**, which writes the rendered diagram to `er-diagram.png`. All three prompt with a native **Save As** dialog.
+
 **Create Migration dialog:**
 
 | Key | Action |
