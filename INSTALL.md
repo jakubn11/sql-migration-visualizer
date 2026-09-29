@@ -48,4 +48,4 @@ Repeat the build and install steps above with the latest source. IntelliJ will r
 
 ## Uninstalling
 
-Open **Settings → Plugins**, find **SQL Migration Visualizer**, click the gear icon, and choose **Uninstall**. Restart IntelliJ IDEA when prompted. No project files are modified by the plugin.
+Open **Settings → Plugins**, find **SQL Migration Visualizer**, click the gear icon, and choose **Uninstall**. Restart IntelliJ IDEA when prompted. Uninstalling doesn't touch your project: migration files you created or renumbered with the plugin stay as they are.
