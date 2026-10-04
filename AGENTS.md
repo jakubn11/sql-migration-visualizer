@@ -276,3 +276,5 @@ Do not add `Co-Authored-By:` trailers to git commits.
    - A bug affecting core functionality was fixed (timeline not loading, migrations not creating, validation not running)
 
    Do NOT suggest a release for: docs-only changes, internal refactors, style tweaks the user won't notice.
+
+**Commit when a task is finished** and the checks above pass — one commit per finished task, in this repo's commit-message style. **Push only when the user asks.**

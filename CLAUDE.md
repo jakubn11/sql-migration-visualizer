@@ -17,3 +17,5 @@ See [AGENTS.md](AGENTS.md) for full project context, package map, data flow, bri
 - All Kotlin↔JS communication goes through `JcefBridge` as JSON
 - No comments unless the WHY is non-obvious
 - Prefer editing existing files over creating new ones
+
+Commit each finished task (its checks passing); push only when asked — see **Before Every Commit** in AGENTS.md.
