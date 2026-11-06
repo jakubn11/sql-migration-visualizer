@@ -49,7 +49,7 @@ The plugin auto-detects common migration directory layouts. If your layout isn't
 ./gradlew test          # run unit tests
 ./gradlew runIde        # launch a sandbox IDE with the plugin loaded
 ./gradlew buildPlugin   # build distributable ZIP
-./gradlew verifyPlugin  # binary compatibility check against the target platform
+./gradlew verifyPlugin  # binary compatibility check against every released IDE from build 241 on
 ```
 
 ## Updating

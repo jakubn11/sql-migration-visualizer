@@ -1,3 +1,6 @@
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+import org.jetbrains.intellij.platform.gradle.models.ProductRelease
+
 plugins {
     id("org.jetbrains.intellij.platform") version "2.5.0"
     id("org.jetbrains.changelog") version "2.2.1"
@@ -55,9 +58,13 @@ intellijPlatform {
 
     pluginVerification {
         ides {
-            ide("IC", "2024.1")
-            ide("IC", "2024.3")
-            ide("IC", "2025.2")
+            // Every released IDE from the supported branch on, because until-build is open-ended.
+            // Ultimate, not Community: the Community artifact ended with 2025.3.
+            select {
+                types = listOf(IntelliJPlatformType.IntellijIdeaUltimate)
+                channels = listOf(ProductRelease.Channel.RELEASE)
+                sinceBuild = "241"
+            }
         }
     }
 }
