@@ -2,7 +2,7 @@ import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.models.ProductRelease
 
 plugins {
-    id("org.jetbrains.intellij.platform") version "2.5.0"
+    id("org.jetbrains.intellij.platform") version "2.19.0"
     id("org.jetbrains.changelog") version "2.2.1"
     kotlin("jvm") version "2.0.21"
     kotlin("plugin.serialization") version "2.0.21"
@@ -59,9 +59,9 @@ intellijPlatform {
     pluginVerification {
         ides {
             // Every released IDE from the supported branch on, because until-build is open-ended.
-            // Ultimate, not Community: the Community artifact ended with 2025.3.
+            // Unified IDEA, not Community: the Community artifact ended with 2025.3.
             select {
-                types = listOf(IntelliJPlatformType.IntellijIdeaUltimate)
+                types = listOf(IntelliJPlatformType.IntellijIdea)
                 channels = listOf(ProductRelease.Channel.RELEASE)
                 sinceBuild = "241"
             }
@@ -79,7 +79,7 @@ changelog {
 
 tasks {
     wrapper {
-        gradleVersion = "8.13"
+        gradleVersion = "9.6.1"
     }
 
     test {

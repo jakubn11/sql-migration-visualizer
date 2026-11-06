@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Build tooling moved to Gradle 9.6.1 and IntelliJ Platform Gradle Plugin 2.19.0, matching the sibling plugins. The plugin ZIP no longer bundles `kotlin-stdlib` and `annotations`, because the IDE provides them
+
 ## [1.5.3] - 2026-08-01
 
 ### Fixed

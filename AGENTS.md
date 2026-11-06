@@ -239,6 +239,8 @@ All web UI lives in `src/main/resources/web/styles.css`. Follow the existing des
 
 `platformType = IC` (IntelliJ IDEA Community), `platformVersion = 2024.1`. Avoid IntelliJ APIs added after 2024.1 — check compatibility before using newer platform classes.
 
+The plugin ZIP ships no Kotlin stdlib: the Gradle plugin leaves out what the platform bundles, so on 2024.1 the code runs on that IDE's Kotlin 1.9.22 stdlib even though it compiles with 2.0.21. Avoid stdlib APIs added after 1.9.
+
 ## Do Not
 
 - Add a JS framework to the web frontend — stay vanilla JS.
