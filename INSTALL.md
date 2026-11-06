@@ -6,7 +6,17 @@ Visualizes SQL migration history as an interactive timeline inside IntelliJ IDEA
 
 > Not yet published. Once available, install directly from **Settings → Plugins → Marketplace** by searching for "SQL Migration Visualizer".
 
-## From a built ZIP
+## From GitHub Releases
+
+1. Download `sql-migration-visualizer-<version>.zip` from the [latest release](https://github.com/jakubn11/sql-migration-visualizer/releases/latest). Don't unzip it.
+
+2. In IntelliJ IDEA, open **Settings → Plugins → ⚙ (gear icon) → Install Plugin from Disk…**
+
+3. Select the ZIP file and click **OK**.
+
+4. Restart IntelliJ IDEA when prompted.
+
+## From source
 
 1. Clone the repository and build the plugin:
    ```bash
@@ -44,7 +54,7 @@ The plugin auto-detects common migration directory layouts. If your layout isn't
 
 ## Updating
 
-Repeat the build and install steps above with the latest source. IntelliJ will replace the old version when you install the new ZIP.
+Download the ZIP from the latest release, or rebuild from the latest source, and install it the same way. IntelliJ will replace the old version when you install the new ZIP.
 
 ## Uninstalling
 

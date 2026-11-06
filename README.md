@@ -49,7 +49,7 @@
 
 See [INSTALL.md](INSTALL.md) for full instructions.
 
-Build from source:
+Download the ZIP from the [latest release](https://github.com/jakubn11/sql-migration-visualizer/releases/latest), or build it from source:
 ```bash
 ./gradlew buildPlugin
 ```
