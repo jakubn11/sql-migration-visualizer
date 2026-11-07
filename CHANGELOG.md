@@ -7,8 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.4] - 2026-11-07
+
 ### Changed
 
+- Reading the schema and opening migration files no longer use APIs that IntelliJ 2026.3 deprecates, so a later IDE that removes them won't break the plugin. Checked against every released IntelliJ IDEA from 2024.1 to 2026.3
 - Build tooling moved to Gradle 9.6.1 and IntelliJ Platform Gradle Plugin 2.19.0, matching the sibling plugins. The plugin ZIP no longer bundles `kotlin-stdlib` and `annotations`, because the IDE provides them
 
 ## [1.5.3] - 2026-08-01
