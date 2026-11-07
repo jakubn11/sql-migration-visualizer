@@ -8,8 +8,10 @@ IntelliJ IDEA plugin (Kotlin 2.0.21, Java 17) that visualizes SQL migration hist
 ./gradlew test          # run all unit tests
 ./gradlew runIde        # launch IDE sandbox with plugin
 ./gradlew buildPlugin   # produce distributable ZIP
-./gradlew verifyPlugin  # binary compatibility check
+./gradlew verifyPlugin  # binary compatibility check against every released IDE from build 241 on
 ```
+
+There is no CI — don't add GitHub workflows. Run `test`, `buildPlugin` and `verifyPlugin` locally before a release — they are the gate.
 
 Tests use Kotlin Test (JUnit Platform). All tests are pure unit tests — no IDE runtime needed.
 
