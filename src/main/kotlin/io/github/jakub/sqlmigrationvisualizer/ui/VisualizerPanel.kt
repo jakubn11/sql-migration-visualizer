@@ -11,11 +11,13 @@ import io.github.jakub.sqlmigrationvisualizer.settings.VisualizerSettings
 import io.github.jakub.sqlmigrationvisualizer.validator.MigrationValidator
 import io.github.jakub.sqlmigrationvisualizer.watcher.SchemaChangePromptService
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
+import com.intellij.openapi.util.ThrowableComputable
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
@@ -148,9 +150,9 @@ class VisualizerPanel(
 
         if (!shouldRefreshSq) return
 
-        val hasMigrations = ReadAction.compute<Boolean, Throwable> {
+        val hasMigrations = ApplicationManager.getApplication().runReadAction(ThrowableComputable<Boolean, Throwable> {
             snapshotService.getSnapshotUnderReadAction().migrations.isNotEmpty()
-        }
+        })
 
         if (hasMigrations) {
             syncPendingMigrationSuggestion()

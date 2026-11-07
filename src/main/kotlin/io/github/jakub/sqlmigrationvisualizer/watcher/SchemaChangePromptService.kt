@@ -22,12 +22,12 @@ import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.ThrowableComputable
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.util.Alarm
 import java.security.MessageDigest
@@ -339,13 +339,13 @@ class SchemaChangePromptService(
     }
 
     private fun readSnapshot(): Snapshot =
-        ReadAction.compute<Snapshot, Throwable> {
+        ApplicationManager.getApplication().runReadAction(ThrowableComputable<Snapshot, Throwable> {
             val snapshot = snapshotService.getSnapshotUnderReadAction()
             Snapshot(
                 migrations = snapshot.migrations,
                 baselineStatements = snapshot.baselineStatements
             )
-        }
+        })
 
     private fun hashMigrations(migrations: List<MigrationFile>): String {
         val digest = MessageDigest.getInstance("SHA-256")

@@ -14,6 +14,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
@@ -131,7 +132,7 @@ class JcefBridge(
                     WriteCommandAction.runWriteCommandAction(project) {
                         val virtualFile = writeUtf8File(filePath, content)
                         if (openAfterSave) {
-                            FileEditorManager.getInstance(project).openFile(virtualFile, true)
+                            OpenFileDescriptor(project, virtualFile).navigate(true)
                         }
                     }
                     schemaChangePromptService.checkPendingSuggestionAfterSave()
@@ -205,7 +206,7 @@ class JcefBridge(
                         settings.rememberMigrationDirectory(directory)
                         settingsState = settings.state
                         if (settings.state.autoOpenCreatedMigration) {
-                            FileEditorManager.getInstance(project).openFile(virtualFile, true)
+                            OpenFileDescriptor(project, virtualFile).navigate(true)
                         }
                     }
                     // Re-evaluate the pending suggestion state — the new migration may
@@ -522,7 +523,7 @@ class JcefBridge(
     private fun openFileInEditor(filePath: String) {
         val virtualFile = LocalFileSystem.getInstance().refreshAndFindFileByPath(filePath) ?: return
         com.intellij.openapi.application.ApplicationManager.getApplication().invokeLater {
-            FileEditorManager.getInstance(project).openFile(virtualFile, true)
+            OpenFileDescriptor(project, virtualFile).navigate(true)
         }
     }
 

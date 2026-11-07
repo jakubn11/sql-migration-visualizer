@@ -4,9 +4,10 @@ import io.github.jakub.sqlmigrationvisualizer.model.BaselineSchemaFile
 import io.github.jakub.sqlmigrationvisualizer.model.MigrationFile
 import io.github.jakub.sqlmigrationvisualizer.parser.MigrationScanner
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.ThrowableComputable
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
@@ -61,9 +62,9 @@ class ProjectSchemaSnapshotService(
     }
 
     fun getSnapshot(): ProjectSchemaSnapshot =
-        ReadAction.compute<ProjectSchemaSnapshot, Throwable> {
+        ApplicationManager.getApplication().runReadAction(ThrowableComputable<ProjectSchemaSnapshot, Throwable> {
             getSnapshotUnderReadAction()
-        }
+        })
 
     fun getSnapshotUnderReadAction(): ProjectSchemaSnapshot {
         if (!migrationsDirty && !baselineDirty) {
@@ -93,10 +94,10 @@ class ProjectSchemaSnapshotService(
     }
 
     fun findRelatedSchemaFile(tableName: String, columnName: String? = null): String? =
-        ReadAction.compute<String?, Throwable> {
+        ApplicationManager.getApplication().runReadAction(ThrowableComputable<String?, Throwable> {
             val snapshot = getSnapshotUnderReadAction()
             val normalizedTable = tableName.trim().lowercase()
-            if (normalizedTable.isEmpty()) return@compute null
+            if (normalizedTable.isEmpty()) return@ThrowableComputable null
 
             val directMatches = snapshot.baselineFiles.filter { file ->
                 file.createStatements.any { statement ->
@@ -106,7 +107,7 @@ class ProjectSchemaSnapshotService(
                     ).containsMatchIn(statement)
                 }
             }
-            if (directMatches.isEmpty()) return@compute null
+            if (directMatches.isEmpty()) return@ThrowableComputable null
 
             val normalizedColumn = columnName?.trim()?.lowercase().orEmpty()
             val preferredMatch = directMatches.firstOrNull { file ->
@@ -115,7 +116,7 @@ class ProjectSchemaSnapshotService(
                         .containsMatchIn(file.rawContent)
             }
             preferredMatch?.filePath ?: directMatches.first().filePath
-        }
+        })
 
     private fun invalidateForEvent(event: VFileEvent) {
         val basePath = project.basePath ?: return
