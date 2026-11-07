@@ -173,7 +173,8 @@ MEDIUM: NULL tightening, type change (non-narrowing), PK/FK changes
 
 - **File writes** must run inside `invokeLater { WriteCommandAction.runWriteCommandAction(project) { … } }` — never call VirtualFile write methods directly from JCEF callbacks.
 - **File reads** use `ReadAction.nonBlocking { … }.finishOnUiThread(ModalityState.any()).expireWith(this)` — `ModalityState.defaultModalityState()` deadlocks when a dialog is open.
-- **`getSnapshotUnderReadAction()`** must be called from within a `ReadAction.compute {}` — not from the EDT directly.
+- **`getSnapshotUnderReadAction()`** must be called from within `ApplicationManager.getApplication().runReadAction(ThrowableComputable { … })` or a `ReadAction.nonBlocking` block — not from the EDT directly. Don't use `ReadAction.compute` or Kotlin's `runReadAction`: both are deprecated on 263, and `computeBlocking`, their replacement, doesn't exist on 241.
+- **Opening files** uses `OpenFileDescriptor(project, file).navigate(true)`. Every non-suspend `FileEditorManager.openFile` is deprecated on 263, and the suspend replacement doesn't exist on 241.
 - **Async services** (`SchemaChangePromptService`, `VisualizerPanel` alarm) run on `POOLED_THREAD`; always guard callbacks with `if (project.isDisposed) return`.
 - **Do not nest** `WriteCommandAction` inside another write action.
 
