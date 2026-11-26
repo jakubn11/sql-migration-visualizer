@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.5] - 2026-11-26
+
 ### Changed
 
 - Builds with Kotlin 2.1.21, the version the sibling plugins use. Kotlin 2.0.21's Gradle plugin declared dependency "Usage" attributes with legacy values (`java-api-jars`, `java-runtime-jars`) that Gradle 9 deprecates and Gradle 10 turns into a build error. The plugin ZIP still ships no Kotlin stdlib, and the Plugin Verifier still passes on every released IntelliJ IDEA from 2024.1 to 2026.3
