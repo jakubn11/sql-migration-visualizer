@@ -111,6 +111,7 @@ MEDIUM: NULL tightening, type change (non-narrowing), PK/FK changes
 - Post-startup activity: schema change detection
 - Settings: project-level under Tools > SQL Migration Visualizer
 - Notification group: "SQL Migration Visualizer"
+- Plugin logo: `META-INF/pluginIcon.svg`, 40×40, the brand logo embedded as a 160px PNG data URI (there is no vector source). The IDE's Plugins list and JetBrains Marketplace read only `pluginIcon.svg` / `pluginIcon_dark.svg`; a `pluginIcon.png` is ignored, which is why 1.5.0–1.5.5 showed the default icon
 
 ## VisualizerSettings Fields
 

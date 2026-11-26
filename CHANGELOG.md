@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- The plugin's logo shows in the IDE's Plugins list again. Since 1.5.0 it was shipped only as `pluginIcon.png`, which IntelliJ ignores, so the list showed the default plugin icon. It is now `pluginIcon.svg`, the same brand logo
+
 ## [1.5.5] - 2026-11-26
 
 ### Changed
