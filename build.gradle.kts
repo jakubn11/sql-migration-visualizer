@@ -4,8 +4,8 @@ import org.jetbrains.intellij.platform.gradle.models.ProductRelease
 plugins {
     id("org.jetbrains.intellij.platform") version "2.19.0"
     id("org.jetbrains.changelog") version "2.2.1"
-    kotlin("jvm") version "2.0.21"
-    kotlin("plugin.serialization") version "2.0.21"
+    kotlin("jvm") version "2.1.21"
+    kotlin("plugin.serialization") version "2.1.21"
 }
 
 group = providers.gradleProperty("pluginGroup").get()

@@ -12,7 +12,7 @@ See [AGENTS.md](AGENTS.md) for full project context, package map, data flow, bri
 
 ## Key conventions
 
-- Kotlin 2.0.21 + Java 17; kotlinx-serialization for all models
+- Kotlin 2.1.21 + Java 17; kotlinx-serialization for all models
 - Web UI is vanilla JS in `src/main/resources/web/` — no framework
 - All Kotlin↔JS communication goes through `JcefBridge` as JSON
 - No comments unless the WHY is non-obvious

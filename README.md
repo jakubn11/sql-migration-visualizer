@@ -20,7 +20,7 @@
   <img alt="License" src="https://img.shields.io/badge/license-GPLv3-58D1C9?style=flat-square">
   <img alt="Platform" src="https://img.shields.io/badge/intellij-2024.1%2B-6AA6FF?style=flat-square">
   <img alt="Java" src="https://img.shields.io/badge/java-17-6AA6FF?style=flat-square">
-  <img alt="Kotlin" src="https://img.shields.io/badge/kotlin-2.0.21-8ABBFF?style=flat-square">
+  <img alt="Kotlin" src="https://img.shields.io/badge/kotlin-2.1.21-8ABBFF?style=flat-square">
 </p>
 
 ## What You Get
