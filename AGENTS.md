@@ -245,6 +245,8 @@ All web UI lives in `src/main/resources/web/styles.css`. Follow the existing des
 
 The plugin ZIP ships no Kotlin stdlib: the Gradle plugin leaves out what the platform bundles, so on 2024.1 the code runs on that IDE's Kotlin 1.9.22 stdlib even though it compiles with 2.1.21. Avoid stdlib APIs added after 1.9.
 
+Builds with Gradle 9.9.3 and IntelliJ Platform Gradle Plugin 2.20.1. Gradle prints two deprecation warnings that aren't this repo's: `Configuration.setVisible` (removed in Gradle 11) from the Kotlin Gradle plugin 2.1.21, and `Task.getAnt()` (removed in Gradle 10) from the IntelliJ Platform Gradle Plugin's `instrumentCode` task. Both clear when those plugins move off the APIs.
+
 ## Do Not
 
 - Add a JS framework to the web frontend — stay vanilla JS.

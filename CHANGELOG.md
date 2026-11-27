@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Build tooling moved to Gradle 9.9.3 and IntelliJ Platform Gradle Plugin 2.20.1. Nothing changes in the plugin itself, and the Plugin Verifier still passes on every released IntelliJ IDEA from 2024.1 to 2026.3
+
 ## [1.5.6] - 2026-11-26
 
 ### Fixed
