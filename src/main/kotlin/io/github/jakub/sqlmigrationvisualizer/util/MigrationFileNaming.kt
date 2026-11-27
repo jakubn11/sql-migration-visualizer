@@ -1,5 +1,6 @@
 package io.github.jakub.sqlmigrationvisualizer.util
 
+import io.github.jakub.sqlmigrationvisualizer.model.MigrationVersion
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -9,7 +10,7 @@ internal object MigrationFileNaming {
 
     fun buildFileName(
         pattern: String,
-        version: Int,
+        version: MigrationVersion,
         name: String?,
         extension: String,
         now: LocalDateTime = LocalDateTime.now()
@@ -54,13 +55,13 @@ internal object MigrationFileNaming {
      *
      *   123.sql          → newVersion.sql
      *   123_foo.sql      → newVersion_foo.sql
-     *   V123__foo.sql    → Vnewversion__foo.sql
+     *   V123__foo.sql    → Vnewversion__foo.sql  (also V1.2__ and V1_2__)
      *
      * Returns null if the original name doesn't match any recognised pattern,
      * so the caller can decide how to recover.
      */
-    fun renumberFileName(originalName: String, newVersion: Int): String? {
-        val flyway = Regex("""^([Vv])(\d+)(__.+)$""").matchEntire(originalName)
+    fun renumberFileName(originalName: String, newVersion: MigrationVersion): String? {
+        val flyway = Regex("""^([Vv])(\d+(?:[._]\d+)*)(__.+)$""").matchEntire(originalName)
         if (flyway != null) {
             return "${flyway.groupValues[1]}$newVersion${flyway.groupValues[3]}"
         }
@@ -73,11 +74,9 @@ internal object MigrationFileNaming {
     }
 
     /**
-     * Lowest positive integer that is strictly greater than every used version.
-     * Returns 1 for an empty collection.
+     * The next whole version after every used one: the highest version's first
+     * part plus one (`12` → `13`, `1.2` → `2`). Returns 1 for an empty collection.
      */
-    fun nextFreeVersion(usedVersions: Collection<Int>): Int {
-        val max = usedVersions.maxOrNull() ?: 0
-        return max + 1
-    }
+    fun nextFreeVersion(usedVersions: Collection<MigrationVersion>): MigrationVersion =
+        MigrationVersion.nextAfter(usedVersions)
 }

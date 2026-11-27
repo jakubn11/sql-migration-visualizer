@@ -2,6 +2,7 @@ package io.github.jakub.sqlmigrationvisualizer.validator
 
 import io.github.jakub.sqlmigrationvisualizer.model.ColumnDef
 import io.github.jakub.sqlmigrationvisualizer.model.MigrationFile
+import io.github.jakub.sqlmigrationvisualizer.model.MigrationVersion
 import io.github.jakub.sqlmigrationvisualizer.model.SchemaVersion
 import io.github.jakub.sqlmigrationvisualizer.model.TableSchema
 import io.github.jakub.sqlmigrationvisualizer.model.ValidationIssueCode
@@ -29,8 +30,8 @@ class MigrationValidatorTest {
 
         val issue = result.issues.firstOrNull { it.code == ValidationIssueCode.VERSION_GAP }
         assertNotNull(issue)
-        assertEquals(listOf(2, 3), issue.missingVersions)
-        assertEquals(listOf(1, 4), issue.contextVersions)
+        assertEquals(versions(2, 3), issue.missingVersions)
+        assertEquals(versions(1, 4), issue.contextVersions)
         assertTrue(issue.suggestedFix.orEmpty().contains("continuous"))
     }
 
@@ -47,9 +48,9 @@ class MigrationValidatorTest {
         val issue = result.issues.firstOrNull { it.code == ValidationIssueCode.VERSION_GAP }
         assertNotNull(issue)
         assertTrue(issue.missingVersions.size <= 100)
-        assertEquals(2, issue.missingVersions.first())
+        assertEquals(MigrationVersion.of(2), issue.missingVersions.first())
         assertTrue(issue.message.contains("Large version gap"))
-        assertEquals(listOf(1, 20_260_101), issue.contextVersions)
+        assertEquals(versions(1, 20_260_101), issue.contextVersions)
     }
 
     @Test
@@ -82,7 +83,7 @@ class MigrationValidatorTest {
             ),
             schemaVersions = listOf(
                 SchemaVersion(
-                    version = 0,
+                    version = MigrationVersion.of(0),
                     tables = mapOf(
                         "users" to TableSchema(
                             name = "users",
@@ -92,7 +93,7 @@ class MigrationValidatorTest {
                     migrationFile = null
                 ),
                 SchemaVersion(
-                    version = 1,
+                    version = MigrationVersion.of(1),
                     tables = mapOf(
                         "users" to TableSchema(
                             name = "users",
@@ -112,7 +113,7 @@ class MigrationValidatorTest {
         val issue = result.issues.firstOrNull { it.code == ValidationIssueCode.ALTER_TABLE_TARGET_MISSING }
         assertNotNull(issue)
         assertEquals("posts", issue.tableName)
-        assertEquals(listOf(0, 1), issue.contextVersions)
+        assertEquals(versions(0, 1), issue.contextVersions)
         assertTrue(issue.explanation.orEmpty().contains("precede"))
     }
 
@@ -136,7 +137,7 @@ class MigrationValidatorTest {
         val issue = result.issues.firstOrNull { it.code == ValidationIssueCode.EMPTY_MIGRATION }
         assertNotNull(issue)
         assertEquals(ValidationSeverity.WARNING, issue.severity)
-        assertEquals(1, issue.version)
+        assertEquals(MigrationVersion.of(1), issue.version)
     }
 
     @Test
@@ -174,7 +175,7 @@ class MigrationValidatorTest {
             primaryKey = listOf("id"),
             foreignKeys = listOf(ForeignKey(listOf("manager_id"), "employees", listOf("id")))
         )
-        val version = SchemaVersion(version = 1, tables = mapOf("employees" to employeesTable), migrationFile = null)
+        val version = SchemaVersion(version = MigrationVersion.of(1), tables = mapOf("employees" to employeesTable), migrationFile = null)
 
         val result = validator.validate(
             migrations = listOf(migration(1)),
@@ -192,7 +193,7 @@ class MigrationValidatorTest {
             primaryKey = listOf("id"),
             foreignKeys = listOf(ForeignKey(listOf("user_id"), "users", listOf("id")))
         )
-        val version = SchemaVersion(version = 1, tables = mapOf("orders" to ordersTable), migrationFile = null)
+        val version = SchemaVersion(version = MigrationVersion.of(1), tables = mapOf("orders" to ordersTable), migrationFile = null)
 
         val result = validator.validate(
             migrations = listOf(migration(1)),
@@ -255,6 +256,38 @@ class MigrationValidatorTest {
         assertTrue(result.issues.none { it.code == ValidationIssueCode.TRANSACTION_STATEMENT })
     }
 
+    @Test
+    fun `timestamp versions in a row are not reported as gaps`() {
+        val result = validator.validate(
+            migrations = listOf(migration("202401151030"), migration("202402011200")),
+            schemaVersions = emptyList()
+        )
+
+        assertTrue(result.issues.none { it.code == ValidationIssueCode.VERSION_GAP })
+    }
+
+    @Test
+    fun `dotted versions are not reported as gaps`() {
+        val result = validator.validate(
+            migrations = listOf(migration("1"), migration("1.1"), migration("1_2"), migration("2")),
+            schemaVersions = emptyList()
+        )
+
+        assertTrue(result.issues.none { it.code == ValidationIssueCode.VERSION_GAP })
+    }
+
+    @Test
+    fun `versions that differ only by trailing zeros are duplicates`() {
+        val result = validator.validate(
+            migrations = listOf(migration("1"), migration("1.0")),
+            schemaVersions = emptyList()
+        )
+
+        val issue = result.issues.firstOrNull { it.code == ValidationIssueCode.DUPLICATE_VERSION }
+        assertNotNull(issue)
+        assertEquals(2, issue.relatedFilePaths.size)
+    }
+
     private fun table(name: String) = TableSchema(
         name = name,
         columns = listOf(ColumnDef(name = "id", type = "INTEGER", isPrimaryKey = true))
@@ -265,9 +298,19 @@ class MigrationValidatorTest {
         tables: Map<String, TableSchema>,
         migrationFile: MigrationFile? = null
     ) = SchemaVersion(
-        version = version,
+        version = MigrationVersion.of(version.toLong()),
         tables = tables,
         migrationFile = migrationFile
+    )
+
+    private fun versions(vararg values: Long) = values.map { MigrationVersion.of(it) }
+
+    private fun migration(version: String) = MigrationFile(
+        version = MigrationVersion.parse(version)!!,
+        filePath = "/tmp/V${version}__step.sql",
+        fileName = "V${version}__step.sql",
+        statements = listOf("SELECT 1"),
+        rawContent = "SELECT 1;"
     )
 
     private fun migration(
@@ -276,7 +319,7 @@ class MigrationValidatorTest {
         rawContent: String = "SELECT 1;",
         statements: List<String> = listOf("SELECT 1")
     ) = MigrationFile(
-        version = version,
+        version = MigrationVersion.of(version.toLong()),
         filePath = filePath,
         fileName = filePath.substringAfterLast('/'),
         statements = statements,

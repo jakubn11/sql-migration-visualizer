@@ -65,10 +65,11 @@
             if (!versions || versions.length === 0) return;
             this.loadPersistedPositions(state);
 
-            const versionNum = parseInt(document.getElementById('er-version').value);
-            const schema = versions.find(v => v.version === versionNum);
+            const selectedVersion = document.getElementById('er-version').value;
+            const schema = versions.find(v => window.MigrationVersions.equals(v.version, selectedVersion));
             if (!schema) return;
-            this.currentVersion = String(versionNum);
+            const versionNum = String(schema.version);
+            this.currentVersion = versionNum;
             this.focusedTable = state.ui && state.ui.erFocusTable ? state.ui.erFocusTable : null;
 
             // Setup canvas

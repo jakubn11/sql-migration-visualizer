@@ -3489,7 +3489,7 @@ code {
 .version-number-input {
     text-align: center;
     min-width: 44px;
-    max-width: 92px;
+    max-width: 160px;
     width: 44px;
     flex: 0 0 auto;
     cursor: text;

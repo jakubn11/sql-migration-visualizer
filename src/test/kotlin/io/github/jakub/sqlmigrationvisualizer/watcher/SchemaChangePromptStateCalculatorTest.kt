@@ -1,6 +1,7 @@
 package io.github.jakub.sqlmigrationvisualizer.watcher
 
 import io.github.jakub.sqlmigrationvisualizer.model.MigrationFile
+import io.github.jakub.sqlmigrationvisualizer.model.MigrationVersion
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -97,7 +98,7 @@ class SchemaChangePromptStateCalculatorTest {
             snapshot = snapshot(
                 migrations = listOf(
                     MigrationFile(
-                        version = 1,
+                        version = MigrationVersion.of(1),
                         filePath = "/tmp/1.sqm",
                         fileName = "1.sqm",
                         statements = listOf("ALTER TABLE users ADD COLUMN email TEXT"),

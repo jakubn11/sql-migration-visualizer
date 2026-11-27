@@ -31,15 +31,15 @@ enum class ValidationIssueCode {
 data class ValidationIssue(
     val severity: ValidationSeverity,
     val message: String,
-    val version: Int? = null,
+    val version: MigrationVersion? = null,
     val filePath: String? = null,
     val details: String? = null,
     val code: ValidationIssueCode? = null,
     val explanation: String? = null,
     val suggestedFix: String? = null,
     val relatedFilePaths: List<String> = emptyList(),
-    val missingVersions: List<Int> = emptyList(),
-    val contextVersions: List<Int> = emptyList(),
+    val missingVersions: List<MigrationVersion> = emptyList(),
+    val contextVersions: List<MigrationVersion> = emptyList(),
     val tableName: String? = null,
     val columnName: String? = null
 )

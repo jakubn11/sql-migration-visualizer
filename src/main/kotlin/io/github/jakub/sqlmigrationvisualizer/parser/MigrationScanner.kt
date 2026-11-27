@@ -2,6 +2,7 @@ package io.github.jakub.sqlmigrationvisualizer.parser
 
 import io.github.jakub.sqlmigrationvisualizer.model.BaselineSchemaFile
 import io.github.jakub.sqlmigrationvisualizer.model.MigrationFile
+import io.github.jakub.sqlmigrationvisualizer.model.MigrationVersion
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtilCore
@@ -18,13 +19,18 @@ class MigrationScanner(private val project: Project) {
         private val migrationPatterns = listOf(
             Regex("""^(\d+)\.(sqm|sql)$""", RegexOption.IGNORE_CASE),
             Regex("""^(\d+)[._-].+\.(sqm|sql)$""", RegexOption.IGNORE_CASE),
-            Regex("""^[Vv](\d+)__.+\.(sqm|sql)$""", RegexOption.IGNORE_CASE)
+            Regex("""^[Vv](\d+(?:[._]\d+)*)__.+\.(sqm|sql)$""", RegexOption.IGNORE_CASE)
         )
+        // Flyway's other file kinds: repeatable (R__), undo (U1__) and baseline (B1__)
+        // migrations. They aren't versioned steps of the timeline, and reading them as
+        // baseline schema files would fold an undo's DROP TABLE into version 0.
+        private val otherFlywayFilePattern =
+            Regex("""^(?:R|[UB]\d+(?:[._]\d+)*)__.+\.(sqm|sql)$""", RegexOption.IGNORE_CASE)
         private val schemaExtensions = setOf("sq", "sql", "ddl")
 
-        internal fun parseMigrationVersion(fileName: String): Int? =
+        internal fun parseMigrationVersion(fileName: String): MigrationVersion? =
             migrationPatterns.firstNotNullOfOrNull { pattern ->
-                pattern.matchEntire(fileName)?.groupValues?.getOrNull(1)?.toIntOrNull()
+                pattern.matchEntire(fileName)?.groupValues?.getOrNull(1)?.let(MigrationVersion::parse)
             }
 
         internal fun isMigrationFileName(fileName: String): Boolean =
@@ -32,7 +38,8 @@ class MigrationScanner(private val project: Project) {
 
         internal fun isSchemaFileName(fileName: String): Boolean {
             val extension = fileName.substringAfterLast('.', "").lowercase()
-            return extension in schemaExtensions && !isMigrationFileName(fileName)
+            return extension in schemaExtensions && !isMigrationFileName(fileName) &&
+                !otherFlywayFilePattern.matches(fileName)
         }
 
         internal fun detectPreferredMigrationExtension(existingMigrationPaths: List<String>): String =

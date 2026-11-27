@@ -3,6 +3,7 @@ package io.github.jakub.sqlmigrationvisualizer.analyzer
 import io.github.jakub.sqlmigrationvisualizer.model.ColumnDef
 import io.github.jakub.sqlmigrationvisualizer.model.ForeignKey
 import io.github.jakub.sqlmigrationvisualizer.model.MigrationRiskLevel
+import io.github.jakub.sqlmigrationvisualizer.model.MigrationVersion
 import io.github.jakub.sqlmigrationvisualizer.model.SchemaVersion
 import io.github.jakub.sqlmigrationvisualizer.model.TableSchema
 import kotlin.test.Test
@@ -77,7 +78,7 @@ class SchemaChangeRiskAnalyzerTest {
     @Test
     fun `table dropped produces high risk`() {
         val before = schemaVersion(version = 1, table = TableSchema("logs", listOf(ColumnDef("id", "INTEGER"))))
-        val after = SchemaVersion(version = 2, tables = emptyMap(), migrationFile = null)
+        val after = SchemaVersion(version = MigrationVersion.of(2), tables = emptyMap(), migrationFile = null)
 
         val risk = SchemaChangeRiskAnalyzer.analyze(before, after)
 
@@ -87,7 +88,7 @@ class SchemaChangeRiskAnalyzerTest {
 
     @Test
     fun `new table with only nullable columns produces no risk items`() {
-        val before = SchemaVersion(version = 1, tables = emptyMap(), migrationFile = null)
+        val before = SchemaVersion(version = MigrationVersion.of(1), tables = emptyMap(), migrationFile = null)
         val after = schemaVersion(
             version = 2,
             table = TableSchema(
@@ -198,7 +199,7 @@ class SchemaChangeRiskAnalyzerTest {
 
     private fun schemaVersion(version: Int, table: TableSchema): SchemaVersion =
         SchemaVersion(
-            version = version,
+            version = MigrationVersion.of(version.toLong()),
             tables = mapOf(table.name to table),
             migrationFile = null
         )

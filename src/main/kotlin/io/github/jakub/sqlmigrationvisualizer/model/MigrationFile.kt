@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class MigrationFile(
-    val version: Int,
+    val version: MigrationVersion,
     val filePath: String,
     val fileName: String,
     val statements: List<String>,

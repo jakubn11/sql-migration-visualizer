@@ -1,6 +1,7 @@
 package io.github.jakub.sqlmigrationvisualizer.parser
 
 import io.github.jakub.sqlmigrationvisualizer.model.MigrationFile
+import io.github.jakub.sqlmigrationvisualizer.model.MigrationVersion
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -22,7 +23,7 @@ class SqlParserTest {
             """.trimIndent()
         )
         val migration = MigrationFile(
-            version = 1,
+            version = MigrationVersion.of(1),
             filePath = "/tmp/1.sqm",
             fileName = "1.sqm",
             statements = listOf(
@@ -53,7 +54,7 @@ class SqlParserTest {
             """.trimIndent()
         )
         val migration = MigrationFile(
-            version = 1,
+            version = MigrationVersion.of(1),
             filePath = "/tmp/1.sql",
             fileName = "1.sql",
             statements = listOf(
@@ -91,7 +92,7 @@ class SqlParserTest {
             """.trimIndent()
         )
         val migration = MigrationFile(
-            version = 1,
+            version = MigrationVersion.of(1),
             filePath = "/tmp/1.sql",
             fileName = "1.sql",
             statements = listOf(
@@ -135,7 +136,7 @@ class SqlParserTest {
             """.trimIndent()
         )
         val migration = MigrationFile(
-            version = 1,
+            version = MigrationVersion.of(1),
             filePath = "/tmp/1.sql",
             fileName = "1.sql",
             statements = listOf("ALTER TABLE users DROP COLUMN external_id"),
@@ -161,7 +162,7 @@ class SqlParserTest {
             """.trimIndent()
         )
         val migration = MigrationFile(
-            version = 1,
+            version = MigrationVersion.of(1),
             filePath = "/tmp/1.sql",
             fileName = "1.sql",
             statements = listOf("ALTER TABLE orders DROP CONSTRAINT fk_orders_users"),
@@ -178,11 +179,11 @@ class SqlParserTest {
     @Test
     fun `buildSchemaTimeline accumulates schema across multiple sequential migrations`() {
         val migration1 = MigrationFile(
-            version = 1, filePath = "/tmp/1.sql", fileName = "1.sql", rawContent = "",
+            version = MigrationVersion.of(1), filePath = "/tmp/1.sql", fileName = "1.sql", rawContent = "",
             statements = listOf("CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT NOT NULL)")
         )
         val migration2 = MigrationFile(
-            version = 2, filePath = "/tmp/2.sql", fileName = "2.sql", rawContent = "",
+            version = MigrationVersion.of(2), filePath = "/tmp/2.sql", fileName = "2.sql", rawContent = "",
             statements = listOf(
                 "CREATE TABLE posts (id INTEGER PRIMARY KEY, user_id INTEGER REFERENCES users(id))",
                 "ALTER TABLE users ADD COLUMN email TEXT"
@@ -237,7 +238,7 @@ class SqlParserTest {
             """.trimIndent()
         )
         val migration = MigrationFile(
-            version = 1,
+            version = MigrationVersion.of(1),
             filePath = "/tmp/1.sql",
             fileName = "1.sql",
             statements = listOf("ALTER TABLE users DROP PRIMARY KEY"),
@@ -256,7 +257,7 @@ class SqlParserTest {
     fun `alter table resolves the target regardless of identifier case`() {
         val baselineStatements = listOf("CREATE TABLE users (id INTEGER PRIMARY KEY)")
         val migration = MigrationFile(
-            version = 1,
+            version = MigrationVersion.of(1),
             filePath = "/tmp/1.sql",
             fileName = "1.sql",
             statements = listOf("ALTER TABLE Users ADD COLUMN email TEXT"),
@@ -274,7 +275,7 @@ class SqlParserTest {
     fun `case-insensitive lookup keeps the originally declared spelling as the key`() {
         val baselineStatements = listOf("CREATE TABLE Orders (id INTEGER PRIMARY KEY)")
         val migration = MigrationFile(
-            version = 1,
+            version = MigrationVersion.of(1),
             filePath = "/tmp/1.sql",
             fileName = "1.sql",
             statements = listOf("ALTER TABLE orders ADD COLUMN total INTEGER"),

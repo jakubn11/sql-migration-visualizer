@@ -6,6 +6,7 @@ import io.github.jakub.sqlmigrationvisualizer.generator.MigrationGenerator
 import io.github.jakub.sqlmigrationvisualizer.generator.SqlDialect
 import io.github.jakub.sqlmigrationvisualizer.model.MigrationFile
 import io.github.jakub.sqlmigrationvisualizer.model.PendingMigrationSuggestion
+import io.github.jakub.sqlmigrationvisualizer.model.MigrationVersion
 import io.github.jakub.sqlmigrationvisualizer.model.SchemaVersion
 import io.github.jakub.sqlmigrationvisualizer.parser.SqlParser
 import io.github.jakub.sqlmigrationvisualizer.services.ProjectSchemaSnapshotService
@@ -149,11 +150,11 @@ class SchemaChangePromptService(
         }
 
         val previousSchema = parser.buildSchemaTimeline(myState.trackedBaselineStatements, emptyList()).firstOrNull()
-            ?: SchemaVersion(0, emptyMap(), null)
+            ?: SchemaVersion(MigrationVersion.ZERO, emptyMap(), null)
         val currentSchema = parser.buildSchemaTimeline(snapshot.baselineStatements, emptyList()).firstOrNull()
-            ?: SchemaVersion(0, emptyMap(), null)
+            ?: SchemaVersion(MigrationVersion.ZERO, emptyMap(), null)
         val risk = SchemaChangeRiskAnalyzer.analyze(previousSchema, currentSchema)
-        val suggestedVersion = (snapshot.migrations.maxOfOrNull { it.version } ?: 0) + 1
+        val suggestedVersion = MigrationFileNaming.nextFreeVersion(snapshot.migrations.map { it.version })
         val suggestedName = suggestMigrationName(myState.pendingMigrationSql)
         val suggestedFileName = MigrationFileNaming.buildFileName(
             pattern = settings.state.migrationFileNamePattern,
@@ -231,9 +232,9 @@ class SchemaChangePromptService(
         currentStatements: List<String>
     ): String? {
         val fromVersion = parser.buildSchemaTimeline(previousStatements, emptyList()).firstOrNull()
-            ?: SchemaVersion(0, emptyMap(), null)
+            ?: SchemaVersion(MigrationVersion.ZERO, emptyMap(), null)
         val toVersion = parser.buildSchemaTimeline(currentStatements, emptyList()).firstOrNull()
-            ?: SchemaVersion(0, emptyMap(), null)
+            ?: SchemaVersion(MigrationVersion.ZERO, emptyMap(), null)
 
         val sql = generator.generateMigration(fromVersion, toVersion, SqlDialect.fromId(settings.state.preferredSqlDialect))
         return if (sql.startsWith("-- No changes detected")) null else sql

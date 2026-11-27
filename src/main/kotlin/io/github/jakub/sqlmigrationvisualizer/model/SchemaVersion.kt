@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class SchemaVersion(
-    val version: Int,
+    val version: MigrationVersion,
     val tables: Map<String, TableSchema>,
     val migrationFile: MigrationFile?,
     val changesSummary: ChangesSummary? = null,

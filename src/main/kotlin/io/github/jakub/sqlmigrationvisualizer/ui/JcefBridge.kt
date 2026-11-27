@@ -2,6 +2,7 @@ package io.github.jakub.sqlmigrationvisualizer.ui
 
 import io.github.jakub.sqlmigrationvisualizer.generator.MigrationGenerator
 import io.github.jakub.sqlmigrationvisualizer.generator.SqlDialect
+import io.github.jakub.sqlmigrationvisualizer.model.MigrationVersion
 import io.github.jakub.sqlmigrationvisualizer.model.PendingMigrationSuggestion
 import io.github.jakub.sqlmigrationvisualizer.model.SchemaVersion
 import io.github.jakub.sqlmigrationvisualizer.model.ValidationResult
@@ -24,7 +25,6 @@ import com.intellij.ui.jcef.JBCefJSQuery
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.cef.browser.CefBrowser
@@ -102,8 +102,8 @@ class JcefBridge(
         generateMigrationQuery.addHandler { jsonStr ->
             try {
                 val params = Json.parseToJsonElement(jsonStr).jsonObject
-                val fromVersion = params["fromVersion"]!!.jsonPrimitive.int
-                val toVersion = params["toVersion"]!!.jsonPrimitive.int
+                val fromVersion = params.requireVersion("fromVersion")
+                val toVersion = params.requireVersion("toVersion")
 
                 val fromSchema = schemaVersions.find { it.version == fromVersion }
                 val toSchema = schemaVersions.find { it.version == toVersion }
@@ -180,7 +180,7 @@ class JcefBridge(
         createMigrationQuery.addHandler { jsonStr ->
             try {
                 val params = Json.parseToJsonElement(jsonStr).jsonObject
-                val version = params["version"]!!.jsonPrimitive.int
+                val version = params.requireVersion("version")
                 val directory = params["directory"]!!.jsonPrimitive.content
                 val content = params["content"]!!.jsonPrimitive.content
                 val name = params["name"]?.jsonPrimitive?.content
@@ -198,6 +198,14 @@ class JcefBridge(
                     name = name,
                     extension = extension
                 )
+                // A dotted version only survives in Flyway's V<version>__<name> form; in
+                // `1.2.sql` or `1.2_name.sql` it would read back as version 1.
+                if (!version.isSinglePart && MigrationScanner.parseMigrationVersion(fileName) != version) {
+                    throw IllegalArgumentException(
+                        "$fileName would be read back as a different version. Use a whole number, or set the " +
+                            "file name pattern to Flyway's V{version}__{name} to keep $version."
+                    )
+                }
                 val filePath = File(directory, fileName).absolutePath
 
                 ApplicationManager.getApplication().invokeLater {
@@ -365,8 +373,8 @@ class JcefBridge(
         saveDiffSelectionQuery.addHandler { jsonStr ->
             try {
                 val params = Json.parseToJsonElement(jsonStr).jsonObject
-                val fromVersion = params["fromVersion"]!!.jsonPrimitive.int
-                val toVersion = params["toVersion"]!!.jsonPrimitive.int
+                val fromVersion = params["fromVersion"]!!.jsonPrimitive.content
+                val toVersion = params["toVersion"]!!.jsonPrimitive.content
                 settings.saveDiffSelection(fromVersion, toVersion)
                 settingsState = settings.state
                 JBCefJSQuery.Response("ok")
@@ -634,6 +642,11 @@ class JcefBridge(
         val virtualFile = parentDir.findChild(ioFile.name) ?: parentDir.createChildData(this, ioFile.name)
         virtualFile.setBinaryContent(content)
         return virtualFile
+    }
+
+    private fun JsonObject.requireVersion(key: String): MigrationVersion {
+        val text = this[key]?.jsonPrimitive?.content ?: throw IllegalArgumentException("Missing $key")
+        return MigrationVersion.parse(text) ?: throw IllegalArgumentException("Not a migration version: $text")
     }
 
     private fun String.asJsStringLiteral(): String =

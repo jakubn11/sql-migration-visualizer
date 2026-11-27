@@ -1,5 +1,6 @@
 package io.github.jakub.sqlmigrationvisualizer.parser
 
+import io.github.jakub.sqlmigrationvisualizer.model.MigrationVersion
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -9,11 +10,38 @@ class MigrationScannerPatternTest {
 
     @Test
     fun `recognizes common migration filename patterns`() {
-        assertEquals(1, MigrationScanner.parseMigrationVersion("1.sql"))
-        assertEquals(2, MigrationScanner.parseMigrationVersion("2.sqm"))
-        assertEquals(3, MigrationScanner.parseMigrationVersion("3_add_users.sql"))
-        assertEquals(4, MigrationScanner.parseMigrationVersion("V4__add_posts.sql"))
-        assertEquals(12, MigrationScanner.parseMigrationVersion("v12__seed_data.sqm"))
+        assertEquals(MigrationVersion.of(1), MigrationScanner.parseMigrationVersion("1.sql"))
+        assertEquals(MigrationVersion.of(2), MigrationScanner.parseMigrationVersion("2.sqm"))
+        assertEquals(MigrationVersion.of(3), MigrationScanner.parseMigrationVersion("3_add_users.sql"))
+        assertEquals(MigrationVersion.of(4), MigrationScanner.parseMigrationVersion("V4__add_posts.sql"))
+        assertEquals(MigrationVersion.of(12), MigrationScanner.parseMigrationVersion("v12__seed_data.sqm"))
+    }
+
+    @Test
+    fun `reads Flyway dotted underscored and timestamp versions`() {
+        assertEquals(MigrationVersion.parse("1.1"), MigrationScanner.parseMigrationVersion("V1.1__add_index.sql"))
+        assertEquals(MigrationVersion.parse("1.1"), MigrationScanner.parseMigrationVersion("V1_1__add_index.sql"))
+        assertEquals(MigrationVersion.parse("2.0.1"), MigrationScanner.parseMigrationVersion("V2_0_1__fix.sqm"))
+        assertEquals(MigrationVersion.parse("202401151030"), MigrationScanner.parseMigrationVersion("V202401151030__create_users.sql"))
+        assertEquals(MigrationVersion.parse("20240115103045"), MigrationScanner.parseMigrationVersion("20240115103045_create_users.sql"))
+        assertEquals(MigrationVersion.of(2), MigrationScanner.parseMigrationVersion("V2.0__init.sql"))
+        assertEquals(null, MigrationScanner.parseMigrationVersion("V1..2__broken.sql"))
+    }
+
+    @Test
+    fun `versioned Flyway files are migrations, not schema files`() {
+        assertTrue(MigrationScanner.isMigrationFileName("V1.1__add_index.sql"))
+        assertFalse(MigrationScanner.isSchemaFileName("V1.1__add_index.sql"))
+        assertFalse(MigrationScanner.isSchemaFileName("V202401151030__create_users.sql"))
+    }
+
+    @Test
+    fun `Flyway repeatable undo and baseline files are neither migrations nor schema files`() {
+        for (name in listOf("R__refresh_views.sql", "U3__undo_orders.sql", "u1.1__undo.sql", "B5__baseline.sql")) {
+            assertFalse(MigrationScanner.isMigrationFileName(name), name)
+            assertFalse(MigrationScanner.isSchemaFileName(name), name)
+        }
+        assertTrue(MigrationScanner.isSchemaFileName("Reports.sql"))
     }
 
     @Test

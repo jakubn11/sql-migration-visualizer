@@ -76,8 +76,12 @@ Recognised file naming patterns:
 | Pattern | Example |
 |---------|---------|
 | Plain version | `1.sql`, `2.sqm` |
-| Version + name | `12_add_users.sql` |
+| Version + name | `12_add_users.sql`, `20240115103045_create_users.sql` |
 | Flyway | `V3__create_orders.sql` |
+| Flyway, dotted version | `V1.1__add_index.sql`, `V1_1__add_index.sql` |
+| Flyway, timestamp version | `V202401151030__create_users.sql` |
+
+Versions compare part by part, as in Flyway (`1.2` < `1.10` < `2`), and `1.0` is the same version as `1`. Flyway's repeatable (`R__`), undo (`U1__`) and baseline (`B1__`) scripts are skipped, since they aren't steps of the timeline.
 
 ## Usage
 
@@ -99,7 +103,7 @@ Open the **SQL Migrations** panel at the bottom of the IDE. The plugin scans you
 | Symptom | Fix |
 |---------|-----|
 | No migrations appear | Check that your migration directory matches one of the supported layouts, or set it manually in **Settings → Tools → SQL Migration Visualizer**. |
-| Timeline shows gaps | Versions must be contiguous integers. Run **Validate** to see the exact gap locations. |
+| Timeline shows gaps | Whole-number versions should be contiguous (timestamp and dotted versions may skip numbers). Run **Validate** to see the exact gap locations. |
 | Two migrations have the same version | Open **Validate**, find the **Duplicate migration version** issue, and click **Renumber … to v&lt;N&gt;** on the file that should be bumped (typically the one from your feature branch). |
 | ER diagram is empty | Requires at least one parsed schema version with valid `CREATE TABLE` statements. |
 | Plugin panel is missing | Open **View → Tool Windows → SQL Migrations** or reopen the project. |

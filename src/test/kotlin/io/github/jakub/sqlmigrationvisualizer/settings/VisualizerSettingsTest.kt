@@ -56,8 +56,8 @@ class VisualizerSettingsTest {
                         " users " to VisualizerSettings.ErTablePosition(Double.NaN, Double.POSITIVE_INFINITY)
                     )
                 ),
-                lastDiffFromVersion = -4,
-                lastDiffToVersion = -1,
+                lastDiffFromVersion = "-4",
+                lastDiffToVersion = " 1_1 ",
                 searchResultLimit = 2,
                 defaultMigrationDirectory = " migrations ",
                 additionalMigrationDirectories = " db/migrations ",
@@ -74,8 +74,8 @@ class VisualizerSettingsTest {
         assertNotNull(position)
         assertEquals(0.0, position.x)
         assertEquals(0.0, position.y)
-        assertEquals(0, state.lastDiffFromVersion)
-        assertEquals(0, state.lastDiffToVersion)
+        assertEquals("", state.lastDiffFromVersion)
+        assertEquals("1.1", state.lastDiffToVersion)
         assertEquals(5, state.searchResultLimit)
         assertEquals("migrations", state.defaultMigrationDirectory)
         assertEquals("db/migrations", state.additionalMigrationDirectories)

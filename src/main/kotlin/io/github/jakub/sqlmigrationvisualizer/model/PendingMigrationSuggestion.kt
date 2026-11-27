@@ -7,7 +7,7 @@ data class PendingMigrationSuggestion(
     val hasPendingChanges: Boolean = false,
     val generatedSql: String = "",
     val summary: String = "",
-    val suggestedVersion: Int = 0,
+    val suggestedVersion: MigrationVersion? = null,
     val suggestedName: String = "",
     val suggestedFileName: String = "",
     val changeHighlights: List<String> = emptyList(),

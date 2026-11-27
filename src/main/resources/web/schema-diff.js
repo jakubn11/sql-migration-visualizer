@@ -24,11 +24,11 @@
                 return;
             }
 
-            const fromVersion = parseInt(document.getElementById('diff-from').value, 10);
-            const toVersion = parseInt(document.getElementById('diff-to').value, 10);
+            const fromVersion = document.getElementById('diff-from').value;
+            const toVersion = document.getElementById('diff-to').value;
 
-            const fromSchema = versions.find(v => v.version === fromVersion);
-            const toSchema = versions.find(v => v.version === toVersion);
+            const fromSchema = versions.find(v => window.MigrationVersions.equals(v.version, fromVersion));
+            const toSchema = versions.find(v => window.MigrationVersions.equals(v.version, toVersion));
 
             if (!fromSchema || !toSchema) {
                 if (summary) summary.innerHTML = '';

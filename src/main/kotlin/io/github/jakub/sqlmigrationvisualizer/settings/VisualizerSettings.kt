@@ -6,6 +6,7 @@ import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.project.Project
 import io.github.jakub.sqlmigrationvisualizer.generator.SqlDialect
+import io.github.jakub.sqlmigrationvisualizer.model.MigrationVersion
 import kotlinx.serialization.Serializable
 
 @Service(Service.Level.PROJECT)
@@ -32,8 +33,8 @@ class VisualizerSettings : PersistentStateComponent<VisualizerSettings.State> {
         var erTablePositions: Map<String, Map<String, ErTablePosition>> = emptyMap(),
         var diffShowUnchangedColumns: Boolean = true,
         var rememberDiffSelections: Boolean = true,
-        var lastDiffFromVersion: Int = 0,
-        var lastDiffToVersion: Int = 0,
+        var lastDiffFromVersion: String = "",
+        var lastDiffToVersion: String = "",
         var searchResultLimit: Int = 20,
         var validateOnRefresh: Boolean = true,
         var suggestPendingMigrationOnSave: Boolean = true,
@@ -79,10 +80,10 @@ class VisualizerSettings : PersistentStateComponent<VisualizerSettings.State> {
         myState = myState.copy(preferredSqlDialect = SqlDialect.fromId(dialectId).id)
     }
 
-    fun saveDiffSelection(fromVersion: Int, toVersion: Int) {
+    fun saveDiffSelection(fromVersion: String, toVersion: String) {
         myState = myState.copy(
-            lastDiffFromVersion = fromVersion.coerceAtLeast(0),
-            lastDiffToVersion = toVersion.coerceAtLeast(0)
+            lastDiffFromVersion = sanitizeVersion(fromVersion),
+            lastDiffToVersion = sanitizeVersion(toVersion)
         )
     }
 
@@ -100,8 +101,8 @@ class VisualizerSettings : PersistentStateComponent<VisualizerSettings.State> {
             erTablePositions = erTablePositions.mapValues { (_, positions) ->
                 positions.sanitizedPositions()
             },
-            lastDiffFromVersion = lastDiffFromVersion.coerceAtLeast(0),
-            lastDiffToVersion = lastDiffToVersion.coerceAtLeast(0),
+            lastDiffFromVersion = sanitizeVersion(lastDiffFromVersion),
+            lastDiffToVersion = sanitizeVersion(lastDiffToVersion),
             searchResultLimit = searchResultLimit.coerceIn(5, 100),
             defaultMigrationDirectory = defaultMigrationDirectory.trim(),
             additionalMigrationDirectories = additionalMigrationDirectories.trim(),
@@ -131,6 +132,9 @@ class VisualizerSettings : PersistentStateComponent<VisualizerSettings.State> {
 
         private fun sanitizeDefaultTab(tabId: String): String =
             tabId.trim().takeIf { it in DEFAULT_TABS } ?: "timeline"
+
+        private fun sanitizeVersion(version: String): String =
+            MigrationVersion.parse(version)?.toString().orEmpty()
 
         fun getInstance(project: Project): VisualizerSettings =
             project.getService(VisualizerSettings::class.java)

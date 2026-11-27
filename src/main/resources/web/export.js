@@ -120,7 +120,7 @@
 
             var version;
             if (versionNum !== undefined) {
-                version = state.schemaVersions.find(function(v) { return v.version === versionNum; });
+                version = state.schemaVersions.find(function(v) { return window.MigrationVersions.equals(v.version, versionNum); });
             } else {
                 version = state.schemaVersions[state.schemaVersions.length - 1];
             }

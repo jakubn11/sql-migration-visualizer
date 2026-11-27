@@ -2,6 +2,7 @@ package io.github.jakub.sqlmigrationvisualizer.parser
 
 import io.github.jakub.sqlmigrationvisualizer.analyzer.SchemaChangeRiskAnalyzer
 import io.github.jakub.sqlmigrationvisualizer.model.*
+import io.github.jakub.sqlmigrationvisualizer.model.MigrationVersion
 import java.util.TreeMap
 
 /**
@@ -147,7 +148,7 @@ class SqlParser {
         }
         versions.add(
             SchemaVersion(
-                version = 0,
+                version = MigrationVersion.ZERO,
                 tables = currentSchema.toMap(),
                 migrationFile = null,
                 changesSummary = ChangesSummary(

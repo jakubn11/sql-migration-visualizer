@@ -7,6 +7,62 @@
 (function() {
     'use strict';
 
+    // Versions arrive from Kotlin as canonical text ("12", "1.1", "202401151030"):
+    // whole-number parts of any size, compared part by part, with trailing zero
+    // parts ignored. Mirrors MigrationVersion.kt; never turn one into a Number,
+    // which would round a long timestamp and drop a dotted part.
+    const MigrationVersions = {
+        rawParts: function(value) {
+            if (value === null || value === undefined) return null;
+            var text = String(value).trim();
+            if (!/^\d+(?:[._]\d+)*$/.test(text)) return null;
+            return text.split(/[._]/).map(function(part) { return part.replace(/^0+(?=\d)/, ''); });
+        },
+        parts: function(value) {
+            var parts = this.rawParts(value);
+            if (!parts) return null;
+            while (parts.length > 1 && parts[parts.length - 1] === '0') parts.pop();
+            return parts;
+        },
+        normalize: function(value) {
+            var parts = this.parts(value);
+            return parts ? parts.join('.') : null;
+        },
+        equals: function(a, b) {
+            var left = this.normalize(a);
+            return left !== null && left === this.normalize(b);
+        },
+        compare: function(a, b) {
+            var left = this.parts(a) || ['0'];
+            var right = this.parts(b) || ['0'];
+            for (var i = 0; i < Math.max(left.length, right.length); i++) {
+                var x = left[i] || '0';
+                var y = right[i] || '0';
+                if (x.length !== y.length) return x.length < y.length ? -1 : 1;
+                if (x !== y) return x < y ? -1 : 1;
+            }
+            return 0;
+        },
+        // The next whole version after every one given: the highest one's first part
+        // plus one ("12" → "13", "1.2" → "2"). Matches MigrationFileNaming.nextFreeVersion.
+        next: function(versions) {
+            var self = this;
+            var max = '0';
+            (versions || []).forEach(function(version) {
+                if (self.parts(version) && self.compare(version, max) > 0) max = version;
+            });
+            return (BigInt(this.parts(max)[0]) + BigInt(1)).toString();
+        },
+        // Steps the last part, never below zero ("1.2" + 1 → "1.3", "12" - 1 → "11").
+        step: function(value, delta) {
+            var parts = this.rawParts(value) || ['0'];
+            var last = BigInt(parts[parts.length - 1]) + BigInt(delta);
+            parts[parts.length - 1] = (last < BigInt(0) ? BigInt(0) : last).toString();
+            return parts.join('.');
+        }
+    };
+    window.MigrationVersions = MigrationVersions;
+
     // ===== State =====
     const state = {
         schemaVersions: [],
@@ -15,7 +71,7 @@
             hasPendingChanges: false,
             generatedSql: '',
             summary: '',
-            suggestedVersion: 0,
+            suggestedVersion: null,
             suggestedName: '',
             suggestedFileName: '',
             changeHighlights: [],
@@ -37,8 +93,8 @@
             erLayoutColumns: 0,
             diffShowUnchangedColumns: true,
             rememberDiffSelections: true,
-            lastDiffFromVersion: 0,
-            lastDiffToVersion: 0,
+            lastDiffFromVersion: '',
+            lastDiffToVersion: '',
             searchResultLimit: 20,
             validateOnRefresh: true,
             suggestPendingMigrationOnSave: true,
@@ -599,7 +655,7 @@
 
     function findVersionIndex(versionNumber) {
         for (var i = 0; i < state.schemaVersions.length; i++) {
-            if (state.schemaVersions[i].version === versionNumber) {
+            if (MigrationVersions.equals(state.schemaVersions[i].version, versionNumber)) {
                 return i;
             }
         }
@@ -662,7 +718,7 @@
             return version.migrationFile != null;
         });
         for (var i = 0; i < displayVersions.length; i++) {
-            if (displayVersions[i].version === versionNumber) {
+            if (MigrationVersions.equals(displayVersions[i].version, versionNumber)) {
                 state.selectedVersion = i;
                 return true;
             }
@@ -699,9 +755,9 @@
 
         var tableName = result.tableName || result.table || '';
         var columnName = result.columnName || result.column || '';
-        var version = parseInt(result.version, 10);
+        var version = MigrationVersions.normalize(result.version);
         var targetView = result.view || 'timeline';
-        if (!tableName || Number.isNaN(version)) return;
+        if (!tableName || version === null) return;
 
         var versionIndex = findVersionIndex(version);
         if (versionIndex < 0) return;
@@ -749,16 +805,9 @@
             '-- Fill in the SQL statements needed for this missing version.\n';
     }
 
-    // Must match MigrationFileNaming.nextFreeVersion on the Kotlin side: max(used) + 1.
+    // Must match MigrationFileNaming.nextFreeVersion on the Kotlin side, which renames the file.
     function computeNextFreeVersion() {
-        var versions = state.schemaVersions || [];
-        var max = 0;
-        for (var i = 0; i < versions.length; i++) {
-            if (typeof versions[i].version === 'number' && versions[i].version > max) {
-                max = versions[i].version;
-            }
-        }
-        return max + 1;
+        return MigrationVersions.next((state.schemaVersions || []).map(function(version) { return version.version; }));
     }
 
     function handleValidationIssueClick(e) {
@@ -785,7 +834,7 @@
             var renumberPath = button.dataset.filePath;
             if (!renumberPath || !window.__bridge || !window.__bridge.renumberMigration) return;
             var renumberFileName = renumberPath.split('/').pop() || 'this migration';
-            var targetVersion = parseInt(button.dataset.targetVersion, 10);
+            var targetVersion = MigrationVersions.normalize(button.dataset.targetVersion);
             // Disabling on confirm (not on click) keeps the button usable if the user
             // cancels the confirm dialog. The validation panel re-renders after the
             // backend refresh, so we don't need to manually re-enable.
@@ -797,7 +846,7 @@
             if (window.AppUi && window.AppUi.confirm) {
                 window.AppUi.confirm({
                     title: 'Renumber migration?',
-                    message: 'Rename ' + renumberFileName + ' to version ' + (Number.isFinite(targetVersion) ? targetVersion : 'the next free number') + '. The file will be renamed in place. Continue?',
+                    message: 'Rename ' + renumberFileName + ' to version ' + (targetVersion !== null ? targetVersion : 'the next free number') + '. The file will be renamed in place. Continue?',
                     confirmLabel: 'Renumber',
                     onConfirm: runRenumber
                 });
@@ -1057,9 +1106,9 @@
         const toSelect = document.getElementById('diff-to');
         if (!fromSelect || !toSelect) return;
 
-        const fromVersion = parseInt(fromSelect.value, 10);
-        const toVersion = parseInt(toSelect.value, 10);
-        if (Number.isNaN(fromVersion) || Number.isNaN(toVersion)) return;
+        const fromVersion = MigrationVersions.normalize(fromSelect.value);
+        const toVersion = MigrationVersions.normalize(toSelect.value);
+        if (fromVersion === null || toVersion === null) return;
 
         state.settings.lastDiffFromVersion = fromVersion;
         state.settings.lastDiffToVersion = toVersion;
@@ -1387,7 +1436,7 @@
 
     window.AppHelpers = {
         getSchemaVersion: function(version) {
-            return state.schemaVersions.find(v => v.version === version) || null;
+            return state.schemaVersions.find(v => MigrationVersions.equals(v.version, version)) || null;
         },
         setSelectedVersion: function(version) {
             state.selectedVersion = version;
@@ -1521,14 +1570,9 @@
     }
 
     function getNextMigrationVersion() {
-        var versions = state.schemaVersions || [];
-        var maxVersion = 0;
-        versions.forEach(function(versionEntry) {
-            if (versionEntry && versionEntry.migrationFile != null && typeof versionEntry.version === 'number') {
-                maxVersion = Math.max(maxVersion, versionEntry.version);
-            }
-        });
-        return maxVersion + 1;
+        return MigrationVersions.next((state.schemaVersions || [])
+            .filter(function(versionEntry) { return versionEntry && versionEntry.migrationFile != null; })
+            .map(function(versionEntry) { return versionEntry.version; }));
     }
 
     function inferMigrationNameFromSql(sql) {
@@ -1554,7 +1598,7 @@
 
     function buildSuggestedMigrationFileName(options) {
         var opts = options || {};
-        var version = Number.isFinite(Number(opts.version)) ? Number(opts.version) : getNextMigrationVersion();
+        var version = MigrationVersions.normalize(opts.version) || getNextMigrationVersion();
         var extension = String(opts.extension || getPreferredMigrationExtension()).replace(/^\./, '').toLowerCase() || 'sql';
         var baseName = opts.explicitName || opts.name || inferMigrationNameFromSql(opts.sql || '');
         var safeName = slugifyMigrationName(baseName) || 'migration';

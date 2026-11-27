@@ -78,8 +78,12 @@ io.github.jakub.sqlmigrationvisualizer/
 ## Migration File Patterns Recognised
 
 - `1.sql`, `2.sqm`
-- `12_add_users.sql`
-- `V3__create_orders.sql` (Flyway)
+- `12_add_users.sql`, `20240115103045_create_users.sql`
+- `V3__create_orders.sql`, `V1.1__x.sql`, `V1_1__x.sql`, `V202401151030__x.sql` (Flyway)
+
+Flyway's `R__`, `U<v>__` and `B<v>__` files are neither migrations nor schema files (`MigrationScanner.otherFlywayFilePattern`); without that exclusion `isSchemaFileName` would fold them into version 0.
+
+Versions are `MigrationVersion`, never `Int`: BigInteger parts, canonical with trailing zero parts dropped (`1.0` == `1`, as Flyway treats them), compared part by part. It serialises as a JSON **string** so a 14-digit timestamp isn't rounded by JavaScript; the web UI compares versions with `window.MigrationVersions` (top of `app.js`), which mirrors the Kotlin rules with `BigInt`. The next free version is always whole (first part + 1) so it fits every file name pattern; a dotted version only survives `V{version}__{name}`, which both `create-migration.js` validation and `JcefBridge.createMigration` enforce.
 
 Auto-detected directories: `db/migrations`, `migrations`, `src/main/sqldelight/**`, `src/main/resources/db/migrations`, etc.
 
@@ -93,6 +97,7 @@ All models are `@Serializable` (kotlinx-serialization-json 1.7.3):
 - `ValidationIssue` — codes: `NO_MIGRATIONS`, `VERSION_GAP`, `DUPLICATE_VERSION`, `EMPTY_MIGRATION`, `ALTER_TABLE_TARGET_MISSING`, `TRANSACTION_STATEMENT`, `DROP_TABLE_STATEMENT`, `FOREIGN_KEY_TARGET_MISSING`
 - `MigrationRisk` — `level` (LOW/MEDIUM/HIGH), `score`, `headline`, `items`
 - `PendingMigrationSuggestion` — `hasPendingChanges`, `generatedSql`, `suggestedVersion`, `suggestedName`
+- `MigrationVersion` — `parts: List<BigInteger>`, `isSinglePart`, `isTimestampLike` (one part ≥ 10,000,000), `nextWhole()`; `parse()` returns null for anything that isn't digits separated by `.` or `_`
 
 ## Risk Analyser Rules
 
@@ -102,6 +107,8 @@ MEDIUM: NULL tightening, type change (non-narrowing), PK/FK changes
 ## Validator Issue Codes
 
 `NO_MIGRATIONS`, `VERSION_GAP`, `DUPLICATE_VERSION`, `EMPTY_MIGRATION`, `ALTER_TABLE_TARGET_MISSING`, `TRANSACTION_STATEMENT`, `DROP_TABLE_STATEMENT`, `FOREIGN_KEY_TARGET_MISSING`
+
+`VERSION_GAP` only compares neighbouring single-part versions and skips a pair of timestamp-like ones, so Flyway's dotted and timestamp schemes aren't flagged; a small version followed by a timestamp still is (as "Large version gap", enumerating at most `MAX_GAP_ENUMERATION` missing versions).
 
 `ALTER_TABLE_TARGET_MISSING` and `DROP_TABLE_STATEMENT` resolve their target using the same qualified-identifier pattern as `SqlParser`, matched case-insensitively — a bare `(\w+)` stops at the dot and reports the schema of `public.users` as a missing table. `TRANSACTION_STATEMENT` fires at most once per file, and is suppressed entirely when the migration contains a `PRAGMA foreign_keys` guard, since that is the SQLite rebuild `MigrationGenerator` emits itself.
 
@@ -128,8 +135,8 @@ MEDIUM: NULL tightening, type change (non-narrowing), PK/FK changes
 | `erTablePositions` | Map | empty |
 | `diffShowUnchangedColumns` | Boolean | true |
 | `rememberDiffSelections` | Boolean | true |
-| `lastDiffFromVersion` | Int | 0 |
-| `lastDiffToVersion` | Int | 0 |
+| `lastDiffFromVersion` | String | `""` (canonical version text) |
+| `lastDiffToVersion` | String | `""` (canonical version text) |
 | `searchResultLimit` | Int | 20 |
 | `validateOnRefresh` | Boolean | true |
 | `suggestPendingMigrationOnSave` | Boolean | true |

@@ -30,9 +30,19 @@
         completionState: null,
         metadataInputsBound: false,
 
-        normalizeVersionValue: function(value) {
-            var clean = String(value || '').replace(/\D/g, '').slice(0, 9);
-            clean = clean.replace(/^0+/, '');
+        // Whole numbers or dotted parts (1.2); an underscore becomes a dot, as Flyway
+        // reads V1_2__ as 1.2. A trailing dot survives while typing, not once done.
+        normalizeVersionValue: function(value, finished) {
+            var clean = String(value || '')
+                .replace(/[_,]/g, '.')
+                .replace(/[^\d.]/g, '')
+                .replace(/^\.+/, '')
+                .replace(/\.{2,}/g, '.')
+                .slice(0, 40);
+            if (finished) clean = clean.replace(/\.+$/, '');
+            clean = clean.split('.').map(function(part) {
+                return part.replace(/^0+(?=\d)/, '');
+            }).join('.');
             return clean || '0';
         },
 
@@ -40,14 +50,9 @@
             var state = window.AppHelpers ? window.AppHelpers.getState() : null;
             var versions = state ? state.schemaVersions : [];
             var pattern = state && state.settings ? state.settings.migrationFileNamePattern || '{version}' : '{version}';
-            var nextVersion = 1;
-            if (versions.length > 0) {
-                var maxVersion = Math.max.apply(null, versions
-                    .filter(function(v) { return v.migrationFile != null; })
-                    .map(function(v) { return v.version; })
-                    .concat([0]));
-                nextVersion = maxVersion + 1;
-            }
+            var nextVersion = window.MigrationVersions.next(versions
+                .filter(function(v) { return v.migrationFile != null; })
+                .map(function(v) { return v.version; }));
 
             var directory = window.__defaultMigrationDir || '';
             if (!directory && versions.length > 0) {
@@ -204,7 +209,7 @@
                 if (id === 'create-mig-version') {
                     input.addEventListener('keydown', function(event) {
                         var allowed = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End'];
-                        if (allowed.indexOf(event.key) === -1 && !/^[0-9]$/.test(event.key)) {
+                        if (allowed.indexOf(event.key) === -1 && !/^[0-9.]$/.test(event.key)) {
                             event.preventDefault();
                         }
                     });
@@ -223,7 +228,7 @@
                 }
                 input.addEventListener('change', function() {
                     if (id === 'create-mig-version') {
-                        input.value = CreateMigrationModule.normalizeVersionValue(input.value);
+                        input.value = CreateMigrationModule.normalizeVersionValue(input.value, true);
                         CreateMigrationModule.resizeVersionInput();
                     }
                     CreateMigrationModule.renderContext();
@@ -723,12 +728,12 @@
             var isEditMode = modal && modal.dataset.mode === 'edit';
 
             this.clearValidationState();
-            var rawVersion = this.normalizeVersionValue(versionInput.value);
+            var rawVersion = this.normalizeVersionValue(versionInput.value, true);
             if (versionInput.value !== rawVersion) {
                 versionInput.value = rawVersion;
                 this.resizeVersionInput();
             }
-            var version = parseInt(rawVersion, 10);
+            var version = window.MigrationVersions.normalize(rawVersion);
             var directory = dirInput.value.trim();
             var name = nameInput.value.trim();
             var sql = sqlInput.value.trim();
@@ -737,8 +742,13 @@
                 : '{version}';
             var patternUsesName = pattern.indexOf('{name}') !== -1;
 
-            if (isNaN(version) || version < 0) {
-                this.showValidationError('Version must be zero or greater.', versionInput);
+            if (version === null) {
+                this.showValidationError('Version must be a whole number, or numbers separated by dots (1.2).', versionInput);
+                return null;
+            }
+            // Mirrors the check in JcefBridge: only Flyway's V<version>__ form keeps a dot.
+            if (version.indexOf('.') !== -1 && !/[Vv]\{version\}__/.test(pattern)) {
+                this.showValidationError('A dotted version needs Flyway\'s V{version}__{name} file name pattern; with the current pattern it would read back as ' + version.split('.')[0] + '. Use a whole number, or change the pattern in Settings.', versionInput);
                 return null;
             }
 
@@ -746,7 +756,7 @@
             var state = window.AppHelpers ? window.AppHelpers.getState() : null;
             var versions = state ? state.schemaVersions : [];
             var exists = versions.some(function(v) {
-                if (v.migrationFile == null || v.version !== version) return false;
+                if (v.migrationFile == null || !window.MigrationVersions.equals(v.version, version)) return false;
                 if (!isEditMode) return true;
                 return v.migrationFile.filePath !== modal.dataset.filePath;
             });
@@ -822,8 +832,8 @@
         resizeVersionInput: function() {
             var versionInput = document.getElementById('create-mig-version');
             if (!versionInput) return;
-            var digits = String(versionInput.value || '0').replace(/\D/g, '').length || 1;
-            var width = Math.min(76, Math.max(44, digits * 11 + 22));
+            var characters = String(versionInput.value || '0').length || 1;
+            var width = Math.min(160, Math.max(44, characters * 10 + 22));
             versionInput.style.width = width + 'px';
         },
 
@@ -831,13 +841,7 @@
             var versionInput = document.getElementById('create-mig-version');
             if (!versionInput) return;
 
-            var currentValue = parseInt(versionInput.value, 10);
-            if (isNaN(currentValue) || currentValue < 0) {
-                currentValue = 0;
-            }
-
-            var nextValue = Math.max(0, currentValue + delta);
-            versionInput.value = nextValue;
+            versionInput.value = window.MigrationVersions.step(this.normalizeVersionValue(versionInput.value, true), delta);
             versionInput.dispatchEvent(new Event('input', { bubbles: true }));
             this.resizeVersionInput();
             versionInput.focus();

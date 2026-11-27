@@ -140,7 +140,7 @@
                     var fileName = version.migrationFile.fileName || '';
                     var directory = filePath.indexOf('/') >= 0 ? filePath.substring(0, filePath.lastIndexOf('/')) : '';
                     var baseName = fileName.replace(/\.[^.]+$/, '');
-                    var derivedName = baseName.replace(/^[Vv]?\d+(?:__|[_-])?/, '') || baseName;
+                    var derivedName = baseName.replace(/^(?:[Vv]\d+(?:[._]\d+)*__|[Vv]?\d+(?:__|[_-])?)/, '') || baseName;
                     window.AppActions.openMigrationComposer({
                         mode: 'edit',
                         filePath: filePath,
@@ -394,7 +394,7 @@
                 return '';
             }
             const columnHistory = columnName ? this.buildColumnHistory(tableName, columnName, versions || []) : [];
-            const currentVersion = (versions || []).find(function(version) { return version.version === currentVersionNumber; }) || null;
+            const currentVersion = (versions || []).find(function(version) { return window.MigrationVersions.equals(version.version, currentVersionNumber); }) || null;
             const currentTable = currentVersion && currentVersion.tables ? currentVersion.tables[tableName] : null;
             const currentSummary = currentTable
                 ? currentTable.columns.length + ' column' + (currentTable.columns.length !== 1 ? 's' : '') + ' in the selected version'

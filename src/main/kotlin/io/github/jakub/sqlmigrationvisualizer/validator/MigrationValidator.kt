@@ -1,11 +1,13 @@
 package io.github.jakub.sqlmigrationvisualizer.validator
 
 import io.github.jakub.sqlmigrationvisualizer.model.MigrationFile
+import io.github.jakub.sqlmigrationvisualizer.model.MigrationVersion
 import io.github.jakub.sqlmigrationvisualizer.model.SchemaVersion
 import io.github.jakub.sqlmigrationvisualizer.model.ValidationIssue
 import io.github.jakub.sqlmigrationvisualizer.model.ValidationIssueCode
 import io.github.jakub.sqlmigrationvisualizer.model.ValidationResult
 import io.github.jakub.sqlmigrationvisualizer.model.ValidationSeverity
+import java.math.BigInteger
 
 /**
  * Validates migration files for consistency, gaps, duplicates,
@@ -68,25 +70,29 @@ class MigrationValidator {
         migrations: List<MigrationFile>,
         issues: MutableList<ValidationIssue>
     ) {
-        val versions = migrations.map { it.version }.sorted()
+        val versions = migrations.map { it.version }.distinct().sorted()
         if (versions.isEmpty()) return
 
         for (i in 0 until versions.size - 1) {
             val current = versions[i]
             val next = versions[i + 1]
-            val gapSize = next.toLong() - current.toLong() - 1L
-            if (gapSize <= 0L) continue
+            // Gaps are only defined between whole numbers. Dotted versions (1.1, 1.2)
+            // and two timestamps in a row are meant to skip values, as Flyway allows.
+            if (!current.isSinglePart || !next.isSinglePart) continue
+            if (current.isTimestampLike && next.isTimestampLike) continue
+            val currentNumber = current.parts[0]
+            val gapSize = next.parts[0] - currentNumber - BigInteger.ONE
+            if (gapSize.signum() <= 0) continue
 
             // Cap enumeration to avoid OOM when a project mixes small versions
             // with Flyway-style timestamp versions (gap can be tens of millions).
             // Only the first missing version is consumed by the UI's "draft missing
             // migration" action, so a truncated list is sufficient.
             val enumerationLimit = MAX_GAP_ENUMERATION
-            val enumerated = gapSize <= enumerationLimit
-            val missing: List<Int> = if (enumerated) {
-                (current + 1 until next).toList()
-            } else {
-                (1..enumerationLimit.toInt()).map { current + it }
+            val enumerated = gapSize <= BigInteger.valueOf(enumerationLimit)
+            val missingCount = if (enumerated) gapSize.toInt() else enumerationLimit.toInt()
+            val missing: List<MigrationVersion> = (1..missingCount).map {
+                MigrationVersion.of(currentNumber + BigInteger.valueOf(it.toLong()))
             }
 
             val message = if (enumerated) {

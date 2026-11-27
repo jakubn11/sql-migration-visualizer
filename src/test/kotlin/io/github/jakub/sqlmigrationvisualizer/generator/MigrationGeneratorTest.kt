@@ -1,6 +1,7 @@
 package io.github.jakub.sqlmigrationvisualizer.generator
 
 import io.github.jakub.sqlmigrationvisualizer.model.ColumnDef
+import io.github.jakub.sqlmigrationvisualizer.model.MigrationVersion
 import io.github.jakub.sqlmigrationvisualizer.model.SchemaVersion
 import io.github.jakub.sqlmigrationvisualizer.model.TableSchema
 import kotlin.test.Test
@@ -210,7 +211,7 @@ class MigrationGeneratorTest {
 
     private fun schemaVersion(version: Int, table: TableSchema): SchemaVersion =
         SchemaVersion(
-            version = version,
+            version = MigrationVersion.of(version.toLong()),
             tables = mapOf(table.name to table),
             migrationFile = null
         )

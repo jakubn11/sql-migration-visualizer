@@ -5,11 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.5.7] - 2026-11-27
 
 ### Changed
 
-- Build tooling moved to Gradle 9.9.3 and IntelliJ Platform Gradle Plugin 2.20.1. Nothing changes in the plugin itself, and the Plugin Verifier still passes on every released IntelliJ IDEA from 2024.1 to 2026.3
+- Build tooling moved to Gradle 9.9.3 and IntelliJ Platform Gradle Plugin 2.20.1. The Plugin Verifier still passes on every released IntelliJ IDEA from 2024.1 to 2026.3
+
+### Fixed
+
+- Flyway migrations with a version that isn't a plain whole number are now read as migrations: dotted and underscored versions (`V1.1__add_index.sql`, `V1_1__add_index.sql`) and timestamps (`V202401151030__create_users.sql`, too large for the old 32-bit version). None of them matched a pattern, so they were read as baseline schema files and folded into version 0, and the timeline showed their tables as present from the start. Versions now compare part by part, as in Flyway (`1.2` < `1.10` < `2`), `1.0` and `1` count as the same version, and a timestamp reaches the web UI as text, so no digits are rounded away
+- Flyway's repeatable (`R__`), undo (`U1__`) and baseline (`B1__`) scripts are no longer read as baseline schema files. They aren't steps of the timeline, and an undo script's `DROP TABLE` ended up in version 0
+- Validation no longer reports a gap between two timestamp versions or next to a dotted one, since those skip numbers by design. A jump from a small version to a timestamp is still reported as a large gap, because it usually means two naming styles are mixed
+- Create Migration takes timestamp-sized versions, where the version field stopped at 9 digits, and a dotted version (`1.2`) when the file name pattern is Flyway's `V{version}__{name}`; with any other pattern a dotted version would be read back as a different one, so the dialog explains that instead. The suggested next version is one past the highest version's first number (`1.2` → `2`, `202401151030` → `202401151031`)
 
 ## [1.5.6] - 2026-11-26
 
