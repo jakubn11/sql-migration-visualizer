@@ -70,7 +70,7 @@ io.github.jakub.sqlmigrationvisualizer/
 ## Key Data Flow
 
 1. `MigrationScanner` finds `.sql`/`.sqm` files matching versioned patterns
-2. `SqlParser` applies DDL statements sequentially → `List<SchemaVersion>`
+2. `SqlParser` applies DDL statements sequentially → `List<SchemaVersion>`. An `ALTER TABLE` is first cut into its comma-separated actions (quote- and bracket-aware) and each is applied as `ALTER TABLE <table> <action>`, which is also what removes Postgres' `IF EXISTS` from the table position — so every ALTER pattern only ever sees one action
 3. Each `SchemaVersion` holds `Map<String, TableSchema>` + `ChangesSummary` + `MigrationRisk`
 4. `JcefBridge` serializes to JSON and passes to JS frontend via JCEF
 5. JS renders timeline/diff/ER views; user actions call back into Kotlin via `JcefBridge`
@@ -110,7 +110,7 @@ MEDIUM: NULL tightening, type change (non-narrowing), PK/FK changes
 
 `VERSION_GAP` only compares neighbouring single-part versions and skips a pair of timestamp-like ones, so Flyway's dotted and timestamp schemes aren't flagged; a small version followed by a timestamp still is (as "Large version gap", enumerating at most `MAX_GAP_ENUMERATION` missing versions).
 
-`ALTER_TABLE_TARGET_MISSING` and `DROP_TABLE_STATEMENT` resolve their target using the same qualified-identifier pattern as `SqlParser`, matched case-insensitively — a bare `(\w+)` stops at the dot and reports the schema of `public.users` as a missing table. `TRANSACTION_STATEMENT` fires at most once per file, and is suppressed entirely when the migration contains a `PRAGMA foreign_keys` guard, since that is the SQLite rebuild `MigrationGenerator` emits itself.
+`ALTER_TABLE_TARGET_MISSING` checks against the previous version's tables plus any the same migration created (or renamed to) in an earlier statement, and skips `ALTER TABLE IF EXISTS`. `ALTER_TABLE_TARGET_MISSING` and `DROP_TABLE_STATEMENT` resolve their target using the same qualified-identifier pattern as `SqlParser`, matched case-insensitively — a bare `(\w+)` stops at the dot and reports the schema of `public.users` as a missing table. `TRANSACTION_STATEMENT` fires at most once per file, and is suppressed entirely when the migration contains a `PRAGMA foreign_keys` guard, since that is the SQLite rebuild `MigrationGenerator` emits itself.
 
 ## Plugin Entry Points (`plugin.xml`)
 

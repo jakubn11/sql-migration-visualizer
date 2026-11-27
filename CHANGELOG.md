@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.8] - 2026-11-27
+
+### Fixed
+
+- Postgres' `IF EXISTS` and `IF NOT EXISTS` in `ALTER TABLE` are understood. `ADD COLUMN IF NOT EXISTS email TEXT` added a column called `IF` with the type `NOT EXISTS EMAIL TEXT`, `DROP COLUMN IF EXISTS name` left `name` in place, and `ALTER TABLE IF EXISTS users …` was ignored and reported as altering a missing table called `IF`. `ADD COLUMN IF NOT EXISTS` now leaves an existing column as it is, and `ALTER TABLE IF EXISTS` is never reported for a missing table
+- An `ALTER TABLE` with several comma-separated actions applies each of them. `ADD COLUMN email TEXT, ADD COLUMN age INTEGER` gave `email` the type `TEXT, ADD COLUMN AGE INTEGER` and never added `age`, and `DROP COLUMN a, DROP COLUMN b` dropped only `a`. A comma inside a quoted default (`DEFAULT 'a, b'`) no longer splits a column in `CREATE TABLE` either
+- Constraints and indexes added by `ALTER TABLE` no longer show up as columns: `ADD CONSTRAINT … UNIQUE`, `ADD UNIQUE (…)`, `ADD CHECK (…)`, `ADD CONSTRAINT … CHECK`, and MySQL's `ADD INDEX` / `ADD KEY` each added a column such as `CONSTRAINT USERS_NAME_KEY`. MySQL's `DROP INDEX` no longer tries to drop a column called `INDEX`
+- `DROP TABLE a, b` drops every table in the list, not only the first
+- Validation no longer reports `ALTER TABLE` on a table that the same migration creates (or renames to) a few statements earlier. Dumped schemas create every table first and add their constraints with `ALTER TABLE` afterwards, so an initial migration was full of false "non-existent table" errors
+
 ## [1.5.7] - 2026-11-27
 
 ### Changed

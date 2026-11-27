@@ -2,6 +2,7 @@ package io.github.jakub.sqlmigrationvisualizer.parser
 
 import io.github.jakub.sqlmigrationvisualizer.model.MigrationFile
 import io.github.jakub.sqlmigrationvisualizer.model.MigrationVersion
+import io.github.jakub.sqlmigrationvisualizer.model.TableSchema
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -289,5 +290,75 @@ class SqlParserTest {
             listOf("id", "total"),
             timeline.last().tables["Orders"]?.columns?.map { it.name }
         )
+    }
+
+    @Test
+    fun `IF NOT EXISTS and IF EXISTS act the way Postgres runs them`() {
+        val users = applyToUsers(
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS email TEXT",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS name VARCHAR(10)",
+            "ALTER TABLE IF EXISTS users ADD COLUMN age INTEGER",
+            "ALTER TABLE IF EXISTS missing ADD COLUMN ignored TEXT",
+            "ALTER TABLE users DROP COLUMN IF EXISTS legacy",
+            "ALTER TABLE users DROP COLUMN IF EXISTS never_there"
+        )
+
+        assertEquals(listOf("id", "name", "email", "age"), users.columns.map { it.name })
+        assertEquals("TEXT", users.columns.first { it.name == "name" }.type)
+    }
+
+    @Test
+    fun `one ALTER TABLE statement applies each of its comma-separated actions`() {
+        val users = applyToUsers(
+            "ALTER TABLE users ADD COLUMN email TEXT DEFAULT 'a, b', ADD COLUMN total NUMERIC(10, 2) NOT NULL, DROP COLUMN legacy"
+        )
+
+        assertEquals(listOf("id", "name", "email", "total"), users.columns.map { it.name })
+        assertEquals("'a, b'", users.columns.first { it.name == "email" }.defaultValue)
+        val total = users.columns.first { it.name == "total" }
+        assertEquals("NUMERIC(10, 2)", total.type)
+        assertFalse(total.nullable)
+    }
+
+    @Test
+    fun `constraints and indexes added by ALTER TABLE are not read as columns`() {
+        val users = applyToUsers(
+            "ALTER TABLE users ADD CONSTRAINT users_name_key UNIQUE (name)",
+            "ALTER TABLE users ADD UNIQUE (name)",
+            "ALTER TABLE users ADD CHECK (id > 0)",
+            "ALTER TABLE users ADD CONSTRAINT users_id_positive CHECK (id > 0)",
+            "ALTER TABLE users ADD INDEX idx_name (name), ADD KEY idx_id USING BTREE (id)",
+            "ALTER TABLE users DROP INDEX idx_name",
+            "ALTER TABLE users ADD key VARCHAR(20)"
+        )
+
+        assertEquals(listOf("id", "name", "legacy", "key"), users.columns.map { it.name })
+    }
+
+    @Test
+    fun `DROP TABLE removes every table it lists`() {
+        val migration = MigrationFile(
+            version = MigrationVersion.of(1), filePath = "/tmp/1.sql", fileName = "1.sql", rawContent = "",
+            statements = listOf("DROP TABLE IF EXISTS users, posts CASCADE")
+        )
+
+        val timeline = parser.buildSchemaTimeline(
+            listOf("CREATE TABLE users (id INTEGER PRIMARY KEY)", "CREATE TABLE posts (id INTEGER PRIMARY KEY)", "CREATE TABLE tags (id INTEGER)"),
+            listOf(migration)
+        )
+
+        assertEquals(listOf("tags"), timeline.last().tables.keys.toList())
+    }
+
+    private fun applyToUsers(vararg statements: String): TableSchema {
+        val migration = MigrationFile(
+            version = MigrationVersion.of(1), filePath = "/tmp/1.sql", fileName = "1.sql", rawContent = "",
+            statements = statements.toList()
+        )
+        val timeline = parser.buildSchemaTimeline(
+            listOf("CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT NOT NULL, legacy TEXT)"),
+            listOf(migration)
+        )
+        return assertNotNull(timeline.last().tables["users"])
     }
 }

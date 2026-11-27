@@ -133,7 +133,17 @@ class MigrationValidator {
             """($IDENTIFIER_SEGMENT(?:\s*\.\s*$IDENTIFIER_SEGMENT)*)"""
 
         val ALTER_TABLE_TARGET_PATTERN = Regex(
-            """ALTER\s+TABLE\s+$OPTIONAL_ONLY$QUALIFIED_IDENTIFIER""",
+            """ALTER\s+TABLE\s+(IF\s+EXISTS\s+)?$OPTIONAL_ONLY$QUALIFIED_IDENTIFIER""",
+            RegexOption.IGNORE_CASE
+        )
+
+        val CREATE_TABLE_TARGET_PATTERN = Regex(
+            """^\s*CREATE\s+(?:(?:GLOBAL|LOCAL)\s+)?(?:TEMP(?:ORARY)?\s+|UNLOGGED\s+)?TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?$QUALIFIED_IDENTIFIER""",
+            RegexOption.IGNORE_CASE
+        )
+
+        val RENAME_TABLE_TARGET_PATTERN = Regex(
+            """\bRENAME\s+TO\s+$QUALIFIED_IDENTIFIER""",
             RegexOption.IGNORE_CASE
         )
 
@@ -152,10 +162,6 @@ class MigrationValidator {
                         .removeSurrounding("[", "]")
                 }
     }
-
-    /** SQL identifiers are case-insensitive unless quoted, so the lookup must be too. */
-    private fun Map<String, *>.containsTable(normalizedName: String): Boolean =
-        keys.any { it.equals(normalizedName, ignoreCase = true) }
 
     private fun checkDuplicateVersions(
         migrations: List<MigrationFile>,
@@ -211,13 +217,21 @@ class MigrationValidator {
             val prevSchema = schemaVersions[i - 1]
             val currentVersion = schemaVersions[i]
             val migration = currentVersion.migrationFile ?: continue
+            // A migration that creates a table and then alters it — the shape of every
+            // dumped schema, which adds its constraints last — targets a table that the
+            // previous version doesn't have yet but this file already does.
+            val tablesSoFar = prevSchema.tables.keys.toMutableList()
 
             for (stmt in migration.statements) {
+                CREATE_TABLE_TARGET_PATTERN.find(stmt)?.let { tablesSoFar += normalizeTableName(it.groupValues[1]) }
                 val alterMatch = ALTER_TABLE_TARGET_PATTERN.find(stmt)
 
                 if (alterMatch != null) {
-                    val tableName = normalizeTableName(alterMatch.groupValues[1])
-                    if (!prevSchema.tables.containsTable(tableName)) {
+                    RENAME_TABLE_TARGET_PATTERN.find(stmt)?.let { tablesSoFar += normalizeTableName(it.groupValues[1]) }
+                    // `ALTER TABLE IF EXISTS` is written for a table that may well be missing.
+                    if (alterMatch.groupValues[1].isNotEmpty()) continue
+                    val tableName = normalizeTableName(alterMatch.groupValues[2])
+                    if (tablesSoFar.none { it.equals(tableName, ignoreCase = true) }) {
                         issues.add(
                             ValidationIssue(
                                 severity = ValidationSeverity.ERROR,

@@ -6,6 +6,8 @@ import io.github.jakub.sqlmigrationvisualizer.model.MigrationVersion
 import io.github.jakub.sqlmigrationvisualizer.model.SchemaVersion
 import io.github.jakub.sqlmigrationvisualizer.model.TableSchema
 import io.github.jakub.sqlmigrationvisualizer.model.ValidationIssueCode
+import io.github.jakub.sqlmigrationvisualizer.model.ValidationResult
+import io.github.jakub.sqlmigrationvisualizer.parser.SqlParser
 import io.github.jakub.sqlmigrationvisualizer.model.ForeignKey
 import io.github.jakub.sqlmigrationvisualizer.model.ValidationSeverity
 import kotlin.test.Test
@@ -257,6 +259,30 @@ class MigrationValidatorTest {
     }
 
     @Test
+    fun `altering a table created earlier in the same migration is not reported`() {
+        val result = validateWithTimeline(
+            "CREATE TABLE tags (id INTEGER PRIMARY KEY, name TEXT)",
+            "ALTER TABLE ONLY tags ADD CONSTRAINT tags_name_key UNIQUE (name)",
+            "CREATE TABLE drafts (id INTEGER)",
+            "ALTER TABLE drafts RENAME TO posts",
+            "ALTER TABLE posts ADD COLUMN title TEXT"
+        )
+
+        assertTrue(result.issues.none { it.code == ValidationIssueCode.ALTER_TABLE_TARGET_MISSING })
+    }
+
+    @Test
+    fun `ALTER TABLE IF EXISTS is not reported for a missing table`() {
+        val result = validateWithTimeline(
+            "ALTER TABLE IF EXISTS archive ADD COLUMN note TEXT",
+            "ALTER TABLE missing ADD COLUMN note TEXT"
+        )
+
+        val issues = result.issues.filter { it.code == ValidationIssueCode.ALTER_TABLE_TARGET_MISSING }
+        assertEquals(listOf("missing"), issues.map { it.tableName })
+    }
+
+    @Test
     fun `timestamp versions in a row are not reported as gaps`() {
         val result = validator.validate(
             migrations = listOf(migration("202401151030"), migration("202402011200")),
@@ -302,6 +328,12 @@ class MigrationValidatorTest {
         tables = tables,
         migrationFile = migrationFile
     )
+
+    private fun validateWithTimeline(vararg statements: String): ValidationResult {
+        val migration = migration(1, statements = statements.toList())
+        val timeline = SqlParser().buildSchemaTimeline(listOf("CREATE TABLE users (id INTEGER PRIMARY KEY)"), listOf(migration))
+        return validator.validate(listOf(migration), timeline)
+    }
 
     private fun versions(vararg values: Long) = values.map { MigrationVersion.of(it) }
 

@@ -24,9 +24,19 @@ class SqlParser {
         )
 
         // ALTER TABLE patterns
+        private val ALTER_TABLE_HEAD_PATTERN = Regex(
+            """^ALTER\s+TABLE\s+(?:IF\s+EXISTS\s+)?$OPTIONAL_ONLY$QUALIFIED_IDENTIFIER\s+""",
+            RegexOption.IGNORE_CASE
+        )
         private val ALTER_ADD_COLUMN_PATTERN = Regex(
-            """ALTER\s+TABLE\s+$OPTIONAL_ONLY$QUALIFIED_IDENTIFIER\s+ADD\s+(?:COLUMN\s+)?(.+)""",
+            """ALTER\s+TABLE\s+$OPTIONAL_ONLY$QUALIFIED_IDENTIFIER\s+ADD\s+(COLUMN\s+)?(IF\s+NOT\s+EXISTS\s+)?(.+)""",
             setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)
+        )
+        // What `ADD` introduces when it isn't a column: a constraint, or a MySQL index.
+        // `KEY` only counts before a name and a bracket, so a column called `key` still parses.
+        private val ADDED_NON_COLUMN_PATTERN = Regex(
+            """^(?:CONSTRAINT|UNIQUE|CHECK)\b|^EXCLUDE\s*(?:USING\b|\()|^(?:FULLTEXT|SPATIAL)\s+(?:INDEX|KEY)\b|^(?:INDEX|KEY)\s*(?:$IDENTIFIER_SEGMENT\s+)?(?:USING\s+\w+\s+)?\(""",
+            RegexOption.IGNORE_CASE
         )
         private val ALTER_RENAME_TABLE_PATTERN = Regex(
             """ALTER\s+TABLE\s+$OPTIONAL_ONLY$QUALIFIED_IDENTIFIER\s+RENAME\s+TO\s+$QUALIFIED_IDENTIFIER""",
@@ -37,7 +47,7 @@ class SqlParser {
             RegexOption.IGNORE_CASE
         )
         private val ALTER_DROP_COLUMN_PATTERN = Regex(
-            """ALTER\s+TABLE\s+$OPTIONAL_ONLY$QUALIFIED_IDENTIFIER\s+DROP\s+(?:COLUMN\s+)?$QUALIFIED_IDENTIFIER""",
+            """ALTER\s+TABLE\s+$OPTIONAL_ONLY$QUALIFIED_IDENTIFIER\s+DROP\s+(COLUMN\s+)?(?:IF\s+EXISTS\s+)?$QUALIFIED_IDENTIFIER""",
             RegexOption.IGNORE_CASE
         )
         private val ALTER_ALTER_COLUMN_TYPE_PATTERN = Regex(
@@ -77,11 +87,11 @@ class SqlParser {
             setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)
         )
         private val ALTER_DROP_FOREIGN_KEY_PATTERN = Regex(
-            """ALTER\s+TABLE\s+$OPTIONAL_ONLY$QUALIFIED_IDENTIFIER\s+DROP\s+FOREIGN\s+KEY\s+$QUALIFIED_IDENTIFIER""",
+            """ALTER\s+TABLE\s+$OPTIONAL_ONLY$QUALIFIED_IDENTIFIER\s+DROP\s+FOREIGN\s+KEY\s+(?:IF\s+EXISTS\s+)?$QUALIFIED_IDENTIFIER""",
             RegexOption.IGNORE_CASE
         )
         private val ALTER_DROP_CONSTRAINT_PATTERN = Regex(
-            """ALTER\s+TABLE\s+$OPTIONAL_ONLY$QUALIFIED_IDENTIFIER\s+DROP\s+CONSTRAINT\s+$QUALIFIED_IDENTIFIER""",
+            """ALTER\s+TABLE\s+$OPTIONAL_ONLY$QUALIFIED_IDENTIFIER\s+DROP\s+CONSTRAINT\s+(?:IF\s+EXISTS\s+)?$QUALIFIED_IDENTIFIER""",
             RegexOption.IGNORE_CASE
         )
         private val ALTER_DROP_PRIMARY_KEY_PATTERN = Regex(
@@ -89,11 +99,14 @@ class SqlParser {
             RegexOption.IGNORE_CASE
         )
 
-        // DROP TABLE pattern
+        // DROP TABLE pattern: one table or a comma-separated list of them
         private val DROP_TABLE_PATTERN = Regex(
-            """DROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?$OPTIONAL_ONLY$QUALIFIED_IDENTIFIER(?:\s+(?:CASCADE|RESTRICT))?""",
-            RegexOption.IGNORE_CASE
+            """^DROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?(.+)$""",
+            setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)
         )
+        private val LEADING_TABLE_NAME_PATTERN = Regex("""^\s*$OPTIONAL_ONLY$QUALIFIED_IDENTIFIER""", RegexOption.IGNORE_CASE)
+        // Words `DROP` can be followed by in MySQL that name something other than a column.
+        private val DROPPED_NON_COLUMNS = setOf("INDEX", "KEY", "CHECK", "PARTITION")
 
         // Column definition pattern for parsing inside CREATE TABLE / ALTER TABLE
         private val COLUMN_DEF_PATTERN = Regex(
@@ -223,10 +236,28 @@ class SqlParser {
 
     /**
      * Apply a single SQL DDL statement to the current schema state.
+     *
+     * `ALTER TABLE t ADD a …, DROP b` does several things in one statement, and every
+     * ALTER pattern below reads one action straight after the table name — so the actions
+     * are applied one by one, each as an `ALTER TABLE t <action>` of its own. That also
+     * takes Postgres' `ALTER TABLE IF EXISTS t` apart, whose `IF` would otherwise be read
+     * as the table.
      */
     private fun applyStatement(statement: String, schema: MutableMap<String, TableSchema>) {
         val trimmed = statement.trim()
+        val head = ALTER_TABLE_HEAD_PATTERN.find(trimmed)
+        if (head == null) {
+            applySingleAction(trimmed, schema)
+            return
+        }
+        val table = head.groupValues[1]
+        splitByTopLevelComma(trimmed.substring(head.range.last + 1))
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .forEach { action -> applySingleAction("ALTER TABLE $table $action", schema) }
+    }
 
+    private fun applySingleAction(trimmed: String, schema: MutableMap<String, TableSchema>) {
         // Try CREATE TABLE
         CREATE_TABLE_PATTERN.find(trimmed)?.let { match ->
             val tableName = normalizeIdentifier(match.groupValues[1])
@@ -288,8 +319,11 @@ class SqlParser {
         ALTER_ADD_COLUMN_PATTERN.find(trimmed)?.let { match ->
             val tableName = normalizeIdentifier(match.groupValues[1])
             val existing = schema[tableName] ?: return
-            val definition = match.groupValues[2].trim()
+            val definition = match.groupValues[4].trim()
+            if (match.groupValues[2].isEmpty() && ADDED_NON_COLUMN_PATTERN.containsMatchIn(definition)) return
             val newColumn = parseColumnDefinition(definition) ?: return
+            val ifNotExists = match.groupValues[3].isNotEmpty()
+            if (ifNotExists && existing.columns.any { it.name.equals(newColumn.name, ignoreCase = true) }) return
             val inlineForeignKey = extractInlineForeignKey(newColumn.name, definition)
             schema[tableName] = existing.copy(
                 columns = existing.columns + newColumn,
@@ -309,7 +343,9 @@ class SqlParser {
 
         ALTER_DROP_COLUMN_PATTERN.find(trimmed)?.let { match ->
             val tableName = normalizeIdentifier(match.groupValues[1])
-            val columnName = normalizeIdentifier(match.groupValues[2]).substringAfterLast('.')
+            val target = match.groupValues[3]
+            if (match.groupValues[2].isEmpty() && target.uppercase() in DROPPED_NON_COLUMNS) return
+            val columnName = normalizeIdentifier(target).substringAfterLast('.')
             dropColumn(schema, tableName, columnName)
             return
         }
@@ -408,9 +444,12 @@ class SqlParser {
 
         // Try DROP TABLE
         DROP_TABLE_PATTERN.find(trimmed)?.let { match ->
-            val tableName = normalizeIdentifier(match.groupValues[1])
-            schema.remove(tableName)
-            removeForeignKeysReferencingTable(schema, tableName)
+            for (entry in splitByTopLevelComma(match.groupValues[1])) {
+                val name = LEADING_TABLE_NAME_PATTERN.find(entry)?.groupValues?.get(1) ?: continue
+                val tableName = normalizeIdentifier(name)
+                schema.remove(tableName)
+                removeForeignKeysReferencingTable(schema, tableName)
+            }
             return
         }
     }
@@ -472,9 +511,20 @@ class SqlParser {
         val parts = mutableListOf<String>()
         val current = StringBuilder()
         var depth = 0
+        // A comma inside 'text', "an identifier" or `one` doesn't separate anything:
+        // `DEFAULT 'a, b'` is one column. A doubled quote toggles twice, so it stays inside.
+        var quote: Char? = null
 
         for (char in input) {
             when {
+                quote != null -> {
+                    if (char == quote) quote = null
+                    current.append(char)
+                }
+                char == '\'' || char == '"' || char == '`' -> {
+                    quote = char
+                    current.append(char)
+                }
                 char == '(' -> {
                     depth++
                     current.append(char)
